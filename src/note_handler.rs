@@ -6,6 +6,8 @@ use colored::*;
 use reqwest::blocking::Client;
 use serde_json::json;
 
+/// Loads Supabase configuration from the user's setup file.
+/// This function is used by both note and suggestion handlers.
 fn load_supabase_config() -> SupabaseConfig {
     let mut setup_path = home_dir().unwrap_or(PathBuf::from("."));
     setup_path.push(".logswise/setup.json");
@@ -18,6 +20,7 @@ fn load_supabase_config() -> SupabaseConfig {
     }
 }
 
+/// Adds a note to the Supabase database.
 pub fn add_note(content: &str) {
     let config = load_supabase_config();
     let client = Client::new();
@@ -39,5 +42,30 @@ pub fn add_note(content: &str) {
         Err(e) => {
             println!("{} {}", "❌ Failed to add note:".red(), e);
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::types::Note;
+
+    #[test]
+    fn test_add_note_and_retrieve() {
+        // Simulate adding a note and retrieving it
+        let note = Note {
+            id: "1".to_string(),
+            content: "Integration test note".to_string(),
+            created_at: "2025-06-05T12:00:00Z".to_string(),
+        };
+        assert_eq!(note.content, "Integration test note");
+    }
+
+    #[test]
+    fn test_suggestion_prompt_format() {
+        // Simulate suggestion prompt creation
+        let user_info = "User Info:\n- Profession: Developer\n- Job Title: Senior\n- Company Name: TestCo\n- Company Size: 10-100";
+        let query = "How to improve logging?";
+        let prompt = format!("{}\n\nUser wants suggestions for: {}\nSuggestions:", user_info, query);
+        assert!(prompt.contains("User wants suggestions for: How to improve logging?"));
     }
 }

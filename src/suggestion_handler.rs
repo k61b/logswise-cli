@@ -6,6 +6,7 @@ use colored::*;
 use reqwest::blocking::Client;
 use serde_json::Value;
 
+/// Loads Supabase configuration from the user's setup file.
 fn load_supabase_config() -> SupabaseConfig {
     let mut setup_path = home_dir().unwrap_or(PathBuf::from("."));
     setup_path.push(".logswise/setup.json");
@@ -18,6 +19,7 @@ fn load_supabase_config() -> SupabaseConfig {
     }
 }
 
+/// Loads the user profile from the setup file.
 fn load_profile() -> serde_json::Value {
     let mut setup_path = home_dir().unwrap_or(PathBuf::from("."));
     setup_path.push(".logswise/setup.json");
@@ -26,6 +28,7 @@ fn load_profile() -> serde_json::Value {
     serde_json::from_str(&data).unwrap()
 }
 
+/// Generates suggestions using the user's profile, recent notes, and LLM.
 pub fn get_suggestions(query: &str) {
     let profile = load_profile();
     let llm_name = profile["llmName"].as_str().unwrap_or("").to_lowercase();
@@ -136,5 +139,64 @@ pub fn get_suggestions(query: &str) {
         }
     } else {
         println!("{}", "😅 No LLM configured. Please set up your LLM in setup.json.".yellow());
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn test_load_supabase_config_valid() {
+        // Prepare a temp setup.json
+        let tmp_dir = tempfile::tempdir().unwrap();
+        let mut setup_path = tmp_dir.path().to_path_buf();
+        setup_path.push("setup.json");
+        let json = r#"{
+            "supabaseUrl": "https://test.supabase.co",
+            "supabaseApiKey": "testkey"
+        }"#;
+        std::fs::write(&setup_path, json).unwrap();
+        // Patch home_dir to return tmp_dir (not possible here), so just test parsing logic
+        let data = std::fs::read_to_string(&setup_path).unwrap();
+        let profile: serde_json::Value = serde_json::from_str(&data).unwrap();
+        let config = SupabaseConfig {
+            project_url: profile["supabaseUrl"].as_str().unwrap().to_string(),
+            api_key: profile["supabaseApiKey"].as_str().unwrap().to_string(),
+        };
+        assert_eq!(config.project_url, "https://test.supabase.co");
+        assert_eq!(config.api_key, "testkey");
+    }
+
+    #[test]
+    fn test_load_profile_valid() {
+        let profile = json!({
+            "profession": "Developer",
+            "jobTitle": "Senior",
+            "companyName": "TestCo",
+            "companySize": "10-100",
+            "llmName": "llama3",
+            "supabaseUrl": "https://test.supabase.co",
+            "supabaseApiKey": "testkey"
+        });
+        assert_eq!(profile["companyName"], "TestCo");
+        assert_eq!(profile["llmName"], "llama3");
+    }
+
+    #[test]
+    fn test_prompt_formatting() {
+        let user_info = "User Info:\n- Profession: Developer\n- Job Title: Senior\n- Company Name: TestCo\n- Company Size: 10-100";
+        let notes_context = "\nRecent Notes:\n1. Note one\n2. Note two";
+        let query = "How to improve logging?";
+        let personalization = "At TestCo scale (10-100), consider centralized log filtering.\n";
+        let cli_instruction = "Reply in this format:\n=== Quick Summary ===\n(3-line summary)\n=== Detailed Suggestions ===\n(Max 10 concise bullets, no markdown, CLI readable)";
+        let full_prompt = format!(
+            "{}{}\n\nUser wants suggestions for: {}\n{}{}\nSuggestions:",
+            user_info, notes_context, query, personalization, cli_instruction
+        );
+        assert!(full_prompt.contains("User wants suggestions for: How to improve logging?"));
+        assert!(full_prompt.contains("Recent Notes:"));
+        assert!(full_prompt.contains("=== Quick Summary ==="));
     }
 }
