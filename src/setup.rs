@@ -5,6 +5,7 @@ use colored::*;
 use dirs::home_dir;
 use serde_json::json;
 
+/// Runs the interactive setup process for user profile and configuration.
 pub fn run_setup() {
     let profession_options = vec!["Software Developer", "Product Manager", "Designer"];
     let job_title_options = vec!["Mid", "Senior", "Lead", "Manager"];

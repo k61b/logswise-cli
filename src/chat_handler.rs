@@ -18,6 +18,7 @@ use serde_json::Value;
 //     }
 // }
 
+/// Chats with the assistant using the configured LLM and user profile.
 pub fn chat_with_assistant(message: &str) {
     let mut setup_path = home_dir().unwrap_or(PathBuf::from("."));
     setup_path.push(".logswise/setup.json");

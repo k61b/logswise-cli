@@ -1,0 +1,24 @@
+# GitHub Actions CI for Rust
+
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+      - name: Build
+        run: cargo build --release
+      - name: Run tests
+        run: cargo test --all --verbose
