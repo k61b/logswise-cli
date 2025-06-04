@@ -1,92 +1,99 @@
 # Logswise CLI
 
-Logswise CLI is a command-line application designed to help users take notes, get suggestions, and chat with an assistant. This application is built using TypeScript and Rust, and connects to a Supabase database for storing notes. Suggestions and chat are powered by a local LLM (Ollama) using your profile and recent notes for context.
+Logswise CLI is a command-line tool for note-taking, context-aware suggestions, and AI chat, powered by your local LLM (Ollama) and Supabase. It is designed for developers and teams who want to capture notes, get actionable suggestions, and chat with an assistant—all from the terminal.
+
+---
 
 ## Features
 
-- **Take Notes**: Easily store your thoughts and ideas.
-- **Get Suggestions**: Receive helpful, context-aware suggestions based on your queries, recent notes, and profile information. No suggestions table is required—everything is generated dynamically.
-- **Chat with Assistant**: Engage in a conversation with an AI assistant, powered by your configured LLM (Ollama).
+- **Take Notes:** Store your thoughts and ideas quickly from the CLI.
+- **Get Suggestions:** Receive helpful, context-aware suggestions based on your queries, recent notes, and profile information. No suggestions table is required—everything is generated dynamically.
+- **Chat with Assistant:** Engage in a conversation with an AI assistant, powered by your configured LLM (Ollama).
+
+---
 
 ## Installation
 
-1. Clone the repository:
-   ```
+1. **Clone the repository:**
+   ```sh
    git clone https://github.com/yourusername/logswise-cli.git
-   ```
-
-2. Navigate to the project directory:
-   ```
    cd logswise-cli
    ```
-
-3. Install the dependencies (for TypeScript):
-   ```
-   npm install
-   ```
-
-4. (Optional) Build the Rust CLI:
-   ```
+2. **Build the Rust CLI:**
+   ```sh
    cargo build --release
    ```
+
+---
 
 ## Setup
 
 Before using the application, you need to set up your profile and connect to your Supabase database and LLM.
 
-1. Run the setup command:
-   ```
-   npm run setup
-   ```
-   or, for the Rust CLI:
-   ```
+1. **Run the setup command:**
+   ```sh
    ./target/release/logswise_cli_rs setup
    ```
-
-2. Follow the prompts to enter your profile information:
-   - Profession (a/b/c)
-   - Job Title (a/b/c/d)
+2. **Follow the prompts to enter your profile information:**
+   - Profession (e.g., Software Developer, Product Manager)
+   - Job Title (e.g., Mid, Senior, Lead, Manager)
    - Company Name
-   - Company Size (a/b/c/d/e)
+   - Company Size (e.g., 1-10, 10-100, 100-500, 500-1000, 1000+)
    - LLM Name (e.g., llama3, deepseek-r1)
-   - Ollama URL (default: http://localhost:11434/api/generate)
    - Supabase Project URL
    - Supabase API Key
 
-This information will be stored securely in a local JSON file.
+Your information is stored locally in `~/.logswise/setup.json`.
+
+For detailed Supabase setup, see [SUPABASE_SETUP.md](SUPABASE_SETUP.md).
+
+---
 
 ## Usage
 
 After setup, you can use the following commands:
 
-- **Take a Note**:
+- **Take a Note:**
+  ```sh
+  lw note "Your note here"
   ```
-  lw note: "Your note here"
+- **Get Suggestions:**
+  ```sh
+  lw suggestion "What would you like suggestions for?"
   ```
-
-- **Get Suggestions** (context-aware, no DB table needed):
+- **Chat with Assistant:**
+  ```sh
+  lw chat "Say anything you like"
   ```
-  lw suggestion: "What would you like suggestions for?"
-  ```
-
-- **Chat with Assistant**:
-  ```
-  lw chat: "Say anything you like"
-  ```
-
-- **Get Help**:
-  ```
+- **Get Help:**
+  ```sh
   lw help
   ```
 
+---
+
 ## How Suggestions Work
 
-Suggestions are generated dynamically using your profile and recent notes as context, and are powered by your local LLM (Ollama). There is no need for a `suggestions` table in your database. Make sure your Ollama server is running and the model you specify is available.
+Suggestions are generated dynamically using your profile and recent notes as context, powered by your local LLM (Ollama). There is no need for a `suggestions` table in your database. Make sure your Ollama server is running and the model you specify is available.
+
+---
+
+## Project Structure
+
+- `src/` — Rust source code
+- `SUPABASE_SETUP.md` — Supabase setup instructions
+- `LICENSE` — MIT License
+- `CONTRIBUTING.md` — Contribution guidelines
+- `CODE_OF_CONDUCT.md` — Code of conduct
+
+---
 
 ## Contributing
 
-Contributions are welcome! Please open an issue or submit a pull request for any enhancements or bug fixes.
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+---
 
 ## License
 
-This project is licensed under the MIT License. See the LICENSE file for details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
