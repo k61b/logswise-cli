@@ -103,10 +103,29 @@ pub fn get_suggestions(query: &str) {
                 if resp.status().is_success() {
                     let raw_body = resp.text().unwrap_or_default();
                     let mut final_response = String::new();
+                    // Try line-by-line JSON parsing (streamed response)
                     for line in raw_body.lines() {
                         if let Ok(data) = serde_json::from_str::<Value>(line) {
                             if let Some(resp_str) = data.get("response").and_then(|v| v.as_str()) {
                                 final_response.push_str(resp_str);
+                            }
+                        }
+                    }
+                    // If nothing found, try parsing as a single JSON object
+                    if final_response.trim().is_empty() {
+                        if let Ok(data) = serde_json::from_str::<Value>(&raw_body) {
+                            if let Some(resp_str) = data.get("response").and_then(|v| v.as_str()) {
+                                final_response.push_str(resp_str);
+                            } else {
+                                // Try to print the whole object for debugging
+                                println!("{} {}", "⚠️  No 'response' field in Ollama output. Full JSON:", serde_json::to_string_pretty(&data).unwrap_or_default().yellow());
+                            }
+                        } else {
+                            println!("{} {}", "⚠️  Ollama output is not valid JSON:", raw_body.yellow());
+                            // Fallback: if raw_body is not empty, print as suggestion
+                            if !raw_body.trim().is_empty() {
+                                println!("{}\n{}", "💡 Suggestions (raw output):".green(), raw_body.trim());
+                                return;
                             }
                         }
                     }
