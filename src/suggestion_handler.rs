@@ -5,6 +5,8 @@ use dirs::home_dir;
 use colored::*;
 use reqwest::blocking::Client;
 use serde_json::Value;
+use indicatif::{ProgressBar, ProgressStyle};
+use std::time::Duration;
 
 /// Loads Supabase configuration from the user's setup file.
 fn load_supabase_config() -> SupabaseConfig {
@@ -34,6 +36,13 @@ pub fn get_suggestions(query: &str) {
     let llm_name = profile["llmName"].as_str().unwrap_or("").to_lowercase();
     if !llm_name.is_empty() {
         let ollama_url = profile["ollamaUrl"].as_str().unwrap_or("http://localhost:11434/api/generate");
+        // Start spinner
+        let spinner = ProgressBar::new_spinner();
+        spinner.set_style(ProgressStyle::default_spinner()
+            .tick_strings(&["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"])
+            .template("{spinner:.cyan} {msg}").unwrap());
+        spinner.enable_steady_tick(Duration::from_millis(100));
+        spinner.set_message("Loading profile and preparing suggestions...");
         // Gather user info for context
         let user_info = format!(
             "User Info:\n- Profession: {}\n- Job Title: {}\n- Company Name: {}\n- Company Size: {}",
@@ -93,17 +102,19 @@ pub fn get_suggestions(query: &str) {
             // "stream": false
         });
         println!("{} {}", "🔎 Using Ollama model:", llm_name.cyan());
+        spinner.set_message("Ollama: Sending request...");
         let ollama_res = client.post(ollama_url)
             .header("Content-Type", "application/json")
             .json(&ollama_body)
             .send();
         match ollama_res {
             Ok(resp) => {
-                println!("{} {}", "🔄 Ollama response status:".cyan(), resp.status());
-                if resp.status().is_success() {
+                let status = resp.status();
+                println!("{} {}", "🔄 Ollama response status:".cyan(), status);
+                if status.is_success() {
+                    spinner.set_message("Ollama: Success! Generating suggestions...");
                     let raw_body = resp.text().unwrap_or_default();
                     let mut final_response = String::new();
-                    // Try line-by-line JSON parsing (streamed response)
                     for line in raw_body.lines() {
                         if let Ok(data) = serde_json::from_str::<Value>(line) {
                             if let Some(resp_str) = data.get("response").and_then(|v| v.as_str()) {
@@ -111,26 +122,25 @@ pub fn get_suggestions(query: &str) {
                             }
                         }
                     }
-                    // If nothing found, try parsing as a single JSON object
                     if final_response.trim().is_empty() {
                         if let Ok(data) = serde_json::from_str::<Value>(&raw_body) {
                             if let Some(resp_str) = data.get("response").and_then(|v| v.as_str()) {
                                 final_response.push_str(resp_str);
                             } else {
-                                // Try to print the whole object for debugging
+                                spinner.finish_and_clear();
                                 println!("{} {}", "⚠️  No 'response' field in Ollama output. Full JSON:", serde_json::to_string_pretty(&data).unwrap_or_default().yellow());
                             }
                         } else {
+                            spinner.finish_and_clear();
                             println!("{} {}", "⚠️  Ollama output is not valid JSON:", raw_body.yellow());
-                            // Fallback: if raw_body is not empty, print as suggestion
                             if !raw_body.trim().is_empty() {
                                 println!("{}\n{}", "💡 Suggestions (raw output):".green(), raw_body.trim());
                                 return;
                             }
                         }
                     }
+                    spinner.finish_and_clear();
                     if !final_response.trim().is_empty() {
-                        // Optionally, only show the part after </think> if present
                         let final_answer = if let Some(idx) = final_response.find("</think>") {
                             final_response[(idx + "</think>".len())..].trim()
                         } else {
@@ -143,6 +153,7 @@ pub fn get_suggestions(query: &str) {
                         println!("{}", raw_body.cyan());
                     }
                 } else {
+                    spinner.finish_and_clear();
                     let status = resp.status();
                     let err_body = resp.text().unwrap_or_default();
                     println!("{} {}", "❌ Ollama server returned error status:", status);
@@ -151,6 +162,7 @@ pub fn get_suggestions(query: &str) {
                 }
             },
             Err(e) => {
+                spinner.finish_and_clear();
                 println!("{} {}", "❌ Error connecting to local Ollama server for model:".red(), llm_name);
                 println!("{}", e);
                 println!("{}", "➡️  Please ensure the Ollama server is running at http://localhost:11434. You can start it with 'ollama serve' or check your setup.json for the correct URL.".yellow());
