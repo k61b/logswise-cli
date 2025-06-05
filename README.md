@@ -14,15 +14,20 @@ Logswise CLI is a command-line tool for note-taking, context-aware suggestions, 
 
 ## Installation
 
-1. **Clone the repository:**
-   ```sh
-   git clone https://github.com/yourusername/logswise-cli.git
-   cd logswise-cli
-   ```
-2. **Build the Rust CLI:**
-   ```sh
-   cargo build --release
-   ```
+### Homebrew (Recommended)
+
+```sh
+brew tap k61b/tap
+brew install logswise-cli
+```
+
+### (Optional) Define an Alias
+To use `lw` as a shortcut for `logswise-cli`, add this to your `~/.zshrc` (or `~/.bashrc`):
+
+```sh
+echo 'alias lw="logswise-cli"' >> ~/.zshrc
+source ~/.zshrc
+```
 
 ---
 
@@ -30,18 +35,20 @@ Logswise CLI is a command-line tool for note-taking, context-aware suggestions, 
 
 Before using the application, you need to set up your profile and connect to your Supabase database and LLM.
 
-1. **Run the setup command:**
-   ```sh
-   ./target/release/logswise_cli_rs setup
-   ```
-2. **Follow the prompts to enter your profile information:**
-   - Profession (e.g., Software Developer, Product Manager)
-   - Job Title (e.g., Mid, Senior, Lead, Manager)
-   - Company Name
-   - Company Size (e.g., 1-10, 10-100, 100-500, 500-1000, 1000+)
-   - LLM Name (e.g., llama3, deepseek-r1)
-   - Supabase Project URL
-   - Supabase API Key
+```sh
+logswise-cli setup
+# or, if you defined the alias:
+lw setup
+```
+
+Follow the prompts to enter your profile information:
+- Profession (e.g., Software Developer, Product Manager)
+- Job Title (e.g., Mid, Senior, Lead, Manager)
+- Company Name
+- Company Size (e.g., 1-10, 10-100, 100-500, 500-1000, 1000+)
+- LLM Name (e.g., llama3, deepseek-r1)
+- Supabase Project URL
+- Supabase API Key
 
 Your information is stored locally in `~/.logswise/setup.json`.
 
