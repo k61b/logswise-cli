@@ -27,15 +27,16 @@ jobs:
       - name: Build aarch64 binary
         run: cargo build --release --target aarch64-apple-darwin
 
-      - name: Create universal binary
+      - name: Create universal binary and rename
         run: |
-          lipo -create -output logswise_cli_rs_universal \
+          lipo -create -output logswise-cli \
             target/x86_64-apple-darwin/release/logswise_cli_rs \
             target/aarch64-apple-darwin/release/logswise_cli_rs
+          chmod +x logswise-cli
 
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v2
         with:
-          files: logswise_cli_rs_universal
+          files: logswise-cli
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
