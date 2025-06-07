@@ -1,5 +1,9 @@
 # Logswise CLI
 
+[![Lint & Format](https://github.com/k61b/logswise-cli/actions/workflows/lint.yml/badge.svg)](https://github.com/k61b/logswise-cli/actions/workflows/lint.yml)
+[![Test](https://github.com/k61b/logswise-cli/actions/workflows/test.yml/badge.svg)](https://github.com/k61b/logswise-cli/actions/workflows/test.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Logswise CLI is a command-line tool for note-taking, context-aware suggestions, and AI chat, powered by your local LLM (Ollama) and Supabase. It is designed for developers and teams who want to capture notes, get actionable suggestions, and chat with an assistant—all from the terminal.
 
 ---
@@ -95,12 +99,48 @@ Suggestions are generated dynamically using your profile and recent notes as con
 
 ---
 
+## Linting & Formatting
+
+This project uses [rustfmt](https://github.com/rust-lang/rustfmt) and [clippy](https://github.com/rust-lang/rust-clippy) for code style and linting.
+
+- To check formatting: `cargo fmt --all -- --check`
+- To auto-format: `cargo fmt --all`
+- To lint: `cargo clippy --all-targets --all-features -- -D warnings`
+
+Linting and formatting are checked automatically on every pull request via GitHub Actions.
+
+---
+
+## Testing
+
+To run all tests:
+
+```sh
+cargo test --all --verbose
+```
+
+Tests are run automatically on every pull request via GitHub Actions.
+
+---
+
 ## Contributing
 
 Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ---
 
+## Code of Conduct
+
+See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+
+---
+
+## Security
+
+See [SECURITY.md](SECURITY.md) for vulnerability reporting instructions.
+
+---
+
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.

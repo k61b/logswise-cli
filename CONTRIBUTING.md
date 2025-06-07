@@ -8,7 +8,7 @@ Thank you for considering contributing to Logswise CLI! We welcome all kinds of 
 2. **Describe your changes** clearly in your pull request.
 3. **Write clear, concise commit messages**.
 4. **Test your code** before submitting.
-5. **Follow the code style** used in the project (TypeScript, consistent formatting).
+5. **Follow the code style** used in the project (Rust, consistent formatting with rustfmt and linting with clippy).
 
 ## Code of Conduct
 
@@ -16,7 +16,7 @@ Please be respectful and considerate in all interactions. For more details, see 
 
 ## Reporting Issues
 
-- Use [GitHub Issues](https://github.com/yourusername/logswise-cli/issues) to report bugs or request features.
+- Use [GitHub Issues](https://github.com/k61b/logswise-cli/issues) to report bugs or request features.
 - Provide as much detail as possible.
 
 ## Pull Requests
