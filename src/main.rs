@@ -3,6 +3,11 @@ mod note_handler;
 mod setup;
 mod suggestion_handler;
 mod types;
+mod utils;
+mod services {
+    pub mod ollama;
+    pub mod supabase;
+}
 
 use clap::{Parser, Subcommand};
 use colored::*;

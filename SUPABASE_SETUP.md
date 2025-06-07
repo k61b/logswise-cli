@@ -17,6 +17,19 @@ create table notes (
 
 > **Note:** You do **not** need a `suggestions` table. Suggestions are generated dynamically using your profile and recent notes, powered by your local LLM (Ollama).
 
+## 2b. Enable pgvector and Add Embedding Column
+To enable semantic search, run these SQL commands in the Supabase SQL Editor:
+
+```sql
+-- Enable pgvector extension (run once)
+create extension if not exists vector;
+
+-- Add embedding column to notes table (1536 for OpenAI, adjust if needed)
+alter table notes add column if not exists embedding vector(1536);
+```
+
+> **Note:** The CLI will use this column to store and search note embeddings for fast, relevant suggestions.
+
 ## 3. Use the CLI Setup
 Run:
 ```sh

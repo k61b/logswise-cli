@@ -9,6 +9,8 @@ pub struct Note {
     pub content: String,
     /// Timestamp when the note was created.
     pub created_at: String,
+    /// Embedding vector for semantic search (optional, not always present)
+    pub embedding: Option<Vec<f32>>,
 }
 
 /// User profile and configuration for LLM and Supabase.
@@ -51,6 +53,7 @@ mod tests {
             id: "1234".to_string(),
             content: "Test note".to_string(),
             created_at: "2025-06-05T12:00:00Z".to_string(),
+            embedding: None,
         };
         assert_eq!(note.content, "Test note");
     }

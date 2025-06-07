@@ -1,31 +1,34 @@
-use crate::types::SupabaseConfig;
+use crate::services::ollama::generate_embedding;
+use crate::utils::load_supabase_config;
 use colored::*;
-use dirs::home_dir;
 use reqwest::blocking::Client;
 use serde_json::json;
-use std::fs;
-use std::path::PathBuf;
-
-/// Loads Supabase configuration from the user's setup file.
-/// This function is used by both note and suggestion handlers.
-fn load_supabase_config() -> SupabaseConfig {
-    let mut setup_path = home_dir().unwrap_or(PathBuf::from("."));
-    setup_path.push(".logswise/setup.json");
-    let data =
-        fs::read_to_string(&setup_path).expect("Setup not found. Please run 'lw setup' first.");
-    let profile: serde_json::Value = serde_json::from_str(&data).unwrap();
-    SupabaseConfig {
-        project_url: profile["supabaseUrl"].as_str().unwrap().to_string(),
-        api_key: profile["supabaseApiKey"].as_str().unwrap().to_string(),
-    }
-}
 
 /// Adds a note to the Supabase database.
 pub fn add_note(content: &str) {
     let config = load_supabase_config();
     let client = Client::new();
+
+    // 1. Generate embedding for the note content using shared Ollama service
+    let ollama_url = std::env::var("OLLAMA_EMBEDDING_URL")
+        .unwrap_or_else(|_| "http://localhost:11434/api/embeddings".to_string());
+    let ollama_model = std::env::var("OLLAMA_EMBEDDING_MODEL")
+        .unwrap_or_else(|_| "text-embedding-ada-002".to_string());
+    let embedding_vec = match generate_embedding(&client, &ollama_url, &ollama_model, content) {
+        Ok(embedding) => Some(embedding),
+        Err(msg) => {
+            println!("{}", msg.yellow());
+            None
+        }
+    };
+
+    // 2. Store note and embedding in Supabase
     let url = format!("{}/rest/v1/notes", config.project_url);
-    let body = json!({ "content": content });
+    let body = if let Some(embedding) = embedding_vec {
+        json!({ "content": content, "embedding": embedding })
+    } else {
+        json!({ "content": content })
+    };
     let res = client
         .post(&url)
         .header("apikey", &config.api_key)
@@ -61,6 +64,7 @@ mod tests {
             id: "1".to_string(),
             content: "Integration test note".to_string(),
             created_at: "2025-06-05T12:00:00Z".to_string(),
+            embedding: None,
         };
         assert_eq!(note.content, "Integration test note");
     }
