@@ -1,209 +1,176 @@
-use crate::types::SupabaseConfig;
 use colored::*;
-use dirs::home_dir;
 use indicatif::{ProgressBar, ProgressStyle};
 use reqwest::blocking::Client;
-use serde_json::Value;
-use std::fs;
-use std::path::PathBuf;
 use std::time::Duration;
 
-/// Loads Supabase configuration from the user's setup file.
-fn load_supabase_config() -> SupabaseConfig {
-    let mut setup_path = home_dir().unwrap_or(PathBuf::from("."));
-    setup_path.push(".logswise/setup.json");
-    let data =
-        fs::read_to_string(&setup_path).expect("Setup not found. Please run 'lw setup' first.");
-    let profile: serde_json::Value = serde_json::from_str(&data).unwrap();
-    SupabaseConfig {
-        project_url: profile["supabaseUrl"].as_str().unwrap().to_string(),
-        api_key: profile["supabaseApiKey"].as_str().unwrap().to_string(),
-    }
-}
+use crate::services::ollama;
+use crate::services::supabase;
+use crate::utils;
 
-/// Loads the user profile from the setup file.
-fn load_profile() -> serde_json::Value {
-    let mut setup_path = home_dir().unwrap_or(PathBuf::from("."));
-    setup_path.push(".logswise/setup.json");
-    let data =
-        fs::read_to_string(&setup_path).expect("Setup not found. Please run 'lw setup' first.");
-    serde_json::from_str(&data).unwrap()
-}
-
-/// Generates suggestions using the user's profile, recent notes, and LLM.
 pub fn get_suggestions(query: &str) {
-    let profile = load_profile();
+    let profile = utils::load_profile();
     let llm_name = profile["llmName"].as_str().unwrap_or("").to_lowercase();
-    if !llm_name.is_empty() {
-        let ollama_url = profile["ollamaUrl"]
-            .as_str()
-            .unwrap_or("http://localhost:11434/api/generate");
-        // Start spinner
-        let spinner = ProgressBar::new_spinner();
-        spinner.set_style(
-            ProgressStyle::default_spinner()
-                .tick_strings(&["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"])
-                .template("{spinner:.cyan} {msg}")
-                .unwrap(),
-        );
-        spinner.enable_steady_tick(Duration::from_millis(100));
-        spinner.set_message("Loading profile and preparing suggestions...");
-        // Gather user info for context
-        let user_info = format!(
-            "User Info:\n- Profession: {}\n- Job Title: {}\n- Company Name: {}\n- Company Size: {}",
-            profile["profession"].as_str().unwrap_or(""),
-            profile["jobTitle"].as_str().unwrap_or(""),
-            profile["companyName"].as_str().unwrap_or(""),
-            profile["companySize"].as_str().unwrap_or("")
-        );
-        // Gather last 3 notes for context (if possible)
-        let mut notes_context = String::new();
-        let config = load_supabase_config();
-        let client = Client::new();
-        let notes_url = format!(
-            "{}/rest/v1/notes?select=content&order=created_at.desc&limit=3",
-            config.project_url
-        );
-        let notes_res = client
-            .get(&notes_url)
-            .header("apikey", &config.api_key)
-            .header("Authorization", format!("Bearer {}", &config.api_key))
-            .header("Accept", "application/json")
-            .send();
-        if let Ok(resp) = notes_res {
-            if let Ok(notes_val) = resp.json::<Value>() {
-                if let Some(arr) = notes_val.as_array() {
-                    if !arr.is_empty() {
-                        notes_context.push_str("\nRecent Notes:");
-                        for (i, n) in arr.iter().enumerate() {
-                            let content = n["content"].as_str().unwrap_or("");
-                            notes_context.push_str(&format!("\n{}. {}", i + 1, content));
-                        }
-                    }
-                }
-            }
-        }
-        // Compose the full prompt for Ollama with CLI-optimized instructions
-        let mut personalization = String::new();
-        if !profile["companyName"].as_str().unwrap_or("").is_empty()
-            && !profile["companySize"].as_str().unwrap_or("").is_empty()
-        {
-            personalization.push_str(&format!(
-                "At {} scale ({}), consider centralized log filtering and context-rich logs.\n",
-                profile["companyName"].as_str().unwrap_or(""),
-                profile["companySize"].as_str().unwrap_or("")
-            ));
-        }
-        if let Some(profession) = profile["profession"].as_str() {
-            if profession.to_lowercase().contains("developer") {
-                personalization.push_str("As a developer, concise logs and clear error levels help with fast debugging.\n");
-            }
-        }
-        personalization.push_str(
-            "Since you're using Supabase, log DB connection and query phases for traceability.\n",
-        );
-        let cli_instruction = "Reply in this format:\n=== Quick Summary ===\n(3-line summary)\n=== Detailed Suggestions ===\n(Max 10 concise bullets, no markdown, CLI readable)";
-        let full_prompt = format!(
-            "{}{}\n\nUser wants suggestions for: {}\n{}{}\nSuggestions:",
-            user_info, notes_context, query, personalization, cli_instruction
-        );
-        // Send prompt to Ollama
-        let ollama_body = serde_json::json!({
-            "model": llm_name,
-            "prompt": full_prompt,
-            // Remove or comment out 'stream' if not needed by your Ollama version
-            // "stream": false
-        });
-        println!("🔎 Using Ollama model: {}", llm_name.cyan());
-        spinner.set_message("Ollama: Sending request...");
-        let ollama_res = client
-            .post(ollama_url)
-            .header("Content-Type", "application/json")
-            .json(&ollama_body)
-            .send();
-        match ollama_res {
-            Ok(resp) => {
-                let status = resp.status();
-                println!("{} {}", "🔄 Ollama response status:".cyan(), status);
-                if status.is_success() {
-                    spinner.set_message("Ollama: Success! Generating suggestions...");
-                    let raw_body = resp.text().unwrap_or_default();
-                    let mut final_response = String::new();
-                    for line in raw_body.lines() {
-                        if let Ok(data) = serde_json::from_str::<Value>(line) {
-                            if let Some(resp_str) = data.get("response").and_then(|v| v.as_str()) {
-                                final_response.push_str(resp_str);
-                            }
-                        }
-                    }
-                    if final_response.trim().is_empty() {
-                        if let Ok(data) = serde_json::from_str::<Value>(&raw_body) {
-                            if let Some(resp_str) = data.get("response").and_then(|v| v.as_str()) {
-                                final_response.push_str(resp_str);
-                            } else {
-                                spinner.finish_and_clear();
-                                println!(
-                                    "⚠️  No 'response' field in Ollama output. Full JSON: {}",
-                                    serde_json::to_string_pretty(&data)
-                                        .unwrap_or_default()
-                                        .yellow()
-                                );
-                            }
-                        } else {
-                            spinner.finish_and_clear();
-                            println!("⚠️  Ollama output is not valid JSON: {}", raw_body.yellow());
-                            if !raw_body.trim().is_empty() {
-                                println!(
-                                    "{}\n{}",
-                                    "💡 Suggestions (raw output):".green(),
-                                    raw_body.trim()
-                                );
-                                return;
-                            }
-                        }
-                    }
-                    spinner.finish_and_clear();
-                    if !final_response.trim().is_empty() {
-                        let final_answer = if let Some(idx) = final_response.find("</think>") {
-                            final_response[(idx + "</think>".len())..].trim()
-                        } else {
-                            final_response.trim()
-                        };
-                        println!("{}\n{}", "💡 Suggestions:".green(), final_answer);
-                    } else {
-                        println!("{} {}", "❌ No suggestion from model:".red(), llm_name);
-                        println!("{}", "--- Full Ollama response for debugging ---".yellow());
-                        println!("{}", raw_body.cyan());
-                    }
-                } else {
-                    spinner.finish_and_clear();
-                    let status = resp.status();
-                    let err_body = resp.text().unwrap_or_default();
-                    println!("❌ Ollama server returned error status: {}", status);
-                    println!("{}", err_body.red());
-                    println!(
-                        "{}",
-                        "➡️  Please check your model name and prompt. See Ollama logs for details."
-                            .yellow()
-                    );
-                }
-            }
-            Err(e) => {
-                spinner.finish_and_clear();
-                println!(
-                    "{} {}",
-                    "❌ Error connecting to local Ollama server for model:".red(),
-                    llm_name
-                );
-                println!("{}", e);
-                println!("{}", "➡️  Please ensure the Ollama server is running at http://localhost:11434. You can start it with 'ollama serve' or check your setup.json for the correct URL.".yellow());
-            }
-        }
-    } else {
+    if llm_name.is_empty() {
         println!(
             "{}",
             "😅 No LLM configured. Please set up your LLM in setup.json.".yellow()
         );
+        return;
+    }
+    let ollama_embedding_url = std::env::var("OLLAMA_EMBEDDING_URL")
+        .unwrap_or_else(|_| "http://localhost:11434/api/embeddings".to_string());
+    let ollama_generate_url = profile["ollamaUrl"]
+        .as_str()
+        .unwrap_or("http://localhost:11434/api/generate");
+    let spinner = ProgressBar::new_spinner();
+    spinner.set_style(
+        ProgressStyle::default_spinner()
+            .tick_strings(&["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"])
+            .template("{spinner:.cyan} {msg}")
+            .unwrap(),
+    );
+    spinner.enable_steady_tick(Duration::from_millis(100));
+    spinner.set_message("Loading profile and preparing suggestions...");
+    let user_info = format!(
+        "User Info:\n- Profession: {}\n- Job Title: {}\n- Company Name: {}\n- Company Size: {}",
+        profile["profession"].as_str().unwrap_or(""),
+        profile["jobTitle"].as_str().unwrap_or(""),
+        profile["companyName"].as_str().unwrap_or(""),
+        profile["companySize"].as_str().unwrap_or("")
+    );
+    let mut notes_context = String::new();
+    let config = utils::load_supabase_config();
+    let client = Client::new();
+    let ollama_model =
+        std::env::var("OLLAMA_EMBEDDING_MODEL").unwrap_or_else(|_| "nomic-embed-text".to_string());
+    let embedding_models = [
+        "nomic-embed-text",
+        "bge-base-en",
+        "all-minilm",
+        // Add more known embedding models here if needed
+    ];
+    let is_embedding = embedding_models
+        .iter()
+        .any(|m| llm_name == *m || llm_name.starts_with(m));
+    if is_embedding {
+        // Only perform embedding and semantic search, print results, and exit (no LLM generation)
+        println!(
+            "{} {}",
+            "⚡ Running in embedding-only mode (semantic search, no LLM generation). Model:",
+            llm_name.cyan()
+        );
+        // 1. Generate embedding for the query using local Ollama
+        let query_embedding = match ollama::generate_embedding(
+            &client,
+            &ollama_embedding_url,
+            &ollama_model,
+            query,
+        ) {
+            Ok(embedding) => embedding,
+            Err(msg) => {
+                spinner.finish_and_clear();
+                println!(
+                    "{}",
+                    "❌ Could not generate embedding for query. No semantic search can be made."
+                        .red()
+                );
+                println!("{}", msg.yellow());
+                println!("➡️  Please check that your embedding model is pulled and running in Ollama (e.g., 'ollama pull nomic-embed-text'), and that OLLAMA_EMBEDDING_MODEL is set correctly.");
+                return;
+            }
+        };
+        // 2. Query Supabase for most similar notes (top 5)
+        let notes = supabase::semantic_search_notes(&client, &config, &query_embedding, 5);
+        if !notes.is_empty() {
+            println!("\nRelevant Notes:");
+            for (i, content) in notes.iter().enumerate() {
+                println!("{}. {}", i + 1, content);
+            }
+        } else {
+            println!("No relevant notes found.");
+        }
+        spinner.finish_and_clear();
+        return;
+    }
+    // 1. Generate embedding for the query using local Ollama
+    let query_embedding = match ollama::generate_embedding(
+        &client,
+        &ollama_embedding_url,
+        &ollama_model,
+        query,
+    ) {
+        Ok(embedding) => embedding,
+        Err(msg) => {
+            spinner.finish_and_clear();
+            println!(
+                "{}",
+                "❌ Could not generate embedding for query. No suggestions can be made.".red()
+            );
+            println!("{}", msg.yellow());
+            println!("➡️  Please check that your embedding model is pulled and running in Ollama (e.g., 'ollama pull nomic-embed-text'), and that OLLAMA_EMBEDDING_MODEL is set correctly.");
+            return;
+        }
+    };
+    // 2. Query Supabase for most similar notes (top 5)
+    let notes = supabase::semantic_search_notes(&client, &config, &query_embedding, 5);
+    if !notes.is_empty() {
+        notes_context.push_str("\nRelevant Notes:");
+        for (i, content) in notes.iter().enumerate() {
+            notes_context.push_str(&format!("\n{}. {}", i + 1, content));
+        }
+    }
+    // Compose the full prompt for Ollama with CLI-optimized instructions
+    let mut personalization = String::new();
+    if !profile["companyName"].as_str().unwrap_or("").is_empty()
+        && !profile["companySize"].as_str().unwrap_or("").is_empty()
+    {
+        personalization.push_str(&format!(
+            "At {} scale ({}), consider centralized log filtering and context-rich logs.\n",
+            profile["companyName"].as_str().unwrap_or(""),
+            profile["companySize"].as_str().unwrap_or("")
+        ));
+    }
+    if let Some(profession) = profile["profession"].as_str() {
+        if profession.to_lowercase().contains("developer") {
+            personalization.push_str(
+                "As a developer, concise logs and clear error levels help with fast debugging.\n",
+            );
+        }
+    }
+    personalization.push_str(
+        "Since you're using Supabase, log DB connection and query phases for traceability.\n",
+    );
+    let cli_instruction = "Reply in this format:\n=== Quick Summary ===\n(3-line summary)\n=== Suggestions by Category ===\n- Learning:\n  1. Suggestion (with a simple way to track success)\n  2. ...\n- Collaboration:\n  3. ...\n- Well-being:\n  4. ...\n(Up to 10 total, grouped by category. For each, add a quick feedback loop, e.g., 'Do a team poll after 2 weeks' or 'Check adoption in next retro'. Keep the tone informal and practical for a small, busy team. No markdown, CLI readable.)";
+    let full_prompt = format!(
+        "{}{}\n\nUser wants suggestions for: {}\n{}{}\nSuggestions:",
+        user_info, notes_context, query, personalization, cli_instruction
+    );
+    println!("🔎 Using Ollama model: {}", llm_name.cyan());
+    spinner.set_message("Ollama: Sending request...");
+    match ollama::generate_suggestion(&client, ollama_generate_url, &llm_name, &full_prompt) {
+        Ok(final_response) => {
+            spinner.finish_and_clear();
+            if !final_response.trim().is_empty() {
+                println!("\n==================== 💡 Team Suggestions ====================\n");
+                let final_answer = if let Some(idx) = final_response.find("</think>") {
+                    final_response[(idx + "</think>".len())..].trim()
+                } else {
+                    final_response.trim()
+                };
+                println!(
+                    "{}\n{}\n{}\n",
+                    "----------------------------------------",
+                    final_answer,
+                    "----------------------------------------"
+                );
+            } else {
+                println!("{} {}", "❌ No suggestion from model:".red(), llm_name);
+            }
+        }
+        Err(msg) => {
+            spinner.finish_and_clear();
+            println!("{}", msg.red());
+        }
     }
 }
 
@@ -255,7 +222,7 @@ mod tests {
         let notes_context = "\nRecent Notes:\n1. Note one\n2. Note two";
         let query = "How to improve logging?";
         let personalization = "At TestCo scale (10-100), consider centralized log filtering.\n";
-        let cli_instruction = "Reply in this format:\n=== Quick Summary ===\n(3-line summary)\n=== Detailed Suggestions ===\n(Max 10 concise bullets, no markdown, CLI readable)";
+        let cli_instruction = "Reply in this format:\n=== Quick Summary ===\n(3-line summary)\n=== Suggestions by Category ===\n- Learning:\n  1. Suggestion (with a simple way to track success)\n  2. ...\n- Collaboration:\n  3. ...\n- Well-being:\n  4. ...\n(Up to 10 total, grouped by category. For each, add a quick feedback loop, e.g., 'Do a team poll after 2 weeks' or 'Check adoption in next retro'. Keep the tone informal and practical for a small, busy team. No markdown, CLI readable)";
         let full_prompt = format!(
             "{}{}\n\nUser wants suggestions for: {}\n{}{}\nSuggestions:",
             user_info, notes_context, query, personalization, cli_instruction

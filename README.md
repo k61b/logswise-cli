@@ -8,11 +8,69 @@ Logswise CLI is a command-line tool for note-taking, context-aware suggestions, 
 
 ---
 
+## 🚀 What's New?
+
+- **Modular, DRY codebase:** Utility and service logic are now shared across features for clarity and maintainability.
+- **Embedding-only mode:** If you configure an embedding model (see below), Logswise will run in fast semantic search mode—no LLM generation, just relevant notes.
+- **Clear model configuration feedback:** The CLI tells you if you're using an embedding model or an LLM, and how to switch.
+- **Context-rich prompts:** Both chat and suggestion features always use your user info and relevant notes for better results.
+- **Improved error messages and troubleshooting tips.**
+
+---
+
+## 🤖 Embedding Models vs. LLMs
+
+Logswise supports two types of models:
+
+- **Embedding Models:** Used for fast semantic search (finding relevant notes). Examples:
+  - `nomic-embed-text`
+  - `bge-base-en`
+  - `all-minilm`
+- **LLMs (Large Language Models):** Used for generating suggestions and chat responses. Examples:
+  - `llama3`
+  - `deepseek-coder`
+  - `mistral`
+  - `phi3`
+
+**How it works:**
+- If you configure an embedding model, Logswise runs in "embedding-only mode": it finds and prints relevant notes, but does not generate new text.
+- If you configure an LLM, Logswise uses your user info and relevant notes as context for suggestions and chat.
+
+**Tip:**
+- For chat and suggestions, use an LLM.
+- For fast semantic search only, use an embedding model.
+
+---
+
+## ⚙️ Model Configuration
+
+During `logswise-cli setup`, you will be asked for your LLM name. Enter the model name exactly as it appears in your Ollama server (or other LLM provider).
+
+- **To use an LLM:** Enter a model like `llama3`, `deepseek-coder`, or `mistral`.
+- **To use embedding-only mode:** Enter a model like `nomic-embed-text` or `bge-base-en`.
+
+**You can change your model at any time** by editing `~/.logswise/setup.json` or re-running `logswise-cli setup`.
+
+---
+
+## 🧠 Embedding-Only Mode (Semantic Search)
+
+If you configure an embedding model, Logswise will:
+- Perform a fast semantic search for relevant notes.
+- Print the most relevant notes to your query.
+- **Not** generate new suggestions or chat responses.
+- Show a message explaining that you are in embedding-only mode and how to switch to an LLM.
+
+This is useful for quickly finding related notes without waiting for LLM generation.
+
+---
+
 ## Features
 
 - **Take Notes:** Store your thoughts and ideas quickly from the CLI.
 - **Get Suggestions:** Receive helpful, context-aware suggestions based on your queries, recent notes, and profile information. No suggestions table is required—everything is generated dynamically.
 - **Chat with Assistant:** Engage in a conversation with an AI assistant, powered by your configured LLM (Ollama).
+- **Semantic Search:** Use embedding-only mode for lightning-fast note retrieval.
 
 ---
 
@@ -43,7 +101,7 @@ Follow the prompts to enter your profile information:
 - Years of Professional Experience (e.g., <1 year, 1-3 years, 3-5 years, 5-10 years, 10+ years)
 - Preferred Programming Language (e.g., Rust, Python, JavaScript/TypeScript, Go, Java, C#, C/C++, Ruby, Swift, Kotlin, Other)
 - Preferred Work Mode (Remote, On-site, Hybrid)
-- LLM Name (e.g., llama3, deepseek-r1, ollama, llama.cpp)
+- **LLM Name (see above for options)**
 - Supabase Project URL
 - Supabase API Key
 
@@ -76,9 +134,26 @@ After setup, you can use the following commands:
 
 ---
 
-## How Suggestions Work
+## How Suggestions & Chat Work
 
-Suggestions are generated dynamically using your profile and recent notes as context, powered by your local LLM (Ollama). There is no need for a `suggestions` table in your database. Make sure your Ollama server is running and the model you specify is available.
+- Both features use your profile and recent notes as context for the LLM.
+- If you use an embedding model, only semantic search is performed (embedding-only mode).
+- If you use an LLM, you get context-rich suggestions and chat.
+- The CLI will always tell you which mode is active and how to change it.
+
+---
+
+## Troubleshooting Model Configuration
+
+- **If you see a message about "embedding-only mode":**
+  - You are using an embedding model. Switch to an LLM for chat/suggestions.
+- **If chat or suggestion commands do not generate text:**
+  - Check your model name in `~/.logswise/setup.json`.
+  - Make sure your Ollama server is running and the model is available.
+  - Use an LLM for generation, or an embedding model for search only.
+- **For best results:**
+  - Use embedding models for fast search, LLMs for chat/suggestions.
+  - Always keep your models up to date in Ollama.
 
 ---
 
