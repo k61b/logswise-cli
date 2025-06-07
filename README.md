@@ -1,7 +1,6 @@
 # Logswise CLI
 
-[![Lint & Format](https://github.com/k61b/logswise-cli/actions/workflows/lint.yml/badge.svg)](https://github.com/k61b/logswise-cli/actions/workflows/lint.yml)
-[![Test](https://github.com/k61b/logswise-cli/actions/workflows/test.yml/badge.svg)](https://github.com/k61b/logswise-cli/actions/workflows/test.yml)
+[![CI](https://github.com/k61b/logswise-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/k61b/logswise-cli/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Logswise CLI is a command-line tool for note-taking, context-aware suggestions, and AI chat, powered by your local LLM (Ollama) and Supabase. It is designed for developers and teams who want to capture notes, get actionable suggestions, and chat with an assistant—all from the terminal.

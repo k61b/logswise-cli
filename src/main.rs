@@ -62,7 +62,7 @@ fn main() {
 
 fn print_about() {
     println!("\nLogswise CLI: Effortless notes, context-aware suggestions, and AI chat for developers.\n");
-    println!("- Take notes, get suggestions, and chat with your local LLM (Ollama)\n- Powered by Rust, Supabase, and your own context\n- Open source, privacy-first, and team-ready\n");
+    println!("-Take notes, get suggestions, and chat with your local LLM (Ollama)\n- Powered by Rust, Supabase, and your own context\n- Open source, privacy-first, and team-ready\n");
     println!("GitHub: https://github.com/k61b/logswise-cli\n");
 }
 
