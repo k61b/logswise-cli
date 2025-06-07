@@ -1,7 +1,7 @@
-mod setup;
-mod note_handler;
-mod suggestion_handler;
 mod chat_handler;
+mod note_handler;
+mod setup;
+mod suggestion_handler;
 mod types;
 
 use clap::{Parser, Subcommand};
@@ -9,7 +9,7 @@ use colored::*;
 use figlet_rs::FIGfont;
 
 #[derive(Parser)]
-#[command(name = "lw")] 
+#[command(name = "lw")]
 #[command(about = "Logswise CLI Application", long_about = None)]
 struct Cli {
     #[command(subcommand)]
@@ -30,8 +30,14 @@ fn print_banner() {
     if let Some(ref fig) = figure {
         println!("{}", fig.to_string().cyan());
     }
-    println!("{}", "📝 Take notes, 💡 get suggestions, 🤖 chat with your assistant!".magenta());
-    println!("{}", "──────────────────────────────────────────────────────────────".bright_black());
+    println!(
+        "{}",
+        "📝 Take notes, 💡 get suggestions, 🤖 chat with your assistant!".magenta()
+    );
+    println!(
+        "{}",
+        "──────────────────────────────────────────────────────────────".bright_black()
+    );
 }
 
 fn main() {

@@ -1,9 +1,9 @@
-use std::fs;
-use std::path::PathBuf;
-use dialoguer::{Input, Select};
 use colored::*;
+use dialoguer::{Input, Select};
 use dirs::home_dir;
 use serde_json::json;
+use std::fs;
+use std::path::PathBuf;
 
 /// Runs the interactive setup process for user profile and configuration.
 pub fn run_setup() {
@@ -60,6 +60,13 @@ pub fn run_setup() {
     setup_path.push(".logswise");
     fs::create_dir_all(&setup_path).unwrap();
     setup_path.push("setup.json");
-    fs::write(&setup_path, serde_json::to_string_pretty(&profile_data).unwrap()).unwrap();
-    println!("{}", "✅ Setup complete! You are ready to use Logswise CLI!".green());
+    fs::write(
+        &setup_path,
+        serde_json::to_string_pretty(&profile_data).unwrap(),
+    )
+    .unwrap();
+    println!(
+        "{}",
+        "✅ Setup complete! You are ready to use Logswise CLI!".green()
+    );
 }

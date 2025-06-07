@@ -1,19 +1,19 @@
 use crate::types::SupabaseConfig;
-use std::fs;
-use std::path::PathBuf;
-use dirs::home_dir;
 use colored::*;
+use dirs::home_dir;
+use indicatif::{ProgressBar, ProgressStyle};
 use reqwest::blocking::Client;
 use serde_json::Value;
-use indicatif::{ProgressBar, ProgressStyle};
+use std::fs;
+use std::path::PathBuf;
 use std::time::Duration;
 
 /// Loads Supabase configuration from the user's setup file.
 fn load_supabase_config() -> SupabaseConfig {
     let mut setup_path = home_dir().unwrap_or(PathBuf::from("."));
     setup_path.push(".logswise/setup.json");
-    let data = fs::read_to_string(&setup_path)
-        .expect("Setup not found. Please run 'lw setup' first.");
+    let data =
+        fs::read_to_string(&setup_path).expect("Setup not found. Please run 'lw setup' first.");
     let profile: serde_json::Value = serde_json::from_str(&data).unwrap();
     SupabaseConfig {
         project_url: profile["supabaseUrl"].as_str().unwrap().to_string(),
@@ -25,8 +25,8 @@ fn load_supabase_config() -> SupabaseConfig {
 fn load_profile() -> serde_json::Value {
     let mut setup_path = home_dir().unwrap_or(PathBuf::from("."));
     setup_path.push(".logswise/setup.json");
-    let data = fs::read_to_string(&setup_path)
-        .expect("Setup not found. Please run 'lw setup' first.");
+    let data =
+        fs::read_to_string(&setup_path).expect("Setup not found. Please run 'lw setup' first.");
     serde_json::from_str(&data).unwrap()
 }
 
@@ -35,12 +35,17 @@ pub fn get_suggestions(query: &str) {
     let profile = load_profile();
     let llm_name = profile["llmName"].as_str().unwrap_or("").to_lowercase();
     if !llm_name.is_empty() {
-        let ollama_url = profile["ollamaUrl"].as_str().unwrap_or("http://localhost:11434/api/generate");
+        let ollama_url = profile["ollamaUrl"]
+            .as_str()
+            .unwrap_or("http://localhost:11434/api/generate");
         // Start spinner
         let spinner = ProgressBar::new_spinner();
-        spinner.set_style(ProgressStyle::default_spinner()
-            .tick_strings(&["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"])
-            .template("{spinner:.cyan} {msg}").unwrap());
+        spinner.set_style(
+            ProgressStyle::default_spinner()
+                .tick_strings(&["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"])
+                .template("{spinner:.cyan} {msg}")
+                .unwrap(),
+        );
         spinner.enable_steady_tick(Duration::from_millis(100));
         spinner.set_message("Loading profile and preparing suggestions...");
         // Gather user info for context
@@ -55,8 +60,12 @@ pub fn get_suggestions(query: &str) {
         let mut notes_context = String::new();
         let config = load_supabase_config();
         let client = Client::new();
-        let notes_url = format!("{}/rest/v1/notes?select=content&order=created_at.desc&limit=3", config.project_url);
-        let notes_res = client.get(&notes_url)
+        let notes_url = format!(
+            "{}/rest/v1/notes?select=content&order=created_at.desc&limit=3",
+            config.project_url
+        );
+        let notes_res = client
+            .get(&notes_url)
             .header("apikey", &config.api_key)
             .header("Authorization", format!("Bearer {}", &config.api_key))
             .header("Accept", "application/json")
@@ -76,7 +85,9 @@ pub fn get_suggestions(query: &str) {
         }
         // Compose the full prompt for Ollama with CLI-optimized instructions
         let mut personalization = String::new();
-        if profile["companyName"].as_str().unwrap_or("") != "" && profile["companySize"].as_str().unwrap_or("") != "" {
+        if !profile["companyName"].as_str().unwrap_or("").is_empty()
+            && !profile["companySize"].as_str().unwrap_or("").is_empty()
+        {
             personalization.push_str(&format!(
                 "At {} scale ({}), consider centralized log filtering and context-rich logs.\n",
                 profile["companyName"].as_str().unwrap_or(""),
@@ -88,7 +99,9 @@ pub fn get_suggestions(query: &str) {
                 personalization.push_str("As a developer, concise logs and clear error levels help with fast debugging.\n");
             }
         }
-        personalization.push_str("Since you're using Supabase, log DB connection and query phases for traceability.\n");
+        personalization.push_str(
+            "Since you're using Supabase, log DB connection and query phases for traceability.\n",
+        );
         let cli_instruction = "Reply in this format:\n=== Quick Summary ===\n(3-line summary)\n=== Detailed Suggestions ===\n(Max 10 concise bullets, no markdown, CLI readable)";
         let full_prompt = format!(
             "{}{}\n\nUser wants suggestions for: {}\n{}{}\nSuggestions:",
@@ -101,9 +114,10 @@ pub fn get_suggestions(query: &str) {
             // Remove or comment out 'stream' if not needed by your Ollama version
             // "stream": false
         });
-        println!("{} {}", "🔎 Using Ollama model:", llm_name.cyan());
+        println!("🔎 Using Ollama model: {}", llm_name.cyan());
         spinner.set_message("Ollama: Sending request...");
-        let ollama_res = client.post(ollama_url)
+        let ollama_res = client
+            .post(ollama_url)
             .header("Content-Type", "application/json")
             .json(&ollama_body)
             .send();
@@ -128,13 +142,22 @@ pub fn get_suggestions(query: &str) {
                                 final_response.push_str(resp_str);
                             } else {
                                 spinner.finish_and_clear();
-                                println!("{} {}", "⚠️  No 'response' field in Ollama output. Full JSON:", serde_json::to_string_pretty(&data).unwrap_or_default().yellow());
+                                println!(
+                                    "⚠️  No 'response' field in Ollama output. Full JSON: {}",
+                                    serde_json::to_string_pretty(&data)
+                                        .unwrap_or_default()
+                                        .yellow()
+                                );
                             }
                         } else {
                             spinner.finish_and_clear();
-                            println!("{} {}", "⚠️  Ollama output is not valid JSON:", raw_body.yellow());
+                            println!("⚠️  Ollama output is not valid JSON: {}", raw_body.yellow());
                             if !raw_body.trim().is_empty() {
-                                println!("{}\n{}", "💡 Suggestions (raw output):".green(), raw_body.trim());
+                                println!(
+                                    "{}\n{}",
+                                    "💡 Suggestions (raw output):".green(),
+                                    raw_body.trim()
+                                );
                                 return;
                             }
                         }
@@ -156,20 +179,31 @@ pub fn get_suggestions(query: &str) {
                     spinner.finish_and_clear();
                     let status = resp.status();
                     let err_body = resp.text().unwrap_or_default();
-                    println!("{} {}", "❌ Ollama server returned error status:", status);
+                    println!("❌ Ollama server returned error status: {}", status);
                     println!("{}", err_body.red());
-                    println!("{}", "➡️  Please check your model name and prompt. See Ollama logs for details.".yellow());
+                    println!(
+                        "{}",
+                        "➡️  Please check your model name and prompt. See Ollama logs for details."
+                            .yellow()
+                    );
                 }
-            },
+            }
             Err(e) => {
                 spinner.finish_and_clear();
-                println!("{} {}", "❌ Error connecting to local Ollama server for model:".red(), llm_name);
+                println!(
+                    "{} {}",
+                    "❌ Error connecting to local Ollama server for model:".red(),
+                    llm_name
+                );
                 println!("{}", e);
                 println!("{}", "➡️  Please ensure the Ollama server is running at http://localhost:11434. You can start it with 'ollama serve' or check your setup.json for the correct URL.".yellow());
             }
         }
     } else {
-        println!("{}", "😅 No LLM configured. Please set up your LLM in setup.json.".yellow());
+        println!(
+            "{}",
+            "😅 No LLM configured. Please set up your LLM in setup.json.".yellow()
+        );
     }
 }
 
