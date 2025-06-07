@@ -317,7 +317,7 @@
                 <span class="prompt">$</span> <b>brew install logswise-cli</b><br>
                 <span class="prompt">$</span> <b>logswise-cli setup</b><br>
                 <span class="prompt">$</span> <b>logswise note "Refactored login handler for better error messages"</b><br>
-                <span class="prompt">$</span> <b>logswise suggest "How to improve onboarding?"</b><br>
+                <span class="prompt">$</span> <b>logswise suggestion "How to improve onboarding?"</b><br>
                 <span class="prompt">$</span> <b>logswise chat "What is the best way to log errors?"</b>
             </div>
         </section>
@@ -421,6 +421,52 @@
                 <span style="color:#ffbd2e; font-weight:bold;">Logswise is set to deeply impact performance evaluation
                 and business relationships worldwide.</span> Now, anyone can turn daily work into a source of insight and
                 improvement—<b>no more forgotten lessons, no more missed opportunities for growth</b>.
+            </div>
+        </section>
+        <section class="terminal-box" aria-label="Model Types & Modes" style="background:#181c20;border:2px solid #00ff99;">
+            <div class="terminal-bar">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+                <span style="margin-left:0.7rem; color:#00ff99; font-size:1.1rem;">logswise --models</span>
+            </div>
+            <div class="terminal-content">
+                <b>Embedding Models vs. LLMs:</b><br>
+                <ul style="color:#00ff99;">
+                    <li><b>Embedding Models</b> (e.g., <code>nomic-embed-text</code>, <code>bge-base-en</code>, <code>all-minilm</code>): Used for fast semantic search. <b>Enables embedding-only mode</b>—finds relevant notes, but does not generate new text.</li>
+                    <li><b>LLMs</b> (e.g., <code>llama3</code>, <code>deepseek-coder</code>, <code>mistral</code>, <code>phi3</code>): Used for generating suggestions and chat responses, always using your profile and relevant notes as context.</li>
+                </ul>
+                <b>How to choose:</b> Use an LLM for chat/suggestions, or an embedding model for fast search only.<br>
+                <b>Tip:</b> The CLI will tell you which mode is active and how to switch models.
+            </div>
+        </section>
+        <section class="terminal-box" aria-label="Troubleshooting" style="background:#23272e;border:2px solid #ff5f56;">
+            <div class="terminal-bar">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+                <span style="margin-left:0.7rem; color:#ff5f56; font-size:1.1rem;">logswise --troubleshoot</span>
+            </div>
+            <div class="terminal-content">
+                <b>Troubleshooting Model Configuration:</b>
+                <ul style="color:#ff5f56;">
+                    <li>If you see a message about <b>embedding-only mode</b>, you are using an embedding model. Switch to an LLM for chat/suggestions.</li>
+                    <li>If chat or suggestion commands do not generate text, check your model name in <code>~/.logswise/setup.json</code> and ensure your Ollama server is running with the correct model.</li>
+                    <li>For best results: use embedding models for fast search, LLMs for chat/suggestions. You can change your model at any time.</li>
+                </ul>
+            </div>
+        </section>
+        <section class="terminal-box" aria-label="Context Usage" style="background:#181c20;border:2px solid #b2f5ea;">
+            <div class="terminal-bar">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+                <span style="margin-left:0.7rem; color:#b2f5ea; font-size:1.1rem;">logswise --context</span>
+            </div>
+            <div class="terminal-content">
+                <b>Context Matters:</b><br>
+                Both <b>suggestion</b> and <b>chat</b> features always use your profile and the most relevant notes as context for the LLM. This ensures that all responses are tailored to your real work and experience.<br>
+                <b>In embedding-only mode</b>, only semantic search is performed and relevant notes are shown.
             </div>
         </section>
     </main>

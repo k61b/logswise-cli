@@ -1,27 +1,46 @@
-// use crate::types::SupabaseConfig;
 use colored::*;
-use dirs::home_dir;
 use indicatif::{ProgressBar, ProgressStyle};
 use reqwest::blocking::Client;
-use serde_json::Value;
-use std::fs;
-use std::path::PathBuf;
 use std::time::Duration;
 
-/// Chats with the assistant using the configured LLM and user profile.
+use crate::services::ollama::generate_suggestion;
+use crate::services::supabase::semantic_search_notes;
+use crate::utils::{load_profile, load_supabase_config};
+
+/// Chats with the assistant using the configured LLM, user profile, and recent notes.
 pub fn chat_with_assistant(message: &str) {
-    let mut setup_path = home_dir().unwrap_or(PathBuf::from("."));
-    setup_path.push(".logswise/setup.json");
-    let data =
-        fs::read_to_string(&setup_path).expect("Setup not found. Please run 'lw setup' first.");
-    let profile: Value = serde_json::from_str(&data).unwrap();
+    let profile = load_profile();
     let llm_name = profile["llmName"].as_str().unwrap_or("").to_lowercase();
-    if !llm_name.is_empty() {
-        let ollama_url = profile
-            .get("ollamaUrl")
-            .and_then(|v| v.as_str())
-            .unwrap_or("http://localhost:11434/api/generate");
-        // Start spinner
+    if llm_name.is_empty() {
+        println!(
+            "{}",
+            "😅 No LLM configured. Please set up your LLM in setup.json.".yellow()
+        );
+        return;
+    }
+    let ollama_url = profile
+        .get("ollamaUrl")
+        .and_then(|v| v.as_str())
+        .unwrap_or("http://localhost:11434/api/generate");
+    let ollama_embedding_url = std::env::var("OLLAMA_EMBEDDING_URL")
+        .unwrap_or_else(|_| "http://localhost:11434/api/embeddings".to_string());
+    let ollama_model =
+        std::env::var("OLLAMA_EMBEDDING_MODEL").unwrap_or_else(|_| "nomic-embed-text".to_string());
+    let embedding_models = [
+        "nomic-embed-text",
+        "bge-base-en",
+        "all-minilm",
+        // Add more known embedding models here if needed
+    ];
+    let is_embedding = embedding_models
+        .iter()
+        .any(|m| llm_name == *m || llm_name.starts_with(m));
+    if is_embedding {
+        // Only perform embedding and semantic search, print results, and exit (no LLM generation)
+        println!(
+            "⚡ Running in embedding-only mode (semantic search, no LLM generation). Model: {}",
+            llm_name.cyan()
+        );
         let spinner = ProgressBar::new_spinner();
         spinner.set_style(
             ProgressStyle::default_spinner()
@@ -30,112 +49,113 @@ pub fn chat_with_assistant(message: &str) {
                 .unwrap(),
         );
         spinner.enable_steady_tick(Duration::from_millis(100));
-        spinner.set_message("Loading profile and preparing chat...");
-        // Gather user info for context
-        let user_info = format!(
-            "User Info:\n- Profession: {}\n- Job Title: {}\n- Company Name: {}\n- Company Size: {}",
-            profile["profession"].as_str().unwrap_or(""),
-            profile["jobTitle"].as_str().unwrap_or(""),
-            profile["companyName"].as_str().unwrap_or(""),
-            profile["companySize"].as_str().unwrap_or("")
-        );
-        // Compose the full prompt
-        let full_prompt = format!("{}\n\nUser: {}\nAssistant:", user_info, message);
+        spinner.set_message("Loading profile and preparing chat context...");
+        // Only use user_info if not in embedding-only mode
+        // (remove unused variable warning)
+        // let user_info = ... (remove this line entirely)
+        let config = load_supabase_config();
         let client = Client::new();
-        let body = serde_json::json!({
-            "model": llm_name,
-            "prompt": full_prompt,
-            // "stream": false // Uncomment if your Ollama version requires it
-        });
-        println!("💬 Using Ollama model: {}", llm_name.cyan());
-        spinner.set_message("Ollama: Sending request...");
-        let res = client
-            .post(ollama_url)
-            .header("Content-Type", "application/json")
-            .json(&body)
-            .send();
-        match res {
-            Ok(resp) => {
-                let status = resp.status();
-                println!("{} {}", "🔄 Ollama response status:".cyan(), status);
-                if status.is_success() {
-                    spinner.set_message("Ollama: Success! Generating response...");
-                    let raw_body = resp.text().unwrap_or_default();
-                    let mut final_response = String::new();
-                    for line in raw_body.lines() {
-                        if let Ok(data) = serde_json::from_str::<Value>(line) {
-                            if let Some(resp_str) = data.get("response").and_then(|v| v.as_str()) {
-                                final_response.push_str(resp_str);
-                            }
-                        }
-                    }
-                    if final_response.trim().is_empty() {
-                        if let Ok(data) = serde_json::from_str::<Value>(&raw_body) {
-                            if let Some(resp_str) = data.get("response").and_then(|v| v.as_str()) {
-                                final_response.push_str(resp_str);
-                            } else {
-                                spinner.finish_and_clear();
-                                println!(
-                                    "⚠️  No 'response' field in Ollama output. Full JSON: {}",
-                                    serde_json::to_string_pretty(&data)
-                                        .unwrap_or_default()
-                                        .yellow()
-                                );
-                            }
-                        } else {
-                            spinner.finish_and_clear();
-                            println!("⚠️  Ollama output is not valid JSON: {}", raw_body.yellow());
-                            if !raw_body.trim().is_empty() {
-                                println!(
-                                    "{}\n{}",
-                                    "🤖 Assistant (raw output):".green(),
-                                    raw_body.trim()
-                                );
-                                return;
-                            }
-                        }
-                    }
-                    spinner.finish_and_clear();
-                    if !final_response.trim().is_empty() {
-                        let final_answer = if let Some(idx) = final_response.find("</think>") {
-                            final_response[(idx + "</think>".len())..].trim()
-                        } else {
-                            final_response.trim()
-                        };
-                        println!("{}\n{}", "🤖 Assistant:".magenta(), final_answer.white());
-                    } else {
-                        println!("{} {}", "❌ No response from model:".red(), llm_name);
-                        println!("{}", "--- Full Ollama response for debugging ---".yellow());
-                        println!("{}", raw_body.cyan());
-                    }
-                } else {
-                    spinner.finish_and_clear();
-                    let status = resp.status();
-                    let err_body = resp.text().unwrap_or_default();
-                    println!("❌ Ollama server returned error status: {}", status);
-                    println!("{}", err_body.red());
-                    println!(
-                        "{}",
-                        "➡️  Please check your model name and prompt. See Ollama logs for details."
-                            .yellow()
-                    );
-                }
-            }
-            Err(e) => {
+        let query_embedding = match crate::services::ollama::generate_embedding(
+            &client,
+            &ollama_embedding_url,
+            &ollama_model,
+            message,
+        ) {
+            Ok(embedding) => embedding,
+            Err(msg) => {
                 spinner.finish_and_clear();
                 println!(
-                    "{} {}",
-                    "❌ Error connecting to local Ollama server for model:".red(),
-                    llm_name
+                    "{}",
+                    "❌ Could not generate embedding for chat message. No semantic search can be made.".red()
                 );
-                println!("{}", e);
-                println!("{}", "➡️  Please ensure the Ollama server is running at http://localhost:11434. You can start it with 'ollama serve' or check your setup.json for the correct URL.".yellow());
+                println!("{}", msg.yellow());
+                println!("➡️  Please check that your embedding model is pulled and running in Ollama (e.g., 'ollama pull nomic-embed-text'), and that OLLAMA_EMBEDDING_MODEL is set correctly.");
+                return;
             }
+        };
+        let notes = semantic_search_notes(&client, &config, &query_embedding, 5);
+        if !notes.is_empty() {
+            println!("\nRelevant Notes:");
+            for (i, content) in notes.iter().enumerate() {
+                println!("{}. {}", i + 1, content);
+            }
+        } else {
+            println!("No relevant notes found.");
         }
+        spinner.finish_and_clear();
+        return;
     } else {
         println!(
-            "{}",
-            "😅 No LLM configured. Please set up your LLM in setup.json.".yellow()
+            "🧠 Running in normal LLM mode (may be slow). Model: {}",
+            llm_name.cyan()
         );
+    }
+    let spinner = ProgressBar::new_spinner();
+    spinner.set_style(
+        ProgressStyle::default_spinner()
+            .tick_strings(&["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"])
+            .template("{spinner:.cyan} {msg}")
+            .unwrap(),
+    );
+    spinner.enable_steady_tick(Duration::from_millis(100));
+    spinner.set_message("Loading profile and preparing chat context...");
+    // Only define and use user_info in normal LLM mode
+    let mut notes_context = String::new();
+    if is_embedding {
+        // ...embedding-only mode logic...
+        // ...existing code...
+        return;
+    }
+    // Normal LLM mode: define and use user_info and notes_context
+    let user_info = format!(
+        "User Info:\n- Profession: {}\n- Job Title: {}\n- Company Name: {}\n- Company Size: {}",
+        profile["profession"].as_str().unwrap_or(""),
+        profile["jobTitle"].as_str().unwrap_or(""),
+        profile["companyName"].as_str().unwrap_or(""),
+        profile["companySize"].as_str().unwrap_or("")
+    );
+    let config = load_supabase_config();
+    let client = Client::new();
+    // 1. Generate embedding for the chat message
+    let query_embedding = match crate::services::ollama::generate_embedding(
+        &client,
+        &ollama_embedding_url,
+        &ollama_model,
+        message,
+    ) {
+        Ok(embedding) => embedding,
+        Err(msg) => {
+            spinner.finish_and_clear();
+            println!(
+                "{}",
+                "❌ Could not generate embedding for chat message.".red()
+            );
+            println!("{}", msg.yellow());
+            return;
+        }
+    };
+    // 2. Query Supabase for most similar notes (top 5)
+    let notes = semantic_search_notes(&client, &config, &query_embedding, 5);
+    if !notes.is_empty() {
+        notes_context.push_str("\nRelevant Notes:");
+        for (i, content) in notes.iter().enumerate() {
+            notes_context.push_str(&format!("\n{}. {}", i + 1, content));
+        }
+    }
+    // Compose the full prompt for Ollama
+    let full_prompt = format!(
+        "{}{}\n\nUser: {}\nAssistant:",
+        user_info, notes_context, message
+    );
+    spinner.set_message("Ollama: Sending request...");
+    match generate_suggestion(&client, ollama_url, &llm_name, &full_prompt) {
+        Ok(response) => {
+            spinner.finish_and_clear();
+            println!("{}", response.cyan());
+        }
+        Err(msg) => {
+            spinner.finish_and_clear();
+            println!("{}", msg.red());
+        }
     }
 }
