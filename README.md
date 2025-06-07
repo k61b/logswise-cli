@@ -25,14 +25,6 @@ brew tap k61b/tap
 brew install logswise-cli
 ```
 
-### (Optional) Define an Alias
-To use `lw` as a shortcut for `logswise-cli`, add this to your `~/.zshrc` (or `~/.bashrc`):
-
-```sh
-echo 'alias lw="logswise-cli"' >> ~/.zshrc
-source ~/.zshrc
-```
-
 ---
 
 ## Setup
@@ -41,16 +33,17 @@ Before using the application, you need to set up your profile and connect to you
 
 ```sh
 logswise-cli setup
-# or, if you defined the alias:
-lw setup
 ```
 
 Follow the prompts to enter your profile information:
-- Profession (e.g., Software Developer, Product Manager)
-- Job Title (e.g., Mid, Senior, Lead, Manager)
+- Profession (e.g., Software Developer, Product Manager, Designer, Data Scientist, QA Engineer, DevOps Engineer, Sales Engineer, Technical Writer, Other)
+- Job Title (e.g., Intern, Junior, Mid, Senior, Lead, Manager, Director, VP, C-level, Other)
 - Company Name
-- Company Size (e.g., 1-10, 10-100, 100-500, 500-1000, 1000+)
-- LLM Name (e.g., llama3, deepseek-r1)
+- Company Size (e.g., 1-10, 10-100, 100-500, 500-1000, 1000-5000, 5000+)
+- Years of Professional Experience (e.g., <1 year, 1-3 years, 3-5 years, 5-10 years, 10+ years)
+- Preferred Programming Language (e.g., Rust, Python, JavaScript/TypeScript, Go, Java, C#, C/C++, Ruby, Swift, Kotlin, Other)
+- Preferred Work Mode (Remote, On-site, Hybrid)
+- LLM Name (e.g., llama3, deepseek-r1, ollama, llama.cpp)
 - Supabase Project URL
 - Supabase API Key
 
@@ -66,19 +59,19 @@ After setup, you can use the following commands:
 
 - **Take a Note:**
   ```sh
-  lw note "Your note here"
+  logswise note "Your note here"
   ```
 - **Get Suggestions:**
   ```sh
-  lw suggestion "What would you like suggestions for?"
+  logswise suggestion "What would you like suggestions for?"
   ```
 - **Chat with Assistant:**
   ```sh
-  lw chat "Say anything you like"
+  logswise chat "Say anything you like"
   ```
 - **Get Help:**
   ```sh
-  lw help
+  logswise help
   ```
 
 ---
