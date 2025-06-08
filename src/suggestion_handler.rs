@@ -8,7 +8,14 @@ use crate::services::supabase;
 use crate::utils;
 
 pub fn get_suggestions(query: &str) {
-    let profile = utils::load_profile();
+    let profile = match utils::load_profile() {
+        Ok(p) => p,
+        Err(e) => {
+            println!("{}", format!("Error loading profile: {}", e).red());
+            println!("Please run 'logswise-cli setup' first.");
+            return;
+        }
+    };
     let llm_name = profile["llmName"].as_str().unwrap_or("").to_lowercase();
     if llm_name.is_empty() {
         println!(
@@ -39,7 +46,14 @@ pub fn get_suggestions(query: &str) {
         profile["companySize"].as_str().unwrap_or("")
     );
     let mut notes_context = String::new();
-    let config = utils::load_supabase_config();
+    let config = match utils::load_supabase_config() {
+        Ok(cfg) => cfg,
+        Err(e) => {
+            println!("{}", format!("Error loading Supabase config: {}", e).red());
+            println!("Please run 'logswise-cli setup' first.");
+            return;
+        }
+    };
     let client = Client::new();
     let ollama_model =
         std::env::var("OLLAMA_EMBEDDING_MODEL").unwrap_or_else(|_| "nomic-embed-text".to_string());

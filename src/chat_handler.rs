@@ -9,7 +9,14 @@ use crate::utils::{load_profile, load_supabase_config};
 
 /// Chats with the assistant using the configured LLM, user profile, and recent notes.
 pub fn chat_with_assistant(message: &str) {
-    let profile = load_profile();
+    let profile = match load_profile() {
+        Ok(p) => p,
+        Err(e) => {
+            println!("{}", format!("Error loading profile: {}", e).red());
+            println!("Please run 'logswise-cli setup' first.");
+            return;
+        }
+    };
     let llm_name = profile["llmName"].as_str().unwrap_or("").to_lowercase();
     if llm_name.is_empty() {
         println!(
@@ -53,7 +60,14 @@ pub fn chat_with_assistant(message: &str) {
         // Only use user_info if not in embedding-only mode
         // (remove unused variable warning)
         // let user_info = ... (remove this line entirely)
-        let config = load_supabase_config();
+        let config = match load_supabase_config() {
+            Ok(cfg) => cfg,
+            Err(e) => {
+                println!("{}", format!("Error loading Supabase config: {}", e).red());
+                println!("Please run 'logswise-cli setup' first.");
+                return;
+            }
+        };
         let client = Client::new();
         let query_embedding = match crate::services::ollama::generate_embedding(
             &client,
@@ -114,7 +128,14 @@ pub fn chat_with_assistant(message: &str) {
         profile["companyName"].as_str().unwrap_or(""),
         profile["companySize"].as_str().unwrap_or("")
     );
-    let config = load_supabase_config();
+    let config = match load_supabase_config() {
+        Ok(cfg) => cfg,
+        Err(e) => {
+            println!("{}", format!("Error loading Supabase config: {}", e).red());
+            println!("Please run 'logswise-cli setup' first.");
+            return;
+        }
+    };
     let client = Client::new();
     // 1. Generate embedding for the chat message
     let query_embedding = match crate::services::ollama::generate_embedding(

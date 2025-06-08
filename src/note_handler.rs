@@ -6,7 +6,14 @@ use serde_json::json;
 
 /// Adds a note to the Supabase database.
 pub fn add_note(content: &str) {
-    let config = load_supabase_config();
+    let config = match load_supabase_config() {
+        Ok(cfg) => cfg,
+        Err(e) => {
+            println!("{}", format!("Error loading Supabase config: {}", e).red());
+            println!("Please run 'logswise-cli setup' first.");
+            return;
+        }
+    };
     let client = Client::new();
 
     // 1. Generate embedding for the note content using shared Ollama service
