@@ -25,7 +25,7 @@ To enable semantic search, run these SQL commands in the Supabase SQL Editor:
 create extension if not exists vector;
 
 -- Add embedding column to notes table (1536 for OpenAI, adjust if needed)
-alter table notes add column if not exists embedding vector(1536);
+alter table notes add column if not exists embedding vector(768);
 ```
 
 > **Note:** The CLI will use this column to store and search note embeddings for fast, relevant suggestions.
