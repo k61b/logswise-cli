@@ -29,7 +29,6 @@ enum Commands {
     Chat { message: String },
     About,
     Stats,
-    Help,
     How,
     Models,
     Troubleshoot,
@@ -54,15 +53,16 @@ fn print_banner() {
 
 fn main() {
     let cli = Cli::parse();
-    print_banner();
     match cli.command {
-        Commands::Setup => setup::run_setup(),
+        Commands::Setup => {
+            print_banner();
+            setup::run_setup();
+        }
         Commands::Note { content } => note_handler::add_note(&content),
         Commands::Suggestion { query } => suggestion_handler::get_suggestions(&query),
         Commands::Chat { message } => chat_handler::chat_with_assistant(&message),
         Commands::About => print_about(),
         Commands::Stats => print_stats(),
-        Commands::Help => print_help(),
         Commands::How => print_how(),
         Commands::Models => print_models(),
         Commands::Troubleshoot => print_troubleshoot(),
@@ -107,28 +107,6 @@ fn print_stats() {
     println!(
         "\nNote: For full stats (note count, etc.), future versions will fetch from Supabase.\n"
     );
-}
-
-fn print_help() {
-    println!("\nLogswise CLI Help\n");
-    println!("USAGE:");
-    println!("  logswise <COMMAND> [ARGS]\n");
-    println!("COMMANDS:");
-    println!("  setup           Run interactive setup for your profile and config");
-    println!("  note <text>     Add a note");
-    println!("  suggestion <q>  Get context-aware suggestions");
-    println!("  chat <msg>      Chat with the assistant");
-    println!("  stats           Show your profile info");
-    println!("  about           About Logswise CLI");
-    println!("  how             How Logswise works");
-    println!("  models          Model types and modes");
-    println!("  troubleshoot    Troubleshooting tips");
-    println!("  context         How context is used");
-    println!("  help            Show this help message\n");
-    println!("EXAMPLES:");
-    println!("  logswise note 'Refactored login handler for better error messages'");
-    println!("  logswise suggestion 'How to improve onboarding?'");
-    println!("  logswise chat 'What is the best way to log errors?'");
 }
 
 fn print_how() {
