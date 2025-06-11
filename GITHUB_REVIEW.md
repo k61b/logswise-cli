@@ -3,6 +3,7 @@
 A CLI tool for note-taking, suggestions, and AI chat, powered by Supabase and LLMs.
 
 ## Project Structure
+
 - `src/` — TypeScript source code
 - `README.md` — Main documentation
 - `SUPABASE_SETUP.md` — Supabase setup instructions
@@ -12,6 +13,7 @@ A CLI tool for note-taking, suggestions, and AI chat, powered by Supabase and LL
 - `CODE_OF_CONDUCT.md` — Code of conduct
 
 ## Best Practices Checklist
+
 - [x] Sensitive data is not committed (see `.gitignore`)
 - [x] No secrets or API keys in code
 - [x] MIT License included
@@ -23,6 +25,7 @@ A CLI tool for note-taking, suggestions, and AI chat, powered by Supabase and LL
 - [x] Console output is user-facing (CLI UX)
 
 ## Recommendations
+
 - Consider replacing `any` types with more specific interfaces where possible.
 - Add tests for core logic if you plan to grow the project.
 - Keep your local `setup.json` out of version control (already handled).

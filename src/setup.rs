@@ -96,6 +96,16 @@ pub fn run_setup() {
         .with_prompt("Enter the LLM name (e.g., ollama, llama.cpp):")
         .interact_text()
         .unwrap();
+    let ollama_url: String = Input::new()
+        .with_prompt("Enter the Ollama base URL (default: http://localhost:11434):")
+        .default("http://localhost:11434".to_string())
+        .interact_text()
+        .unwrap();
+    let ollama_embedding_model: String = Input::new()
+        .with_prompt("Enter the embedding model name (default: nomic-embed-text):")
+        .default("nomic-embed-text".to_string())
+        .interact_text()
+        .unwrap();
     let supabase_url: String = Input::new()
         .with_prompt("Enter your Supabase project URL:")
         .interact_text()
@@ -114,6 +124,8 @@ pub fn run_setup() {
         "preferredLanguage": language_options[preferred_language],
         "workMode": work_mode_options[work_mode],
         "llmName": llm_name,
+        "ollamaBaseUrl": ollama_url,
+        "embeddingModel": ollama_embedding_model,
         "supabaseUrl": supabase_url,
         "supabaseApiKey": supabase_api_key
     });

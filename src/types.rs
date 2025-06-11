@@ -13,25 +13,6 @@ pub struct Note {
     pub embedding: Option<Vec<f32>>,
 }
 
-/// User profile and configuration for LLM and Supabase.
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct Profile {
-    /// User's profession (e.g., Developer, Manager).
-    pub profession: String,
-    /// User's job title.
-    pub job_title: String,
-    /// Name of the user's company.
-    pub company_name: String,
-    /// Size of the user's company.
-    pub company_size: String,
-    /// Name of the LLM model to use.
-    pub llm_name: String,
-    /// Supabase project URL.
-    pub supabase_url: String,
-    /// Supabase API key.
-    pub supabase_api_key: String,
-}
-
 /// Configuration for connecting to Supabase.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SupabaseConfig {

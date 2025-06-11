@@ -24,11 +24,14 @@ pub fn get_suggestions(query: &str) {
         );
         return;
     }
-    let ollama_embedding_url = std::env::var("OLLAMA_EMBEDDING_URL")
-        .unwrap_or_else(|_| "http://localhost:11434/api/embeddings".to_string());
-    let ollama_generate_url = profile["ollamaUrl"]
+    let ollama_base_url = profile["ollamaBaseUrl"]
         .as_str()
-        .unwrap_or("http://localhost:11434/api/generate");
+        .unwrap_or("http://localhost:11434");
+    let ollama_embedding_url = format!("{}/api/embeddings", ollama_base_url);
+    let ollama_generate_url = format!("{}/api/generate", ollama_base_url);
+    let ollama_model = profile["embeddingModel"]
+        .as_str()
+        .unwrap_or("nomic-embed-text");
     let spinner = ProgressBar::new_spinner();
     spinner.set_style(
         ProgressStyle::default_spinner()
@@ -55,8 +58,6 @@ pub fn get_suggestions(query: &str) {
         }
     };
     let client = Client::new();
-    let ollama_model =
-        std::env::var("OLLAMA_EMBEDDING_MODEL").unwrap_or_else(|_| "nomic-embed-text".to_string());
     let embedding_models = [
         "nomic-embed-text",
         "bge-base-en",
@@ -76,7 +77,7 @@ pub fn get_suggestions(query: &str) {
         let query_embedding = match ollama::generate_embedding(
             &client,
             &ollama_embedding_url,
-            &ollama_model,
+            ollama_model,
             query,
         ) {
             Ok(embedding) => embedding,
@@ -109,7 +110,7 @@ pub fn get_suggestions(query: &str) {
     let query_embedding = match ollama::generate_embedding(
         &client,
         &ollama_embedding_url,
-        &ollama_model,
+        ollama_model,
         query,
     ) {
         Ok(embedding) => embedding,
@@ -160,7 +161,7 @@ pub fn get_suggestions(query: &str) {
     );
     println!("🔎 Using Ollama model: {}", llm_name.cyan());
     spinner.set_message("Ollama: Sending request...");
-    match ollama::generate_suggestion(&client, ollama_generate_url, &llm_name, &full_prompt) {
+    match ollama::generate_suggestion(&client, &ollama_generate_url, &llm_name, &full_prompt) {
         Ok(final_response) => {
             spinner.finish_and_clear();
             if !final_response.trim().is_empty() {

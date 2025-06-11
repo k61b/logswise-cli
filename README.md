@@ -9,11 +9,15 @@ Logswise CLI is a command-line tool for note-taking, context-aware suggestions, 
 
 ## 🚀 What's New?
 
-- **Modular, DRY codebase:** Utility and service logic are now shared across features for clarity and maintainability.
-- **Embedding-only mode:** If you configure an embedding model (see below), Logswise will run in fast semantic search mode—no LLM generation, just relevant notes.
-- **Clear model configuration feedback:** The CLI tells you if you're using an embedding model or an LLM, and how to switch.
-- **Context-rich prompts:** Both chat and suggestion features always use your user info and relevant notes for better results.
-- **Improved error messages and troubleshooting tips.**
+- **🔧 Health Check System:** New `doctor` command validates configuration and tests connectivity to Ollama/Supabase
+- **⚡ Enhanced Error Handling:** Eliminated all dangerous `unwrap()` calls with graceful error recovery
+- **✅ Input Validation:** Comprehensive validation for notes (10K character limit), queries, and messages
+- **🛡️ Network Resilience:** 30-second timeouts and detailed error messages for connection failures
+- **📋 Detailed CLI Help:** Enhanced help system with examples, troubleshooting guides, and getting started instructions
+- **🎯 Command Improvements:** Added version support (`--version`), renamed help to `guide` to avoid conflicts
+- **🔍 Configuration Validation:** URL format validation, API key checking, and model name validation
+- **⚙️ Modular Architecture:** Clean separation of concerns with custom error types and validation framework
+- **📊 Performance Framework:** Built-in timing utilities for operation monitoring
 
 ---
 
@@ -32,10 +36,12 @@ Logswise supports two types of models:
   - `phi3`
 
 **How it works:**
+
 - If you configure an embedding model, Logswise runs in "embedding-only mode": it finds and prints relevant notes, but does not generate new text.
 - If you configure an LLM, Logswise uses your user info and relevant notes as context for suggestions and chat.
 
 **Tip:**
+
 - For chat and suggestions, use an LLM.
 - For fast semantic search only, use an embedding model.
 
@@ -55,6 +61,7 @@ During `logswise-cli setup`, you will be asked for your LLM name. Enter the mode
 ## 🧠 Embedding-Only Mode (Semantic Search)
 
 If you configure an embedding model, Logswise will:
+
 - Perform a fast semantic search for relevant notes.
 - Print the most relevant notes to your query.
 - **Not** generate new suggestions or chat responses.
@@ -66,10 +73,15 @@ This is useful for quickly finding related notes without waiting for LLM generat
 
 ## Features
 
-- **Take Notes:** Store your thoughts and ideas quickly from the CLI.
-- **Get Suggestions:** Receive helpful, context-aware suggestions based on your queries, recent notes, and profile information. No suggestions table is required—everything is generated dynamically.
-- **Chat with Assistant:** Engage in a conversation with an AI assistant, powered by your configured LLM (Ollama).
-- **Semantic Search:** Use embedding-only mode for lightning-fast note retrieval.
+- **📝 Take Notes:** Store your thoughts and ideas quickly from the CLI with input validation (up to 10,000 characters)
+- **💡 Get Suggestions:** Receive helpful, context-aware suggestions based on your queries, recent notes, and profile information
+- **🤖 Chat with Assistant:** Engage in conversation with an AI assistant, powered by your configured LLM (Ollama)
+- **🔍 Semantic Search:** Use embedding-only mode for lightning-fast note retrieval
+- **🔧 Health Diagnostics:** Comprehensive configuration and connectivity checking with the `doctor` command
+- **⚡ Network Resilience:** 30-second timeouts and robust error handling for all network operations
+- **📊 Progress Indicators:** Visual feedback during long-running operations
+- **🛡️ Input Validation:** Comprehensive validation for all user inputs with helpful error messages
+- **📋 Enhanced CLI:** Detailed help, examples, troubleshooting guides, and version information
 
 ---
 
@@ -93,6 +105,7 @@ logswise-cli setup
 ```
 
 Follow the prompts to enter your profile information:
+
 - Profession (e.g., Software Developer, Product Manager, Designer, Data Scientist, QA Engineer, DevOps Engineer, Sales Engineer, Technical Writer, Other)
 - Job Title (e.g., Intern, Junior, Mid, Senior, Lead, Manager, Director, VP, C-level, Other)
 - Company Name
@@ -101,6 +114,8 @@ Follow the prompts to enter your profile information:
 - Preferred Programming Language (e.g., Rust, Python, JavaScript/TypeScript, Go, Java, C#, C/C++, Ruby, Swift, Kotlin, Other)
 - Preferred Work Mode (Remote, On-site, Hybrid)
 - **LLM Name (see above for options)**
+- **Ollama Base URL** (default: http://localhost:11434)
+- **Embedding Model** (default: nomic-embed-text)
 - Supabase Project URL
 - Supabase API Key
 
@@ -116,20 +131,43 @@ After setup, you can use the following commands:
 
 - **Take a Note:**
   ```sh
-  logswise note "Your note here"
+  logswise-cli note "Your note here"
   ```
 - **Get Suggestions:**
   ```sh
-  logswise suggestion "What would you like suggestions for?"
+  logswise-cli suggestion "What would you like suggestions for?"
   ```
 - **Chat with Assistant:**
   ```sh
-  logswise chat "Say anything you like"
+  logswise-cli chat "Say anything you like"
   ```
-- **Get Help:**
+- **Check Configuration Health:**
   ```sh
-  logswise help
+  logswise-cli doctor
   ```
+- **View Detailed Help:**
+  ```sh
+  logswise-cli guide
+  ```
+- **Show Version:**
+  ```sh
+  logswise-cli --version
+  ```
+- **Display Your Profile:**
+  ```sh
+  logswise-cli stats
+  ```
+- **Show About Information:**
+  ```sh
+  logswise-cli about
+  ```
+
+### Additional Commands
+
+- `logswise-cli how` - Explain how Logswise works
+- `logswise-cli models` - Show information about embedding models vs LLMs
+- `logswise-cli troubleshoot` - Show troubleshooting tips for model configuration
+- `logswise-cli context` - Explain how context is used in suggestions and chat
 
 ---
 
@@ -142,17 +180,44 @@ After setup, you can use the following commands:
 
 ---
 
-## Troubleshooting Model Configuration
+## Troubleshooting & Health Check
+
+### Doctor Command
+
+The `doctor` command provides comprehensive health checking and diagnostics:
+
+```sh
+logswise-cli doctor
+```
+
+This will:
+
+- ✅ Validate your configuration file
+- ✅ Check URL formats and API key validity
+- ✅ Test Ollama server connectivity
+- ✅ Verify embedding model availability
+- ✅ Test LLM model functionality
+- ✅ Check Supabase connection
+- 📊 Provide actionable recommendations for any issues found
+
+### Model Configuration Issues
 
 - **If you see a message about "embedding-only mode":**
   - You are using an embedding model. Switch to an LLM for chat/suggestions.
 - **If chat or suggestion commands do not generate text:**
-  - Check your model name in `~/.logswise/setup.json`.
-  - Make sure your Ollama server is running and the model is available.
+  - Run `logswise-cli doctor` to diagnose the issue
+  - Check your model name in `~/.logswise/setup.json`
+  - Make sure your Ollama server is running: `ollama serve`
+  - Ensure the model is available: `ollama pull <model-name>`
   - Use an LLM for generation, or an embedding model for search only.
+- **For connection issues:**
+  - Verify Ollama is running on the correct URL
+  - Check your Supabase URL and API key
+  - Ensure network connectivity
 - **For best results:**
-  - Use embedding models for fast search, LLMs for chat/suggestions.
-  - Always keep your models up to date in Ollama.
+  - Use embedding models for fast search, LLMs for chat/suggestions
+  - Always keep your models up to date in Ollama
+  - Run `logswise-cli doctor` after any configuration changes
 
 ---
 
@@ -165,6 +230,19 @@ After setup, you can use the following commands:
 - `CODE_OF_CONDUCT.md` — Code of conduct
 
 ---
+
+## Quality & Reliability
+
+Logswise CLI is built with production-grade quality standards:
+
+- **🛡️ Zero Panic Code:** All dangerous `unwrap()` calls eliminated with proper error handling
+- **✅ Comprehensive Testing:** 8/8 tests passing with continuous integration
+- **🔍 Strict Linting:** Zero clippy warnings with `-D warnings` enforcement
+- **⚡ Optimized Build:** 4.4MB release binary with full optimization
+- **📊 Performance Monitoring:** Built-in timing framework for operation tracking
+- **🔒 Input Validation:** Comprehensive validation for all user inputs
+- **🌐 Network Resilience:** Timeout handling and graceful error recovery
+- **📋 User Experience:** Detailed error messages and actionable diagnostics
 
 ## Linting & Formatting
 

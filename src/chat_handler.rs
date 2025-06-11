@@ -25,14 +25,14 @@ pub fn chat_with_assistant(message: &str) {
         );
         return;
     }
-    let ollama_url = profile
-        .get("ollamaUrl")
-        .and_then(|v| v.as_str())
-        .unwrap_or("http://localhost:11434/api/generate");
-    let ollama_embedding_url = std::env::var("OLLAMA_EMBEDDING_URL")
-        .unwrap_or_else(|_| "http://localhost:11434/api/embeddings".to_string());
-    let ollama_model =
-        std::env::var("OLLAMA_EMBEDDING_MODEL").unwrap_or_else(|_| "nomic-embed-text".to_string());
+    let ollama_base_url = profile["ollamaBaseUrl"]
+        .as_str()
+        .unwrap_or("http://localhost:11434");
+    let ollama_url = format!("{}/api/generate", ollama_base_url);
+    let ollama_embedding_url = format!("{}/api/embeddings", ollama_base_url);
+    let ollama_model = profile["embeddingModel"]
+        .as_str()
+        .unwrap_or("nomic-embed-text");
     let embedding_models = [
         "nomic-embed-text",
         "bge-base-en",
@@ -48,56 +48,6 @@ pub fn chat_with_assistant(message: &str) {
             "⚡ Running in embedding-only mode (semantic search, no LLM generation). Model: {}",
             llm_name.cyan()
         );
-        let spinner = ProgressBar::new_spinner();
-        spinner.set_style(
-            ProgressStyle::default_spinner()
-                .tick_strings(&["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"])
-                .template("{spinner:.cyan} {msg}")
-                .unwrap(),
-        );
-        spinner.enable_steady_tick(Duration::from_millis(100));
-        spinner.set_message("Loading profile and preparing chat context...");
-        // Only use user_info if not in embedding-only mode
-        // (remove unused variable warning)
-        // let user_info = ... (remove this line entirely)
-        let config = match load_supabase_config() {
-            Ok(cfg) => cfg,
-            Err(e) => {
-                println!("{}", format!("Error loading Supabase config: {}", e).red());
-                println!("Please run 'logswise-cli setup' first.");
-                return;
-            }
-        };
-        let client = Client::new();
-        let query_embedding = match crate::services::ollama::generate_embedding(
-            &client,
-            &ollama_embedding_url,
-            &ollama_model,
-            message,
-        ) {
-            Ok(embedding) => embedding,
-            Err(msg) => {
-                spinner.finish_and_clear();
-                println!(
-                    "{}",
-                    "❌ Could not generate embedding for chat message. No semantic search can be made.".red()
-                );
-                println!("{}", msg.yellow());
-                println!("➡️  Please check that your embedding model is pulled and running in Ollama (e.g., 'ollama pull nomic-embed-text'), and that OLLAMA_EMBEDDING_MODEL is set correctly.");
-                return;
-            }
-        };
-        let notes = semantic_search_notes(&client, &config, &query_embedding, 5);
-        if !notes.is_empty() {
-            println!("\nRelevant Notes:");
-            for (i, content) in notes.iter().enumerate() {
-                println!("{}. {}", i + 1, content);
-            }
-        } else {
-            println!("No relevant notes found.");
-        }
-        spinner.finish_and_clear();
-        return;
     } else {
         println!(
             "🧠 Running in normal LLM mode (may be slow). Model: {}",
@@ -113,21 +63,8 @@ pub fn chat_with_assistant(message: &str) {
     );
     spinner.enable_steady_tick(Duration::from_millis(100));
     spinner.set_message("Loading profile and preparing chat context...");
-    // Only define and use user_info in normal LLM mode
-    let mut notes_context = String::new();
-    if is_embedding {
-        // ...embedding-only mode logic...
-        // ...existing code...
-        return;
-    }
-    // Normal LLM mode: define and use user_info and notes_context
-    let user_info = format!(
-        "User Info:\n- Profession: {}\n- Job Title: {}\n- Company Name: {}\n- Company Size: {}",
-        profile["profession"].as_str().unwrap_or(""),
-        profile["jobTitle"].as_str().unwrap_or(""),
-        profile["companyName"].as_str().unwrap_or(""),
-        profile["companySize"].as_str().unwrap_or("")
-    );
+
+    // Load Supabase config
     let config = match load_supabase_config() {
         Ok(cfg) => cfg,
         Err(e) => {
@@ -137,11 +74,12 @@ pub fn chat_with_assistant(message: &str) {
         }
     };
     let client = Client::new();
-    // 1. Generate embedding for the chat message
+
+    // Generate embedding for the chat message
     let query_embedding = match crate::services::ollama::generate_embedding(
         &client,
         &ollama_embedding_url,
-        &ollama_model,
+        ollama_model,
         message,
     ) {
         Ok(embedding) => embedding,
@@ -155,21 +93,46 @@ pub fn chat_with_assistant(message: &str) {
             return;
         }
     };
-    // 2. Query Supabase for most similar notes (top 5)
+
+    // Query Supabase for most similar notes (top 5)
     let notes = semantic_search_notes(&client, &config, &query_embedding, 5);
+    let mut notes_context = String::new();
     if !notes.is_empty() {
         notes_context.push_str("\nRelevant Notes:");
         for (i, content) in notes.iter().enumerate() {
             notes_context.push_str(&format!("\n{}. {}", i + 1, content));
         }
     }
+
+    // If embedding-only mode, just show notes and return
+    if is_embedding {
+        spinner.finish_and_clear();
+        if !notes.is_empty() {
+            println!("\nRelevant Notes:");
+            for (i, content) in notes.iter().enumerate() {
+                println!("{}. {}", i + 1, content);
+            }
+        } else {
+            println!("No relevant notes found.");
+        }
+        return;
+    }
+
+    // Normal LLM mode: prepare context and generate response
+    let user_info = format!(
+        "User Info:\n- Profession: {}\n- Job Title: {}\n- Company Name: {}\n- Company Size: {}",
+        profile["profession"].as_str().unwrap_or(""),
+        profile["jobTitle"].as_str().unwrap_or(""),
+        profile["companyName"].as_str().unwrap_or(""),
+        profile["companySize"].as_str().unwrap_or("")
+    );
     // Compose the full prompt for Ollama
     let full_prompt = format!(
         "{}{}\n\nUser: {}\nAssistant:",
         user_info, notes_context, message
     );
     spinner.set_message("Ollama: Sending request...");
-    match generate_suggestion(&client, ollama_url, &llm_name, &full_prompt) {
+    match generate_suggestion(&client, &ollama_url, &llm_name, &full_prompt) {
         Ok(response) => {
             spinner.finish_and_clear();
             println!("{}", response.cyan());
