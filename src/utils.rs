@@ -7,7 +7,7 @@ pub fn load_supabase_config() -> Result<SupabaseConfig, String> {
         home_dir().ok_or_else(|| "Could not determine home directory".to_string())?;
     setup_path.push(".logswise/setup.json");
     let data = fs::read_to_string(&setup_path)
-        .map_err(|_| "Setup not found. Please run 'lw setup' first.".to_string())?;
+        .map_err(|_| "Setup not found. Please run 'logswise-cli setup' first.".to_string())?;
     let profile: serde_json::Value = serde_json::from_str(&data)
         .map_err(|_| "Failed to parse setup.json. Please check the file format.".to_string())?;
     let project_url = profile["supabaseUrl"]
@@ -29,7 +29,7 @@ pub fn load_profile() -> Result<serde_json::Value, String> {
         home_dir().ok_or_else(|| "Could not determine home directory".to_string())?;
     setup_path.push(".logswise/setup.json");
     let data = fs::read_to_string(&setup_path)
-        .map_err(|_| "Setup not found. Please run 'lw setup' first.".to_string())?;
+        .map_err(|_| "Setup not found. Please run 'logswise-cli setup' first.".to_string())?;
     serde_json::from_str(&data)
         .map_err(|_| "Failed to parse setup.json. Please check the file format.".to_string())
 }

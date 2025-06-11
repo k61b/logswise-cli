@@ -26,7 +26,8 @@
         <section class="hero">
             <h1><span>📝</span>Logswise CLI</h1>
             <div class="subtitle">
-                <b>Supercharge your terminal.</b> Take instant notes, get AI-powered suggestions, and chat with your own local LLM. <span class="highlight">All private. All yours.</span>
+                <b>Supercharge your terminal.</b> Take instant notes, get AI-powered suggestions, and chat with your own
+                local LLM. <span class="highlight">All private. All yours.</span>
             </div>
             <a href="#install" class="cta-btn">Get Started Free</a>
             <div class="hero-badges">
@@ -41,13 +42,24 @@
         </section>
 
         <!-- SHOWCASE: Animated Terminal Demo -->
-        <section id="showcase" class="terminal-section">
-            <div class="terminal-demo">
-                <div class="terminal-demo-title">🚀 <b>See Logswise CLI in action:</b></div>
-                <div class="terminal-container" aria-label="Logswise CLI Animated Terminal">
-                    <div class="terminal-bar"></div>
+        <section id="showcase" class="terminal-section"
+            style="display:flex;align-items:center;justify-content:center;width:100%;margin-bottom:2.7rem;">
+            <div class="terminal-demo" style="width:100%;max-width:760px;">
+                <div style="color:#b2f5ea;font-size:1.19rem;text-align:left;margin-bottom:0.9rem;opacity:0.88;">🚀
+                    <b>See Logswise CLI in action:</b>
+                </div>
+                <div class="terminal-container" aria-label="Logswise CLI Animated Terminal" style="margin-bottom:0;">
+                    <div class="terminal-bar">
+                        <span class="dot red"></span>
+                        <span class="dot yellow"></span>
+                        <span class="dot green"></span>
+                        <span style="margin-left:0.7rem; color:#00ff99; font-size:1.1rem;">logswise showcase</span>
+                    </div>
                     <div class="terminal-content" id="terminal"></div>
-                    <div id="terminal-hint"></div>
+                    <div id="terminal-hint"
+                        style="position:absolute;bottom:0.7rem;right:1.2rem;font-size:1.03rem;color:#b2f5ea;opacity:0.7;user-select:none;">
+                        Press <b>Space</b> or <b>Enter</b> to continue
+                    </div>
                 </div>
             </div>
         </section>
@@ -58,15 +70,18 @@
             <div class="install-commands">
                 <div class="install-row">
                     <span class="install-cmd"><span class="install-prompt">$</span>brew tap k61b/tap</span>
-                    <button class="install-copy" onclick="navigator.clipboard.writeText('brew tap k61b/tap');this.textContent='✓';setTimeout(()=>this.textContent='⎘',900);">⎘</button>
+                    <button class="install-copy"
+                        onclick="navigator.clipboard.writeText('brew tap k61b/tap');this.textContent='✓';setTimeout(()=>this.textContent='⎘',900);">⎘</button>
                 </div>
                 <div class="install-row">
                     <span class="install-cmd"><span class="install-prompt">$</span>brew install logswise-cli</span>
-                    <button class="install-copy" onclick="navigator.clipboard.writeText('brew install logswise-cli');this.textContent='✓';setTimeout(()=>this.textContent='⎘',900);">⎘</button>
+                    <button class="install-copy"
+                        onclick="navigator.clipboard.writeText('brew install logswise-cli');this.textContent='✓';setTimeout(()=>this.textContent='⎘',900);">⎘</button>
                 </div>
                 <div class="install-row">
                     <span class="install-cmd"><span class="install-prompt">$</span>logswise-cli setup</span>
-                    <button class="install-copy" onclick="navigator.clipboard.writeText('logswise-cli setup');this.textContent='✓';setTimeout(()=>this.textContent='⎘',900);">⎘</button>
+                    <button class="install-copy"
+                        onclick="navigator.clipboard.writeText('logswise-cli setup');this.textContent='✓';setTimeout(()=>this.textContent='⎘',900);">⎘</button>
                 </div>
             </div>
             <div class="install-note">No account. No cloud. Works offline.</div>
@@ -77,22 +92,26 @@
             <div class="feature-card">
                 <span class="feature-icon">📝</span>
                 <div class="feature-title">Instant Notes</div>
-                <div class="feature-desc">Log ideas, todos, and code snippets from your terminal. No context switching, no friction.</div>
+                <div class="feature-desc">Log ideas, todos, and code snippets from your terminal. No context switching,
+                    no friction.</div>
             </div>
             <div class="feature-card">
                 <span class="feature-icon">💡</span>
                 <div class="feature-title">AI Suggestions</div>
-                <div class="feature-desc">Get actionable, context-aware tips powered by your notes, profile, and real context.</div>
+                <div class="feature-desc">Get actionable, context-aware tips powered by your notes, profile, and real
+                    context.</div>
             </div>
             <div class="feature-card">
                 <span class="feature-icon">🤖</span>
                 <div class="feature-title">Local AI Chat</div>
-                <div class="feature-desc">Chat with an AI assistant powered by your own LLM (Ollama). Get help, brainstorm, or ask anything—directly from your terminal.</div>
+                <div class="feature-desc">Chat with an AI assistant powered by your own LLM (Ollama). Get help,
+                    brainstorm, or ask anything—directly from your terminal.</div>
             </div>
             <div class="feature-card">
                 <span class="feature-icon">🔒</span>
                 <div class="feature-title">Privacy-First</div>
-                <div class="feature-desc">All notes and profile data are stored locally. Only your notes are synced to your own Supabase. No cloud lock-in, no vendor tracking.</div>
+                <div class="feature-desc">All notes and profile data are stored locally. Only your notes are synced to
+                    your own Supabase. No cloud lock-in, no vendor tracking.</div>
             </div>
         </section>
 
@@ -193,6 +212,14 @@
                 },
                 {
                     text: '✓  LLM: llama3',
+                    cls: 'output-success'
+                },
+                {
+                    text: '✓  Ollama Base URL: http://localhost:11434',
+                    cls: 'output-success'
+                },
+                {
+                    text: '✓  Embedding Model: nomic-embed-text',
                     cls: 'output-success'
                 },
                 {
