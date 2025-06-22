@@ -50,18 +50,6 @@ fn validate_input(cli: &Cli) {
                 std::process::exit(1);
             }
         }
-        cli::Commands::Template { template_type } => {
-            if template_type.trim().is_empty() {
-                eprintln!("❌ Template type cannot be empty");
-                std::process::exit(1);
-            }
-        }
-        cli::Commands::Quick { suggestion_type } => {
-            if suggestion_type.trim().is_empty() {
-                eprintln!("❌ Suggestion type cannot be empty");
-                std::process::exit(1);
-            }
-        }
         cli::Commands::Completions { shell } => {
             if shell.trim().is_empty() {
                 eprintln!("❌ Shell type cannot be empty");

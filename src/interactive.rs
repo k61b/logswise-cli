@@ -19,7 +19,7 @@ pub fn run_interactive() {
 
     loop {
         let action_options = vec![
-            "💬 Quick Chat",
+            "💬 Chat",
             "📝 Add Note",
             "💡 Get Suggestions",
             "📊 View Stats",
@@ -35,7 +35,7 @@ pub fn run_interactive() {
 
         match selection {
             Ok(0) => {
-                // Quick Chat
+                // Chat
                 let message: String = Input::new()
                     .with_prompt("💬 Ask me anything")
                     .interact_text()
@@ -100,7 +100,7 @@ fn print_interactive_help() {
     println!("{}", "Interactive Mode Help:".bold().cyan());
     println!(
         "• {} - Have a conversation with your AI assistant",
-        "Quick Chat".green()
+        "Chat".green()
     );
     println!(
         "• {} - Capture thoughts, ideas, or code snippets",

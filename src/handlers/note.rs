@@ -14,8 +14,4 @@ impl NoteHandler {
     pub fn show_recent_notes(&self, count: usize) {
         note_handler::show_recent_notes(count);
     }
-
-    pub fn create_from_template(&self, template_type: &str) {
-        note_handler::create_from_template(template_type);
-    }
 }

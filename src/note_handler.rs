@@ -114,35 +114,6 @@ pub fn add_note(content: &str) {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use crate::types::Note;
-
-    #[test]
-    fn test_add_note_and_retrieve() {
-        // Simulate adding a note and retrieving it
-        let note = Note {
-            id: "1".to_string(),
-            content: "Integration test note".to_string(),
-            created_at: "2025-06-05T12:00:00Z".to_string(),
-            embedding: None,
-        };
-        assert_eq!(note.content, "Integration test note");
-    }
-
-    #[test]
-    fn test_suggestion_prompt_format() {
-        // Simulate suggestion prompt creation
-        let user_info = "User Info:\n- Profession: Developer\n- Job Title: Senior\n- Company Name: TestCo\n- Company Size: 10-100";
-        let query = "How to improve logging?";
-        let prompt = format!(
-            "{}\n\nUser wants suggestions for: {}\nSuggestions:",
-            user_info, query
-        );
-        assert!(prompt.contains("User wants suggestions for: How to improve logging?"));
-    }
-}
-
 /// Shows recent notes from Supabase
 pub fn show_recent_notes(count: usize) {
     let config = match load_supabase_config() {
@@ -227,73 +198,31 @@ pub fn show_recent_notes(count: usize) {
     }
 }
 
-/// Creates a note from a predefined template
-pub fn create_from_template(template_type: &str) {
-    use dialoguer::Input;
+#[cfg(test)]
+mod tests {
+    use crate::types::Note;
 
-    let template_content = match template_type.to_lowercase().as_str() {
-        "daily" => {
-            let date = std::process::Command::new("date")
-                .arg("+%Y-%m-%d")
-                .output()
-                .map(|output| String::from_utf8_lossy(&output.stdout).trim().to_string())
-                .unwrap_or_else(|_| "Today".to_string());
+    #[test]
+    fn test_add_note_and_retrieve() {
+        // Simulate adding a note and retrieving it
+        let note = Note {
+            id: "1".to_string(),
+            content: "Integration test note".to_string(),
+            created_at: "2025-06-05T12:00:00Z".to_string(),
+            embedding: None,
+        };
+        assert_eq!(note.content, "Integration test note");
+    }
 
-            format!("Daily Log - {}\n\n✅ Completed:\n- \n\n🎯 Today's Focus:\n- \n\n🔄 In Progress:\n- \n\n📝 Notes:\n- ", date)
-        }
-        "meeting" => {
-            let meeting_title: String = Input::new()
-                .with_prompt("Meeting title")
-                .interact_text()
-                .unwrap_or_default();
-
-            format!("Meeting: {}\n\n🎯 Agenda:\n- \n\n💬 Discussion:\n- \n\n✅ Action Items:\n- \n\n📅 Next Steps:\n- ", meeting_title)
-        }
-        "bug" => {
-            let bug_title: String = Input::new()
-                .with_prompt("Bug description")
-                .interact_text()
-                .unwrap_or_default();
-
-            format!("🐛 Bug: {}\n\n🔍 Reproduction Steps:\n1. \n\n💥 Expected vs Actual:\n- Expected: \n- Actual: \n\n🛠️ Potential Fix:\n- \n\n🔗 Related:\n- ", bug_title)
-        }
-        "idea" => {
-            format!("💡 Idea\n\n🎯 Core Concept:\n- \n\n✨ Why This Matters:\n- \n\n🚀 Implementation Thoughts:\n- \n\n🤔 Considerations:\n- ")
-        }
-        "todo" => {
-            format!("📋 TODO\n\n🔥 High Priority:\n- [ ] \n\n📅 This Week:\n- [ ] \n\n💭 Someday/Maybe:\n- [ ] \n\n✅ Completed:\n- [x] ")
-        }
-        "retrospective" => {
-            format!("🔄 Retrospective\n\n✅ What Went Well:\n- \n\n🚫 What Didn't Work:\n- \n\n💡 What We Learned:\n- \n\n🎯 Action Items:\n- ")
-        }
-        _ => {
-            println!("{}", "❌ Unknown template type. Available templates:".red());
-            println!("  • {} - Daily work log with focus areas", "daily".cyan());
-            println!(
-                "  • {} - Meeting notes with agenda and action items",
-                "meeting".cyan()
-            );
-            println!("  • {} - Bug report template", "bug".cyan());
-            println!("  • {} - Idea capture template", "idea".cyan());
-            println!("  • {} - TODO list with priorities", "todo".cyan());
-            println!(
-                "  • {} - Team retrospective template",
-                "retrospective".cyan()
-            );
-            return;
-        }
-    };
-
-    // Allow user to edit the template
-    let final_content: String = Input::new()
-        .with_prompt("Edit your note (or press Enter to save as-is)")
-        .with_initial_text(&template_content)
-        .interact_text()
-        .unwrap_or(template_content);
-
-    if !final_content.trim().is_empty() {
-        add_note(&final_content);
-    } else {
-        println!("{}", "❌ Empty note not saved".yellow());
+    #[test]
+    fn test_suggestion_prompt_format() {
+        // Simulate suggestion prompt creation
+        let user_info = "User Info:\n- Profession: Developer\n- Job Title: Senior\n- Company Name: TestCo\n- Company Size: 10-100";
+        let query = "How to improve logging?";
+        let prompt = format!(
+            "{}\n\nUser wants suggestions for: {}\nSuggestions:",
+            user_info, query
+        );
+        assert!(prompt.contains("User wants suggestions for: How to improve logging?"));
     }
 }

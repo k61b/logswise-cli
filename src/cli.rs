@@ -70,16 +70,6 @@ pub enum Commands {
         #[arg(short, long, default_value = "5")]
         count: usize,
     },
-    /// Use a note template
-    Template {
-        /// Template type (daily, meeting, bug, idea, todo)
-        template_type: String,
-    },
-    /// Quick suggestions for common scenarios
-    Quick {
-        /// Quick suggestion type (standup, review, 1on1, debug)
-        suggestion_type: String,
-    },
     /// Generate shell completions
     Completions {
         /// Shell type (bash, zsh, fish, powershell)

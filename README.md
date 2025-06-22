@@ -23,8 +23,6 @@ Logswise CLI is a command-line tool for note-taking, context-aware suggestions, 
 
 - **🏃 Command Shortcuts:** Use `n`, `s`, `c` as short forms for `note`, `suggestion`, `chat`
 - **🔄 Interactive Mode:** Run `logswise-cli interactive` for a persistent session with guided menus
-- **📝 Note Templates:** Pre-built templates for daily logs, meetings, bugs, ideas, and todos
-- **⚡ Quick Suggestions:** Instant suggestions for standups, reviews, 1-on-1s, debugging, and more
 - **📊 Recent Notes:** View your latest notes with `logswise-cli recent --count 10`
 - **🔧 Shell Completions:** Generate auto-completions for bash, zsh, fish, and PowerShell
 - **💡 Smart Discovery:** Enhanced help with examples and common workflows
@@ -170,30 +168,6 @@ After setup, you can use the following commands:
 
   Start a persistent session with guided menus for continuous note-taking and chatting.
 
-- **Note Templates (NEW!):**
-
-  ```sh
-  logswise-cli template daily        # Daily work log
-  logswise-cli template meeting      # Meeting notes with agenda
-  logswise-cli template bug         # Bug report template
-  logswise-cli template idea        # Idea capture
-  logswise-cli template todo        # TODO list with priorities
-  logswise-cli template retrospective # Team retrospective
-  ```
-
-- **Quick Suggestions (NEW!):**
-
-  ```sh
-  logswise-cli quick standup         # Standup preparation
-  logswise-cli quick review          # Code review checklist
-  logswise-cli quick 1on1           # 1-on-1 meeting topics
-  logswise-cli quick debug          # Debugging strategies
-  logswise-cli quick retro          # Retrospective questions
-  logswise-cli quick planning       # Sprint planning help
-  logswise-cli quick deploy         # Deployment checklist
-  logswise-cli quick onboard        # Onboarding checklist
-  ```
-
 - **Recent Notes (NEW!):**
   ```sh
   logswise-cli recent               # Show last 5 notes
@@ -271,7 +245,6 @@ After setup, you can use the following commands:
    ```sh
    logswise-cli n "Fixed critical bug in auth service"
    logswise-cli s "How to write better commit messages?"
-   logswise-cli quick standup
    ```
 
 3. **Review your work:**

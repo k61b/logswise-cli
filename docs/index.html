@@ -1,622 +1,461 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logswise CLI – Developer Productivity, Reinvented</title>
+    <title>Logswise CLI - Effortless Notes, Context-Aware Suggestions, and AI Chat</title>
+    <meta name="description" content="A powerful command-line tool for note-taking, context-aware AI suggestions, and chat powered by Ollama and Supabase.">
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-
 <body>
-    <!-- Sticky Header -->
-    <header class="header">
-        <div class="header-inner">
-            <span class="logo">📝 Logswise CLI</span>
-            <nav class="nav">
-                <a href="#showcase">Showcase</a>
-                <a href="#features">Features</a>
-                <a href="#install">Install</a>
-                <a href="https://github.com/k61b/logswise-cli" target="_blank">GitHub</a>
-            </nav>
+    <!-- Hero Section -->
+    <header class="hero">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="logo">
+                    <i class="fas fa-terminal"></i>
+                    <span>Logswise CLI</span>
+                </div>
+                <div class="nav-links">
+                    <a href="#features">Features</a>
+                    <a href="#installation">Installation</a>
+                    <a href="#usage">Usage</a>
+                    <a href="#commands">Commands</a>
+                    <a href="https://github.com/k61b/logswise-cli" target="_blank" class="github-link">
+                        <i class="fab fa-github"></i> GitHub
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>Logswise CLI</h1>
+                <p class="hero-subtitle">Effortless notes, context-aware suggestions, and AI chat for developers</p>
+                <p class="hero-description">
+                    A powerful command-line tool that combines note-taking, AI-powered suggestions, and chat functionality. 
+                    Powered by your own Ollama instance and Supabase for privacy-first, team-ready collaboration.
+                </p>
+                
+                <div class="hero-buttons">
+                    <a href="#installation" class="btn btn-primary">
+                        <i class="fas fa-download"></i> Get Started
+                    </a>
+                    <a href="#features" class="btn btn-secondary">
+                        <i class="fas fa-play"></i> Learn More
+                    </a>
+                </div>
+
+                <div class="hero-highlights">
+                    <div class="highlight-grid">
+                        <div class="highlight-item">
+                            <div class="highlight-icon">
+                                <i class="fas fa-zap"></i>
+                            </div>
+                            <h3>Lightning Fast</h3>
+                            <p>Built in Rust for maximum performance</p>
+                        </div>
+                        <div class="highlight-item">
+                            <div class="highlight-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <h3>Privacy First</h3>
+                            <p>Your data stays local and secure</p>
+                        </div>
+                        <div class="highlight-item">
+                            <div class="highlight-icon">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <h3>AI Powered</h3>
+                            <p>Context-aware suggestions and chat</p>
+                        </div>
+                        <div class="highlight-item">
+                            <div class="highlight-icon">
+                                <i class="fas fa-terminal"></i>
+                            </div>
+                            <h3>CLI Native</h3>
+                            <p>Seamless terminal integration</p>
+                        </div>
+                    </div>
+                    
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <i class="fas fa-download"></i>
+                            <span>Easy Install</span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fab fa-github"></i>
+                            <span>Open Source</span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-users"></i>
+                            <span>Team Ready</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </header>
-    <div class="main-wrap">
-        <!-- HERO SECTION -->
-        <section class="hero">
-            <h1><span>📝</span>Logswise CLI</h1>
-            <div class="subtitle">
-                <b>Supercharge your terminal.</b> Take instant notes, get AI-powered suggestions, and chat with your own
-                local LLM. <span class="highlight">All private. All yours.</span>
-            </div>
-            <a href="#install" class="cta-btn">Get Started Free</a>
-            <div class="hero-badges">
-                <span class="badge">⚡ Rust</span>
-                <span class="badge">🔒 100% Private</span>
-                <span class="badge">🤖 Local LLM</span>
-                <span class="badge">🗄️ Supabase Sync</span>
-                <span class="badge">💡 AI Suggestions</span>
-                <span class="badge">💚 Open Source</span>
-                <span class="badge">🖥️ macOS/Linux</span>
-            </div>
-        </section>
 
-        <!-- SHOWCASE: Animated Terminal Demo -->
-        <section id="showcase" class="terminal-section"
-            style="display:flex;align-items:center;justify-content:center;width:100%;margin-bottom:2.7rem;">
-            <div class="terminal-demo" style="width:100%;max-width:760px;">
-                <div style="color:#b2f5ea;font-size:1.19rem;text-align:left;margin-bottom:0.9rem;opacity:0.88;">🚀
-                    <b>See Logswise CLI in action:</b>
-                </div>
-                <div class="terminal-container" aria-label="Logswise CLI Animated Terminal" style="margin-bottom:0;">
-                    <div class="terminal-bar">
-                        <span class="dot red"></span>
-                        <span class="dot yellow"></span>
-                        <span class="dot green"></span>
-                        <span style="margin-left:0.7rem; color:#00ff99; font-size:1.1rem;">logswise showcase</span>
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <h2>Why Choose Logswise CLI?</h2>
+            <p class="section-subtitle">Built for developers who want powerful, privacy-first tools</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-sticky-note"></i>
                     </div>
-                    <div class="terminal-content" id="terminal"></div>
-                    <div id="terminal-hint"
-                        style="position:absolute;bottom:0.7rem;right:1.2rem;font-size:1.03rem;color:#b2f5ea;opacity:0.7;user-select:none;">
-                        Press <b>Space</b> or <b>Enter</b> to continue
+                    <h3>Smart Note-Taking</h3>
+                    <p>Capture ideas, bugs, and insights with lightning-fast commands. Perfect for quick note-taking and documentation.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>AI-Powered Suggestions</h3>
+                    <p>Get context-aware suggestions based on your notes and profile. Perfect for standups, reviews, and planning.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h3>Interactive Chat</h3>
+                    <p>Chat with your AI assistant using your notes as context. Get personalized help and insights.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Privacy First</h3>
+                    <p>Your data stays with you. Uses your own Ollama instance and Supabase for complete control.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Team Ready</h3>
+                    <p>Share notes and insights with your team while maintaining transparency and collaboration.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h3>Lightning Fast</h3>
+                    <p>Built in Rust for maximum performance. Short aliases and interactive mode for efficient workflows.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Installation Section -->
+    <section id="installation" class="installation">
+        <div class="container">
+            <h2>Quick Installation</h2>
+            <p class="section-subtitle">Get up and running in minutes</p>
+            
+            <div class="installation-steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Install Ollama</h3>
+                        <p>Download and install Ollama for local AI processing</p>
+                        <div class="code-block">
+                            <code>curl -fsSL https://ollama.ai/install.sh | sh</code>
+                            <button class="copy-btn" onclick="copyCode(this)">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Pull a Model</h3>
+                        <p>Download a language model for AI functionality</p>
+                        <div class="code-block">
+                            <code>ollama pull llama3</code>
+                            <button class="copy-btn" onclick="copyCode(this)">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Setup Supabase</h3>
+                        <p>Create a Supabase project for note storage</p>
+                        <div class="code-block">
+                            <code># See SUPABASE_SETUP.md for detailed instructions</code>
+                            <button class="copy-btn" onclick="copyCode(this)">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Install Logswise CLI</h3>
+                        <p>Install using Homebrew for easy setup and updates</p>
+                        <div class="code-block">
+                            <code>brew tap k61b/tap
+brew install logswise-cli</code>
+                            <button class="copy-btn" onclick="copyCode(this)">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h3>Run Setup</h3>
+                        <p>Configure your profile and connections</p>
+                        <div class="code-block">
+                            <code>logswise-cli setup</code>
+                            <button class="copy-btn" onclick="copyCode(this)">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- INSTALL SECTION -->
-        <section id="install" class="install-section">
-            <div class="install-title">Install in seconds:</div>
-            <div class="install-commands">
-                <div class="install-row">
-                    <span class="install-cmd"><span class="install-prompt">$</span>brew tap k61b/tap</span>
-                    <button class="install-copy"
-                        onclick="navigator.clipboard.writeText('brew tap k61b/tap');this.textContent='✓';setTimeout(()=>this.textContent='⎘',900);">⎘</button>
+    <!-- Usage Section -->
+    <section id="usage" class="usage">
+        <div class="container">
+            <h2>How It Works</h2>
+            <p class="section-subtitle">Simple commands, powerful results</p>
+            
+            <div class="usage-examples">
+                <div class="example">
+                    <div class="example-code">
+                        <div class="terminal-window">
+                            <div class="terminal-header">
+                                <div class="terminal-buttons">
+                                    <span class="btn-close"></span>
+                                    <span class="btn-minimize"></span>
+                                    <span class="btn-maximize"></span>
+                                </div>
+                            </div>
+                            <div class="terminal-body">
+                                <div class="terminal-line">
+                                    <span class="prompt">$</span> logswise-cli n "Implemented user authentication"
+                                </div>
+                                <div class="terminal-output">📝 Note added successfully!</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="example-description">
+                        <h3>Take Notes Instantly</h3>
+                        <p>Use short commands to quickly capture thoughts, progress, and insights. Your notes are automatically embedded and stored for future context.</p>
+                    </div>
                 </div>
-                <div class="install-row">
-                    <span class="install-cmd"><span class="install-prompt">$</span>brew install logswise-cli</span>
-                    <button class="install-copy"
-                        onclick="navigator.clipboard.writeText('brew install logswise-cli');this.textContent='✓';setTimeout(()=>this.textContent='⎘',900);">⎘</button>
-                </div>
-                <div class="install-row">
-                    <span class="install-cmd"><span class="install-prompt">$</span>logswise-cli setup</span>
-                    <button class="install-copy"
-                        onclick="navigator.clipboard.writeText('logswise-cli setup');this.textContent='✓';setTimeout(()=>this.textContent='⎘',900);">⎘</button>
-                </div>
-            </div>
-            <div class="install-note">No account. No cloud. Works offline.</div>
-        </section>
 
-        <!-- FEATURES SECTION -->
-        <section id="features" class="features-modern">
-            <div class="feature-card">
-                <span class="feature-icon">📝</span>
-                <div class="feature-title">Instant Notes</div>
-                <div class="feature-desc">Log ideas, todos, and code snippets from your terminal. No context switching,
-                    no friction.</div>
-            </div>
-            <div class="feature-card">
-                <span class="feature-icon">💡</span>
-                <div class="feature-title">AI Suggestions</div>
-                <div class="feature-desc">Get actionable, context-aware tips powered by your notes, profile, and real
-                    context.</div>
-            </div>
-            <div class="feature-card">
-                <span class="feature-icon">🤖</span>
-                <div class="feature-title">Local AI Chat</div>
-                <div class="feature-desc">Chat with an AI assistant powered by your own LLM (Ollama). Get help,
-                    brainstorm, or ask anything—directly from your terminal.</div>
-            </div>
-            <div class="feature-card">
-                <span class="feature-icon">🔒</span>
-                <div class="feature-title">Privacy-First</div>
-                <div class="feature-desc">All notes and profile data are stored locally. Only your notes are synced to
-                    your own Supabase. No cloud lock-in, no vendor tracking.</div>
-            </div>
-        </section>
+                <div class="example">
+                    <div class="example-description">
+                        <h3>Get Smart Suggestions</h3>
+                        <p>Ask questions and get AI-powered suggestions based on your notes, profile, and context. Perfect for planning and problem-solving.</p>
+                    </div>
+                    <div class="example-code">
+                        <div class="terminal-window">
+                            <div class="terminal-header">
+                                <div class="terminal-buttons">
+                                    <span class="btn-close"></span>
+                                    <span class="btn-minimize"></span>
+                                    <span class="btn-maximize"></span>
+                                </div>
+                            </div>
+                            <div class="terminal-body">
+                                <div class="terminal-line">
+                                    <span class="prompt">$</span> logswise-cli s "What should I focus on this week?"
+                                </div>
+                                <div class="terminal-output">💡 Based on your recent work, consider...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-        <!-- HOW IT WORKS SECTION -->
-        <section class="how-it-works">
-            <div class="how-steps">
-                <div class="how-step">
-                    <span>⚙️</span>
-                    <div class="step-title">1. Setup in Seconds</div>
-                    <div class="step-desc">Run <b>logswise-cli setup</b> and connect your Supabase/LLM.</div>
-                </div>
-                <div class="how-step">
-                    <span>📝</span>
-                    <div class="step-title">2. Take Notes Instantly</div>
-                    <div class="step-desc">Add notes, todos, or code snippets from anywhere in your terminal.</div>
-                </div>
-                <div class="how-step">
-                    <span>💡</span>
-                    <div class="step-title">3. Get AI Suggestions</div>
-                    <div class="step-desc">Ask for context-aware tips, code improvements, or feedback.</div>
-                </div>
-                <div class="how-step">
-                    <span>🤖</span>
-                    <div class="step-title">4. Chat with Your LLM</div>
-                    <div class="step-desc">Chat with your own local AI for help, brainstorming, or Q&A.</div>
+                <div class="example">
+                    <div class="example-code">
+                        <div class="terminal-window">
+                            <div class="terminal-header">
+                                <div class="terminal-buttons">
+                                    <span class="btn-close"></span>
+                                    <span class="btn-minimize"></span>
+                                    <span class="btn-maximize"></span>
+                                </div>
+                            </div>
+                            <div class="terminal-body">
+                                <div class="terminal-line">
+                                    <span class="prompt">$</span> logswise-cli interactive
+                                </div>
+                                <div class="terminal-output">🎯 Welcome to Interactive Mode!</div>
+                                <div class="terminal-output">Choose: 1) Add Note 2) Get Suggestions 3) Chat...</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="example-description">
+                        <h3>Interactive Mode</h3>
+                        <p>Enter guided interactive mode for continuous workflows. Perfect for daily planning, retrospectives, and deep work sessions.</p>
+                    </div>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- CTA: View on GitHub -->
-        <section class="cta">
-            <a href="https://github.com/k61b/logswise-cli" target="_blank">View on GitHub</a>
-        </section>
-    </div>
-    <script>
-        const steps = [{
-            cmd: 'brew tap k61b/tap',
-            out: [{
-                text: '==> Tapping k61b/tap',
-                cls: 'output-info'
-            },
-            {
-                text: "Cloning into '/usr/local/Homebrew/Library/Taps/k61b/homebrew-tap'...",
-                cls: 'output-info'
-            },
-            {
-                text: 'Tapped 1 formula (27 files, 50KB).',
-                cls: 'output-success'
-            }
-            ]
-        },
-        {
-            cmd: 'brew install logswise-cli',
-            out: [{
-                text: '==> Installing logswise-cli from k61b/tap',
-                cls: 'output-info'
-            },
-            {
-                text: '🍺  /usr/local/Cellar/logswise-cli/1.2.3: 10 files, 1.5MB',
-                cls: 'output-success'
-            }
-            ]
-        },
-        {
-            cmd: 'logswise-cli setup',
-            out: [
-                {
-                    text: 'Welcome to Logswise CLI!',
-                    cls: 'output-info'
-                },
-                {
-                    text: '✓  Profession: Software Developer',
-                    cls: 'output-success'
-                },
-                {
-                    text: '✓  Job Title: Mid',
-                    cls: 'output-success'
-                },
-                {
-                    text: '✓  Company: Logswise',
-                    cls: 'output-success'
-                },
-                {
-                    text: '✓  Company Size: 1000-5000',
-                    cls: 'output-success'
-                },
-                {
-                    text: '✓  Experience: 3-5 years',
-                    cls: 'output-success'
-                },
-                {
-                    text: '✓  Language: Rust',
-                    cls: 'output-success'
-                },
-                {
-                    text: '✓  Work Mode: Hybrid',
-                    cls: 'output-success'
-                },
-                {
-                    text: '✓  LLM: llama3',
-                    cls: 'output-success'
-                },
-                {
-                    text: '✓  Ollama Base URL: http://localhost:11434',
-                    cls: 'output-success'
-                },
-                {
-                    text: '✓  Embedding Model: nomic-embed-text',
-                    cls: 'output-success'
-                },
-                {
-                    text: '✓  Supabase URL: url',
-                    cls: 'output-success'
-                },
-                {
-                    text: '✓  Supabase API Key: key',
-                    cls: 'output-success'
-                },
-                {
-                    text: 'Setup complete! You are ready to use Logswise CLI!',
-                    cls: 'output-success'
-                },
-                {
-                    text: "Alias 'logswise' added to ~/.zshrc. You may need to restart your terminal or run 'source ~/.zshrc' to use it.",
-                    cls: 'output-success'
-                }
-            ]
-        },
-        {
-            cmd: 'logswise note "Refactored login handler for better error messages"',
-            out: [{
-                text: '📝 Note added!',
-                cls: 'output-success'
-            }]
-        },
-        {
-            cmd: 'logswise suggestion "How to improve onboarding?"',
-            out: [
-                {
-                    text: '🔎 Using Ollama model: llama3',
-                    cls: 'output-info'
-                },
-                {
-                    text: '=== Quick Summary ===\n- Focus on onboarding documentation.\n- Assign mentors to new hires.\n- Gather feedback after 2 weeks.\n=== Suggestions by Category ===\n- Learning:\n  1. Create a step-by-step onboarding doc (track: ask for feedback after 2 weeks)\n- Collaboration:\n  2. Assign a mentor to each new hire (track: check-in after 1 month)\n- Well-being:\n  3. Schedule a welcome lunch (track: team poll after event)',
-                    cls: 'output-info'
-                }]
-        },
-        {
-            cmd: 'logswise chat "What is the best way to log errors?"',
-            out: [{
-                text: '🤖 logswise: The best way to log errors is to use structured, centralized logging. Consider using error levels, context info, and automated alerting for critical issues.',
-                cls: 'output-info'
-            }]
-        },
-        {
-            cmd: 'logswise stats',
-            out: [{
-                text: 'Profile loaded from ~/.logswise/setup.json',
-                cls: 'output-info'
-            },
-            {
-                text: 'Profession: Software Developer',
-                cls: 'output-info'
-            },
-            {
-                text: 'Job Title: Senior',
-                cls: 'output-info'
-            },
-            {
-                text: 'Company: ExampleCorp (100-500 employees)',
-                cls: 'output-info'
-            },
-            {
-                text: 'LLM: llama3',
-                cls: 'output-info'
-            },
-            {
-                text: 'Supabase URL: https://xyzcompany.supabase.co',
-                cls: 'output-info'
-            },
-            {
-                text: 'Note: For full stats (note count, etc.), future versions will fetch from Supabase.',
-                cls: 'output-warn'
-            }]
-        },
-        {
-            cmd: 'logswise help',
-            out: [{
-                text: 'Logswise CLI Help',
-                cls: 'output-info'
-            },
-            {
-                text: 'USAGE:',
-                cls: 'output-info'
-            },
-            {
-                text: '  logswise <COMMAND> [ARGS]',
-                cls: 'output-info'
-            },
-            {
-                text: 'COMMANDS:',
-                cls: 'output-info'
-            },
-            {
-                text: '  setup           Run interactive setup for your profile and config',
-                cls: 'output-info'
-            },
-            {
-                text: '  note <text>     Add a note',
-                cls: 'output-info'
-            },
-            {
-                text: '  suggestion <q>  Get context-aware suggestions',
-                cls: 'output-info'
-            },
-            {
-                text: '  chat <msg>      Chat with the assistant',
-                cls: 'output-info'
-            },
-            {
-                text: '  stats           Show your profile info',
-                cls: 'output-info'
-            },
-            {
-                text: '  about           About Logswise CLI',
-                cls: 'output-info'
-            },
-            {
-                text: '  how             How Logswise works',
-                cls: 'output-info'
-            },
-            {
-                text: '  models          Model types and modes',
-                cls: 'output-info'
-            },
-            {
-                text: '  troubleshoot    Troubleshooting tips',
-                cls: 'output-info'
-            },
-            {
-                text: '  context         How context is used',
-                cls: 'output-info'
-            },
-            {
-                text: '  help            Show this help message',
-                cls: 'output-info'
-            },
-            {
-                text: 'EXAMPLES:',
-                cls: 'output-info'
-            },
-            {
-                text: "  logswise note 'Refactored login handler for better error messages'",
-                cls: 'output-info'
-            },
-            {
-                text: "  logswise suggestion 'How to improve onboarding?'",
-                cls: 'output-info'
-            },
-            {
-                text: "  logswise chat 'What is the best way to log errors?'",
-                cls: 'output-info'
-            }]
-        },
-        {
-            cmd: 'logswise about',
-            out: [{
-                text: 'Logswise CLI: Effortless notes, context-aware suggestions, and AI chat for developers.',
-                cls: 'output-info'
-            },
-            {
-                text: '- Take notes, get suggestions, and chat with your local LLM (Ollama)',
-                cls: 'output-info'
-            },
-            {
-                text: '- Powered by Rust, Supabase, and your own context',
-                cls: 'output-info'
-            },
-            {
-                text: '- Open source, privacy-first, and team-ready',
-                cls: 'output-info'
-            },
-            {
-                text: 'GitHub: https://github.com/k61b/logswise-cli',
-                cls: 'output-info'
-            }]
-        },
-        {
-            cmd: 'logswise how',
-            out: [{
-                text: 'How Logswise Works:',
-                cls: 'output-info'
-            },
-            {
-                text: '- Setup your profile and connect to your own Supabase and LLM (Ollama).',
-                cls: 'output-info'
-            },
-            {
-                text: '- Take notes, get suggestions, and chat—all from the CLI.',
-                cls: 'output-info'
-            },
-            {
-                text: '- Suggestions are generated dynamically using your profile and recent notes as context.',
-                cls: 'output-info'
-            },
-            {
-                text: '- No personal data is stored in the cloud—only your notes are synced to your Supabase.',
-                cls: 'output-info'
-            },
-            {
-                text: '- Perfect for performance reviews, self-improvement, and transparent team collaboration.',
-                cls: 'output-info'
-            }]
-        },
-        {
-            cmd: 'logswise models',
-            out: [{
-                text: 'Embedding Models vs. LLMs:',
-                cls: 'output-info'
-            },
-            {
-                text: '- Embedding Models (e.g., nomic-embed-text, bge-base-en, all-minilm): Used for fast semantic search. Enables embedding-only mode—finds relevant notes, but does not generate new text.',
-                cls: 'output-info'
-            },
-            {
-                text: '- LLMs (e.g., llama3, deepseek-coder, mistral, phi3): Used for generating suggestions and chat responses, always using your profile and relevant notes as context.',
-                cls: 'output-info'
-            },
-            {
-                text: 'How to choose: Use an LLM for chat/suggestions, or an embedding model for fast search only.',
-                cls: 'output-info'
-            },
-            {
-                text: 'Tip: The CLI will tell you which mode is active and how to switch models.',
-                cls: 'output-info'
-            }]
-        },
-        {
-            cmd: 'logswise troubleshoot',
-            out: [{
-                text: 'Troubleshooting Model Configuration:',
-                cls: 'output-info'
-            },
-            {
-                text: '- If you see a message about embedding-only mode, you are using an embedding model. Switch to an LLM for chat/suggestions.',
-                cls: 'output-info'
-            },
-            {
-                text: '- If chat or suggestion commands do not generate text, check your model name in ~/.logswise/setup.json and ensure your Ollama server is running with the correct model.',
-                cls: 'output-info'
-            },
-            {
-                text: '- For best results: use embedding models for fast search, LLMs for chat/suggestions. You can change your model at any time.',
-                cls: 'output-info'
-            }]
-        },
-        {
-            cmd: 'logswise context',
-            out: [{
-                text: 'Context Matters:',
-                cls: 'output-info'
-            },
-            {
-                text: '- Both suggestion and chat features always use your profile and the most relevant notes as context for the LLM. This ensures that all responses are tailored to your real work and experience.',
-                cls: 'output-info'
-            },
-            {
-                text: '- In embedding-only mode, only semantic search is performed and relevant notes are shown.',
-                cls: 'output-info'
-            }]
-        }
-        ];
-        const terminal = document.getElementById('terminal');
-        const hint = document.getElementById('terminal-hint');
-        const sidebar = document.getElementById('sidebar-info');
-        let currentStep = 0;
-        let running = false;
-        function typeLine(line, el, speed = 28) {
-            return new Promise(resolve => {
-                let i = 0;
-                function type() {
-                    if (i <= line.length) {
-                        el.textContent = line.slice(0, i) + (i === line.length ? '' : '\u2588'); // blinking block cursor
-                        i++;
-                        setTimeout(type, Math.random() * 30 + speed);
-                    } else {
-                        el.textContent = line; // remove cursor
-                        resolve();
-                    }
-                }
-                type();
-            });
-        }
-        async function showStep(s) {
-            running = true;
-            hint.style.opacity = 0.7;
-            const lineDiv = document.createElement('div');
-            lineDiv.className = 'line';
-            const prompt = document.createElement('span');
-            prompt.className = 'prompt';
-            prompt.textContent = '$';
-            const cmd = document.createElement('span');
-            cmd.className = 'command';
-            // Copy button
-            const copyBtn = document.createElement('button');
-            copyBtn.textContent = '⎘';
-            copyBtn.title = 'Copy command';
-            copyBtn.style = 'margin-left:0.7em;background:none;border:none;color:#b2f5ea;cursor:pointer;font-size:1em;opacity:0.7;';
-            copyBtn.onclick = () => {
-                navigator.clipboard.writeText(s.cmd);
-                copyBtn.textContent = '✓';
-                setTimeout(() => copyBtn.textContent = '⎘', 900);
-            };
-            lineDiv.appendChild(prompt);
-            lineDiv.appendChild(cmd);
-            lineDiv.appendChild(copyBtn);
-            terminal.appendChild(lineDiv);
-            await typeLine(s.cmd, cmd);
-            await new Promise(r => setTimeout(r, 350));
-            for (const o of s.out) {
-                const outDiv = document.createElement('div');
-                outDiv.className = 'line output ' + o.cls;
-                if (o.text.match(/^✓/)) {
-                    const icon = document.createElement('span');
-                    icon.className = 'output-icon';
-                    icon.textContent = '✓';
-                    outDiv.appendChild(icon);
-                    outDiv.appendChild(document.createTextNode(' ' + o.text.slice(1)));
-                } else if (o.text.match(/^🍺/)) {
-                    const icon = document.createElement('span');
-                    icon.className = 'output-icon';
-                    icon.textContent = '🍺';
-                    outDiv.appendChild(icon);
-                    outDiv.appendChild(document.createTextNode(o.text.slice(2)));
-                } else if (o.text.match(/^💡/)) {
-                    const icon = document.createElement('span');
-                    icon.className = 'output-icon';
-                    icon.textContent = '💡';
-                    outDiv.appendChild(icon);
-                    outDiv.appendChild(document.createTextNode(o.text.slice(2)));
-                } else if (o.text.match(/^🤖/)) {
-                    const icon = document.createElement('span');
-                    icon.className = 'output-icon';
-                    icon.textContent = '🤖';
-                    outDiv.appendChild(icon);
-                    outDiv.appendChild(document.createTextNode(o.text.slice(2)));
-                } else if (o.text.match(/^📝/)) {
-                    const icon = document.createElement('span');
-                    icon.className = 'output-icon';
-                    icon.textContent = '📝';
-                    outDiv.appendChild(icon);
-                    outDiv.appendChild(document.createTextNode(o.text.slice(2)));
-                } else if (o.text.match(/^✅/)) {
-                    const icon = document.createElement('span');
-                    icon.className = 'output-icon';
-                    icon.textContent = '✅';
-                    outDiv.appendChild(icon);
-                    outDiv.appendChild(document.createTextNode(o.text.slice(2)));
-                } else if (o.text.match(/^🔎/)) {
-                    const icon = document.createElement('span');
-                    icon.className = 'output-icon';
-                    icon.textContent = '🔎';
-                    outDiv.appendChild(icon);
-                    outDiv.appendChild(document.createTextNode(o.text.slice(2)));
-                } else {
-                    outDiv.textContent = o.text;
-                }
-                terminal.appendChild(outDiv);
-                await typeLine(outDiv.textContent, outDiv, 8);
-                await new Promise(r => setTimeout(r, 200 + Math.random() * 120));
-            }
-            terminal.scrollTop = terminal.scrollHeight;
-            running = false;
-            hint.style.opacity = 1;
-        }
-        async function runShowcase() {
-            terminal.innerHTML = '';
-            currentStep = 0;
-            await showStep(steps[currentStep]);
-        }
-        document.addEventListener('keydown', async (e) => {
-            if (running) return;
-            if (e.key === ' ' || e.key === 'Enter') {
-                if (currentStep < steps.length - 1) {
-                    currentStep++;
-                    await showStep(steps[currentStep]);
-                } else if (currentStep === steps.length - 1) {
-                    hint.textContent = 'Type "help" or "about" to see more.';
-                }
-            }
-            if (e.key === 'h') {
-                sidebar.style.display = sidebar.style.display === 'none' ? 'block' : 'none';
-            }
-        });
-        // Simulate typing 'help' or 'about' to show sidebar
-        terminal.addEventListener('click', () => {
-            if (!running && sidebar.style.display === 'none') {
-                sidebar.style.display = 'block';
-            }
-        });
-        runShowcase();
-    </script>
+    <!-- Commands Section -->
+    <section id="commands" class="commands">
+        <div class="container">
+            <h2>Command Reference</h2>
+            <p class="section-subtitle">All the tools you need at your fingertips</p>
+            
+            <div class="commands-grid">
+                <div class="command-group">
+                    <h3><i class="fas fa-edit"></i> Core Commands</h3>
+                    <div class="command-list">
+                        <div class="command-item">
+                            <code>logswise-cli note "text"</code>
+                            <span>Add a note</span>
+                        </div>
+                        <div class="command-item">
+                            <code>logswise-cli n "text"</code>
+                            <span>Add a note (short)</span>
+                        </div>
+                        <div class="command-item">
+                            <code>logswise-cli suggestion "query"</code>
+                            <span>Get AI suggestions</span>
+                        </div>
+                        <div class="command-item">
+                            <code>logswise-cli s "query"</code>
+                            <span>Get suggestions (short)</span>
+                        </div>
+                        <div class="command-item">
+                            <code>logswise-cli chat "message"</code>
+                            <span>Chat with AI</span>
+                        </div>
+                        <div class="command-item">
+                            <code>logswise-cli c "message"</code>
+                            <span>Chat with AI (short)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="command-group">
+                    <h3><i class="fas fa-magic"></i> Productivity</h3>
+                    <div class="command-list">
+                        <div class="command-item">
+                            <code>logswise-cli interactive</code>
+                            <span>Interactive mode</span>
+                        </div>
+                        <div class="command-item">
+                            <code>logswise-cli recent --count 10</code>
+                            <span>Show recent notes</span>
+                        </div>
+                        <div class="command-item">
+                            <code>logswise-cli completions bash</code>
+                            <span>Shell completions</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="command-group">
+                    <h3><i class="fas fa-cog"></i> System</h3>
+                    <div class="command-list">
+                        <div class="command-item">
+                            <code>logswise-cli setup</code>
+                            <span>Initial setup</span>
+                        </div>
+                        <div class="command-item">
+                            <code>logswise-cli stats</code>
+                            <span>Show configuration</span>
+                        </div>
+                        <div class="command-item">
+                            <code>logswise-cli doctor</code>
+                            <span>Health check</span>
+                        </div>
+                        <div class="command-item">
+                            <code>logswise-cli guide</code>
+                            <span>Detailed help</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
     <footer class="footer">
-        <div>Bize Her Yer Trabzon ❤️💙</div>
-    </footer>
-</body>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3><i class="fas fa-terminal"></i> Logswise CLI</h3>
+                    <p>Effortless notes, context-aware suggestions, and AI chat for developers.</p>
+                    <div class="social-links">
+                        <a href="https://github.com/k61b/logswise-cli" target="_blank">
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                </div>
 
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="https://github.com/k61b/logswise-cli/blob/main/README.md">Documentation</a></li>
+                        <li><a href="https://github.com/k61b/logswise-cli/blob/main/SUPABASE_SETUP.md">Setup Guide</a></li>
+                        <li><a href="https://github.com/k61b/logswise-cli/issues">Issues</a></li>
+                        <li><a href="https://github.com/k61b/logswise-cli/blob/main/CONTRIBUTING.md">Contributing</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Technologies</h4>
+                    <ul>
+                        <li><a href="https://www.rust-lang.org/" target="_blank">Rust</a></li>
+                        <li><a href="https://ollama.ai/" target="_blank">Ollama</a></li>
+                        <li><a href="https://supabase.com/" target="_blank">Supabase</a></li>
+                        <li><a href="https://docs.rs/clap/" target="_blank">Clap</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Quick Start</h4>
+                    <div class="footer-code">
+                        <code>brew tap k61b/tap</code>
+                    </div>
+                    <div class="footer-code">
+                        <code>brew install logswise-cli</code>
+                    </div>
+                    <div class="footer-code">
+                        <code>logswise-cli setup</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2025 Logswise CLI. Open source under MIT License.</p>
+                <p>Built with ❤️ for developers who value privacy and efficiency.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
 </html>

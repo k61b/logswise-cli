@@ -77,14 +77,7 @@ impl HelpHandler {
             "  {}  Show recent notes (default: 5)",
             "recent".green().bold()
         );
-        println!(
-            "  {}  Create note from template (daily, meeting, bug, idea, todo)",
-            "template".green().bold()
-        );
-        println!(
-            "  {}  Quick suggestions (standup, review, 1on1, debug, etc.)",
-            "quick".green().bold()
-        );
+
         println!(
             "  {}  Generate shell completions",
             "completions".green().bold()
@@ -138,14 +131,7 @@ impl HelpHandler {
             "  {}  # View recent notes",
             "logswise-cli recent --count 10".cyan()
         );
-        println!(
-            "  {}  # Create daily log template",
-            "logswise-cli template daily".cyan()
-        );
-        println!(
-            "  {}  # Quick standup prep",
-            "logswise-cli quick standup".cyan()
-        );
+
         println!(
             "  {}  # Generate Bash completions",
             "logswise-cli completions bash".cyan()

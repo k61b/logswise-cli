@@ -39,9 +39,6 @@ impl CommandRouter {
             Commands::Recent { count } => {
                 self.note_handler.show_recent_notes(count);
             }
-            Commands::Template { template_type } => {
-                self.note_handler.create_from_template(&template_type);
-            }
 
             // AI interaction commands
             Commands::Suggestion { query } | Commands::S { query } => {
@@ -49,9 +46,6 @@ impl CommandRouter {
             }
             Commands::Chat { message } | Commands::C { message } => {
                 self.chat_handler.chat_with_assistant(&message);
-            }
-            Commands::Quick { suggestion_type } => {
-                self.suggestion_handler.quick_suggestions(&suggestion_type);
             }
 
             // Interactive mode

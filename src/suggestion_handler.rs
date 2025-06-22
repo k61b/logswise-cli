@@ -244,37 +244,3 @@ mod tests {
         assert!(full_prompt.contains("=== Quick Summary ==="));
     }
 }
-
-/// Provides quick suggestions for common developer scenarios
-pub fn quick_suggestions(suggestion_type: &str) {
-    let query = match suggestion_type.to_lowercase().as_str() {
-        "standup" => "What should I share in today's standup? Help me prepare talking points about my recent work.",
-        "review" => "I'm doing a code review. What should I look for? Give me a checklist of important things to check.",
-        "1on1" => "I have a 1-on-1 with my manager coming up. What topics should I bring up? Help me prepare.",
-        "debug" => "I'm debugging a complex issue. What's a systematic approach I should take?",
-        "retro" => "We're having a team retrospective. What questions should we ask to make it productive?",
-        "planning" => "I'm planning next sprint. What should I consider when estimating and prioritizing tasks?",
-        "deploy" => "I'm about to deploy to production. What should I check before and after deployment?",
-        "onboard" => "I'm onboarding a new team member. What should I cover in their first week?",
-        _ => {
-            println!("{}", "❌ Unknown quick suggestion type. Available types:".red());
-            println!("  • {} - Standup meeting preparation", "standup".cyan());
-            println!("  • {} - Code review checklist", "review".cyan());
-            println!("  • {} - 1-on-1 meeting topics", "1on1".cyan());
-            println!("  • {} - Debugging strategies", "debug".cyan());
-            println!("  • {} - Retrospective questions", "retro".cyan());
-            println!("  • {} - Sprint planning considerations", "planning".cyan());
-            println!("  • {} - Deployment checklist", "deploy".cyan());
-            println!("  • {} - Onboarding checklist", "onboard".cyan());
-            return;
-        }
-    };
-
-    println!(
-        "🚀 {}",
-        format!("Quick suggestions for: {}", suggestion_type)
-            .cyan()
-            .bold()
-    );
-    get_suggestions(query);
-}
