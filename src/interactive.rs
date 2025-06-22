@@ -69,7 +69,9 @@ pub fn run_interactive() {
             }
             Ok(3) => {
                 // View Stats
-                crate::print_stats();
+                use crate::handlers::system::SystemHandler;
+                let system_handler = SystemHandler::new();
+                system_handler.print_stats();
             }
             Ok(4) => {
                 // Help
