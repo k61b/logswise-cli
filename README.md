@@ -19,6 +19,16 @@ Logswise CLI is a command-line tool for note-taking, context-aware suggestions, 
 - **⚙️ Modular Architecture:** Clean separation of concerns with custom error types and validation framework
 - **📊 Performance Framework:** Built-in timing utilities for operation monitoring
 
+## 🚀 Usability Enhancements (Latest)
+
+- **🏃 Command Shortcuts:** Use `n`, `s`, `c` as short forms for `note`, `suggestion`, `chat`
+- **🔄 Interactive Mode:** Run `logswise-cli interactive` for a persistent session with guided menus
+- **📝 Note Templates:** Pre-built templates for daily logs, meetings, bugs, ideas, and todos
+- **⚡ Quick Suggestions:** Instant suggestions for standups, reviews, 1-on-1s, debugging, and more
+- **📊 Recent Notes:** View your latest notes with `logswise-cli recent --count 10`
+- **🔧 Shell Completions:** Generate auto-completions for bash, zsh, fish, and PowerShell
+- **💡 Smart Discovery:** Enhanced help with examples and common workflows
+
 ---
 
 ## 🤖 Embedding Models vs. LLMs
@@ -129,38 +139,145 @@ For detailed Supabase setup, see [SUPABASE_SETUP.md](SUPABASE_SETUP.md).
 
 After setup, you can use the following commands:
 
+### Core Commands
+
 - **Take a Note:**
   ```sh
   logswise-cli note "Your note here"
+  # Or use the short form:
+  logswise-cli n "Quick note"
   ```
 - **Get Suggestions:**
   ```sh
   logswise-cli suggestion "What would you like suggestions for?"
+  # Or use the short form:
+  logswise-cli s "How to improve onboarding?"
   ```
 - **Chat with Assistant:**
   ```sh
   logswise-cli chat "Say anything you like"
+  # Or use the short form:
+  logswise-cli c "Best practices for logging?"
   ```
+
+### Enhanced Productivity Features
+
+- **Interactive Mode (NEW!):**
+
+  ```sh
+  logswise-cli interactive
+  ```
+
+  Start a persistent session with guided menus for continuous note-taking and chatting.
+
+- **Note Templates (NEW!):**
+
+  ```sh
+  logswise-cli template daily        # Daily work log
+  logswise-cli template meeting      # Meeting notes with agenda
+  logswise-cli template bug         # Bug report template
+  logswise-cli template idea        # Idea capture
+  logswise-cli template todo        # TODO list with priorities
+  logswise-cli template retrospective # Team retrospective
+  ```
+
+- **Quick Suggestions (NEW!):**
+
+  ```sh
+  logswise-cli quick standup         # Standup preparation
+  logswise-cli quick review          # Code review checklist
+  logswise-cli quick 1on1           # 1-on-1 meeting topics
+  logswise-cli quick debug          # Debugging strategies
+  logswise-cli quick retro          # Retrospective questions
+  logswise-cli quick planning       # Sprint planning help
+  logswise-cli quick deploy         # Deployment checklist
+  logswise-cli quick onboard        # Onboarding checklist
+  ```
+
+- **Recent Notes (NEW!):**
+  ```sh
+  logswise-cli recent               # Show last 5 notes
+  logswise-cli recent --count 10    # Show last 10 notes
+  ```
+
+### System Commands
+
 - **Check Configuration Health:**
+
   ```sh
   logswise-cli doctor
   ```
+
+  Run a comprehensive health check of your configuration and connectivity.
+
 - **View Detailed Help:**
+
   ```sh
   logswise-cli guide
   ```
+
+  Get enhanced help with examples, troubleshooting guides, and getting started instructions.
+
 - **Show Version:**
+
   ```sh
   logswise-cli --version
   ```
+
+  Display the current version of Logswise CLI.
+
 - **Display Your Profile:**
+
   ```sh
   logswise-cli stats
   ```
+
+  Show your profile information and configuration details.
+
 - **Show About Information:**
+
   ```sh
   logswise-cli about
   ```
+
+  Display information about Logswise CLI and its authors.
+
+- **Generate Shell Completions (NEW!):**
+  ```sh
+  logswise-cli completions bash     # For Bash
+  logswise-cli completions zsh      # For Zsh
+  logswise-cli completions fish     # For Fish
+  logswise-cli completions powershell # For PowerShell
+  ```
+
+### Quick Start Workflow
+
+1. **First time setup:**
+
+   ```sh
+   logswise-cli setup
+   ```
+
+2. **Start working (choose your style):**
+
+   **Option A: Interactive Mode (Recommended for new users)**
+
+   ```sh
+   logswise-cli interactive
+   ```
+
+   **Option B: Direct Commands (Great for power users)**
+
+   ```sh
+   logswise-cli n "Fixed critical bug in auth service"
+   logswise-cli s "How to write better commit messages?"
+   logswise-cli quick standup
+   ```
+
+3. **Review your work:**
+   ```sh
+   logswise-cli recent --count 5
+   ```
 
 ### Additional Commands
 

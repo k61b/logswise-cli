@@ -6,6 +6,7 @@
 
 mod chat_handler;
 mod errors;
+mod interactive;
 mod note_handler;
 mod performance;
 mod setup;
@@ -43,8 +44,18 @@ enum Commands {
         /// The content of the note to add
         content: String,
     },
+    /// Add a note to your collection (alias for 'note')
+    N {
+        /// The content of the note to add
+        content: String,
+    },
     /// Get context-aware suggestions for a query
     Suggestion {
+        /// The query to get suggestions for
+        query: String,
+    },
+    /// Get context-aware suggestions for a query (alias for 'suggestion')
+    S {
         /// The query to get suggestions for
         query: String,
     },
@@ -53,6 +64,13 @@ enum Commands {
         /// The message to send to the assistant
         message: String,
     },
+    /// Chat with the AI assistant (alias for 'chat')
+    C {
+        /// The message to send to the assistant
+        message: String,
+    },
+    /// Start interactive mode for continuous note-taking and chatting
+    Interactive,
     /// Show information about Logswise CLI
     About,
     /// Display your profile and configuration stats
@@ -69,6 +87,27 @@ enum Commands {
     Guide,
     /// Check configuration health and connectivity
     Doctor,
+    /// Show recent notes
+    Recent {
+        /// Number of recent notes to show (default: 5)
+        #[arg(short, long, default_value = "5")]
+        count: usize,
+    },
+    /// Use a note template
+    Template {
+        /// Template type (daily, meeting, bug, idea, todo)
+        template_type: String,
+    },
+    /// Quick suggestions for common scenarios
+    Quick {
+        /// Quick suggestion type (standup, review, 1on1, debug)
+        suggestion_type: String,
+    },
+    /// Generate shell completions
+    Completions {
+        /// Shell type (bash, zsh, fish, powershell)
+        shell: String,
+    },
 }
 
 fn print_banner() {
@@ -92,7 +131,7 @@ fn main() {
 
     // Input validation
     match &cli.command {
-        Commands::Note { content } => {
+        Commands::Note { content } | Commands::N { content } => {
             if content.trim().is_empty() {
                 eprintln!("❌ Note content cannot be empty");
                 std::process::exit(1);
@@ -102,15 +141,33 @@ fn main() {
                 std::process::exit(1);
             }
         }
-        Commands::Suggestion { query } => {
+        Commands::Suggestion { query } | Commands::S { query } => {
             if query.trim().is_empty() {
                 eprintln!("❌ Query cannot be empty");
                 std::process::exit(1);
             }
         }
-        Commands::Chat { message } => {
+        Commands::Chat { message } | Commands::C { message } => {
             if message.trim().is_empty() {
                 eprintln!("❌ Message cannot be empty");
+                std::process::exit(1);
+            }
+        }
+        Commands::Template { template_type } => {
+            if template_type.trim().is_empty() {
+                eprintln!("❌ Template type cannot be empty");
+                std::process::exit(1);
+            }
+        }
+        Commands::Quick { suggestion_type } => {
+            if suggestion_type.trim().is_empty() {
+                eprintln!("❌ Suggestion type cannot be empty");
+                std::process::exit(1);
+            }
+        }
+        Commands::Completions { shell } => {
+            if shell.trim().is_empty() {
+                eprintln!("❌ Shell type cannot be empty");
                 std::process::exit(1);
             }
         }
@@ -123,8 +180,11 @@ fn main() {
             setup::run_setup();
         }
         Commands::Note { content } => note_handler::add_note(&content),
+        Commands::N { content } => note_handler::add_note(&content),
         Commands::Suggestion { query } => suggestion_handler::get_suggestions(&query),
+        Commands::S { query } => suggestion_handler::get_suggestions(&query),
         Commands::Chat { message } => chat_handler::chat_with_assistant(&message),
+        Commands::C { message } => chat_handler::chat_with_assistant(&message),
         Commands::About => print_about(),
         Commands::Stats => print_stats(),
         Commands::How => print_how(),
@@ -133,6 +193,16 @@ fn main() {
         Commands::Context => print_context(),
         Commands::Guide => print_help(),
         Commands::Doctor => run_doctor(),
+        Commands::Interactive => {
+            print_banner();
+            interactive::run_interactive();
+        }
+        Commands::Recent { count } => note_handler::show_recent_notes(count),
+        Commands::Template { template_type } => note_handler::create_from_template(&template_type),
+        Commands::Quick { suggestion_type } => {
+            suggestion_handler::quick_suggestions(&suggestion_type)
+        }
+        Commands::Completions { shell } => generate_completions(&shell),
     }
 }
 
@@ -229,14 +299,40 @@ fn print_help() {
         "setup".green().bold()
     );
     println!(
-        "  {}   Add a note to your collection",
-        "note".green().bold()
+        "  {} (or {})   Add a note to your collection",
+        "note".green().bold(),
+        "n".green()
     );
     println!(
-        "  {} Get context-aware suggestions for a query",
-        "suggestion".green().bold()
+        "  {} (or {}) Get context-aware suggestions for a query",
+        "suggestion".green().bold(),
+        "s".green()
     );
-    println!("  {}   Chat with your AI assistant", "chat".green().bold());
+    println!(
+        "  {} (or {})   Chat with your AI assistant",
+        "chat".green().bold(),
+        "c".green()
+    );
+    println!(
+        "  {}  Start interactive mode for continuous use",
+        "interactive".green().bold()
+    );
+    println!(
+        "  {}  Show recent notes (default: 5)",
+        "recent".green().bold()
+    );
+    println!(
+        "  {}  Create note from template (daily, meeting, bug, idea, todo)",
+        "template".green().bold()
+    );
+    println!(
+        "  {}  Quick suggestions (standup, review, 1on1, debug, etc.)",
+        "quick".green().bold()
+    );
+    println!(
+        "  {}  Generate shell completions",
+        "completions".green().bold()
+    );
     println!(
         "  {}  Display your profile and configuration",
         "stats".green().bold()
@@ -267,20 +363,36 @@ fn print_help() {
         "logswise-cli setup".cyan()
     );
     println!(
-        "  {}  # Add a quick note",
-        "logswise-cli note 'Fixed login bug'".cyan()
+        "  {}  # Add a quick note (short form)",
+        "logswise-cli n 'Fixed login bug'".cyan()
     );
     println!(
-        "  {}  # Get suggestions",
-        "logswise-cli suggestion 'How to improve onboarding?'".cyan()
+        "  {}  # Get suggestions (short form)",
+        "logswise-cli s 'How to improve onboarding?'".cyan()
     );
     println!(
-        "  {}  # Chat with AI",
-        "logswise-cli chat 'What are the best practices for logging?'".cyan()
+        "  {}  # Quick chat (short form)",
+        "logswise-cli c 'Best practices for logging?'".cyan()
     );
     println!(
-        "  {}  # Check your configuration\n",
-        "logswise-cli stats".cyan()
+        "  {}  # Start interactive mode",
+        "logswise-cli interactive".cyan()
+    );
+    println!(
+        "  {}  # View recent notes",
+        "logswise-cli recent --count 10".cyan()
+    );
+    println!(
+        "  {}  # Create daily log template",
+        "logswise-cli template daily".cyan()
+    );
+    println!(
+        "  {}  # Quick standup prep",
+        "logswise-cli quick standup".cyan()
+    );
+    println!(
+        "  {}  # Generate Bash completions",
+        "logswise-cli completions bash".cyan()
     );
 
     println!("{}", "TROUBLESHOOTING:".bold());
@@ -320,6 +432,29 @@ fn print_help() {
         "  5. Start taking notes: {}",
         "logswise-cli note 'My first note!'".cyan()
     );
+}
+
+fn generate_completions(shell: &str) {
+    use clap::CommandFactory;
+    use clap_complete::{generate, Shell};
+    use std::io;
+
+    let shell_type = match shell.to_lowercase().as_str() {
+        "bash" => Shell::Bash,
+        "zsh" => Shell::Zsh,
+        "fish" => Shell::Fish,
+        "powershell" => Shell::PowerShell,
+        _ => {
+            println!(
+                "{}",
+                "❌ Unsupported shell. Available: bash, zsh, fish, powershell".red()
+            );
+            return;
+        }
+    };
+
+    let mut app = Cli::command();
+    generate(shell_type, &mut app, "logswise-cli", &mut io::stdout());
 }
 
 fn run_doctor() {
