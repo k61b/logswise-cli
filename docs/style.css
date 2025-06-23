@@ -488,9 +488,16 @@ body {
 
 .command-group {
     background: #f8fafc;
-    padding: 30px;
-    border-radius: 16px;
+    padding: 35px;
+    border-radius: 20px;
     border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.command-group:hover {
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.1);
+    transform: translateY(-3px);
 }
 
 .command-group h3 {
@@ -509,32 +516,47 @@ body {
 .command-list {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 18px;
 }
 
 .command-item {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
+    flex-direction: column;
+    gap: 8px;
+    padding: 20px;
     background: white;
-    border-radius: 8px;
+    border-radius: 12px;
     border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.command-item:hover {
+    border-color: #667eea;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+    transform: translateY(-2px);
 }
 
 .command-item code {
-    background: #1e1e1e;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
     color: #64FFDA;
-    padding: 4px 8px;
-    border-radius: 4px;
+    padding: 12px 16px;
+    border-radius: 8px;
     font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-    font-size: 0.85rem;
-    margin-right: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border: 1px solid #333;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    word-break: break-all;
+    line-height: 1.4;
 }
 
-.command-item span:last-child {
-    color: #718096;
-    font-size: 0.9rem;
+.command-description {
+    color: #4a5568;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-top: 4px;
+    font-weight: 500;
 }
 
 /* Features Detail Section */
@@ -946,6 +968,20 @@ body {
     
     .btn {
         max-width: 260px;
+    }
+    
+    .command-item code {
+        font-size: 0.8rem;
+        padding: 10px 12px;
+        word-break: break-word;
+    }
+    
+    .command-description {
+        font-size: 0.85rem;
+    }
+    
+    .command-group {
+        padding: 25px 20px;
     }
 }
 
