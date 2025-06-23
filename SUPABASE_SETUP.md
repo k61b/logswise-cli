@@ -44,7 +44,7 @@ npm run setup
 or, for the Rust CLI:
 
 ```sh
-./target/release/logswise_cli_rs setup
+logswise-cli setup
 ```
 
 and enter your Supabase Project URL and API key when prompted.
