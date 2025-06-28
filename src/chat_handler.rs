@@ -12,7 +12,7 @@ pub fn chat_with_assistant(message: &str) {
     let profile = match load_profile() {
         Ok(p) => p,
         Err(e) => {
-            println!("{}", format!("Error loading profile: {}", e).red());
+            println!("{}", format!("Error loading profile: {e}").red());
             println!("Please run 'logswise-cli setup' first.");
             return;
         }
@@ -28,8 +28,8 @@ pub fn chat_with_assistant(message: &str) {
     let ollama_base_url = profile["ollamaBaseUrl"]
         .as_str()
         .unwrap_or("http://localhost:11434");
-    let ollama_url = format!("{}/api/generate", ollama_base_url);
-    let ollama_embedding_url = format!("{}/api/embeddings", ollama_base_url);
+    let ollama_url = format!("{ollama_base_url}/api/generate");
+    let ollama_embedding_url = format!("{ollama_base_url}/api/embeddings");
     let ollama_model = profile["embeddingModel"]
         .as_str()
         .unwrap_or("nomic-embed-text");
@@ -68,7 +68,7 @@ pub fn chat_with_assistant(message: &str) {
     let config = match load_supabase_config() {
         Ok(cfg) => cfg,
         Err(e) => {
-            println!("{}", format!("Error loading Supabase config: {}", e).red());
+            println!("{}", format!("Error loading Supabase config: {e}").red());
             println!("Please run 'logswise-cli setup' first.");
             return;
         }
@@ -127,10 +127,7 @@ pub fn chat_with_assistant(message: &str) {
         profile["companySize"].as_str().unwrap_or("")
     );
     // Compose the full prompt for Ollama
-    let full_prompt = format!(
-        "{}{}\n\nUser: {}\nAssistant:",
-        user_info, notes_context, message
-    );
+    let full_prompt = format!("{user_info}{notes_context}\n\nUser: {message}\nAssistant:");
     spinner.set_message("Ollama: Sending request...");
     match generate_suggestion(&client, &ollama_url, &llm_name, &full_prompt) {
         Ok(response) => {

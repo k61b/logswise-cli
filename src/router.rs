@@ -64,6 +64,7 @@ impl CommandRouter {
             // System commands
             Commands::Stats => self.system_handler.print_stats(),
             Commands::Doctor => self.system_handler.run_doctor(),
+            Commands::Init => self.system_handler.run_init(),
             Commands::Completions { shell } => {
                 self.system_handler.generate_completions(&shell);
             }

@@ -25,7 +25,7 @@ pub fn add_note(content: &str) {
     let config = match load_supabase_config() {
         Ok(cfg) => cfg,
         Err(e) => {
-            println!("{}", format!("Error loading Supabase config: {}", e).red());
+            println!("{}", format!("Error loading Supabase config: {e}").red());
             println!("Please run 'logswise-cli setup' first.");
             return;
         }
@@ -35,7 +35,7 @@ pub fn add_note(content: &str) {
     let profile = match crate::utils::load_profile() {
         Ok(p) => p,
         Err(e) => {
-            println!("{}", format!("Error loading profile: {}", e).red());
+            println!("{}", format!("Error loading profile: {e}").red());
             println!("Please run 'logswise-cli setup' first.");
             return;
         }
@@ -57,7 +57,7 @@ pub fn add_note(content: &str) {
     let ollama_base_url = profile["ollamaBaseUrl"]
         .as_str()
         .unwrap_or("http://localhost:11434");
-    let ollama_url = format!("{}/api/embeddings", ollama_base_url);
+    let ollama_url = format!("{ollama_base_url}/api/embeddings");
     let ollama_model = profile["embeddingModel"]
         .as_str()
         .unwrap_or("nomic-embed-text");
@@ -119,7 +119,7 @@ pub fn show_recent_notes(count: usize) {
     let config = match load_supabase_config() {
         Ok(cfg) => cfg,
         Err(e) => {
-            println!("{}", format!("Error loading Supabase config: {}", e).red());
+            println!("{}", format!("Error loading Supabase config: {e}").red());
             println!("Please run 'logswise-cli setup' first.");
             return;
         }
@@ -175,13 +175,13 @@ pub fn show_recent_notes(count: usize) {
                                     "{}. {} {}",
                                     (i + 1).to_string().green(),
                                     content,
-                                    format!("({})", formatted_time).bright_black()
+                                    format!("({formatted_time})").bright_black()
                                 );
                             }
                         }
                     }
                     Err(e) => {
-                        println!("{}", format!("Error parsing notes: {}", e).red());
+                        println!("{}", format!("Error parsing notes: {e}").red());
                     }
                 }
             } else {
@@ -193,7 +193,7 @@ pub fn show_recent_notes(count: usize) {
         }
         Err(e) => {
             spinner.finish_and_clear();
-            println!("{}", format!("Network error: {}", e).red());
+            println!("{}", format!("Network error: {e}").red());
         }
     }
 }
@@ -219,10 +219,7 @@ mod tests {
         // Simulate suggestion prompt creation
         let user_info = "User Info:\n- Profession: Developer\n- Job Title: Senior\n- Company Name: TestCo\n- Company Size: 10-100";
         let query = "How to improve logging?";
-        let prompt = format!(
-            "{}\n\nUser wants suggestions for: {}\nSuggestions:",
-            user_info, query
-        );
+        let prompt = format!("{user_info}\n\nUser wants suggestions for: {query}\nSuggestions:");
         assert!(prompt.contains("User wants suggestions for: How to improve logging?"));
     }
 }

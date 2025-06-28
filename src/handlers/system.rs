@@ -42,7 +42,7 @@ impl SystemHandler {
                 );
             }
             Err(e) => {
-                println!("{}", format!("Error loading profile: {}", e).red());
+                println!("{}", format!("Error loading profile: {e}").red());
                 println!("No profile found. Run 'logswise-cli setup' first.");
             }
         }
@@ -96,7 +96,7 @@ impl SystemHandler {
                 for (field, display_name) in &required_fields {
                     if let Some(value) = profile[field].as_str() {
                         if !value.trim().is_empty() {
-                            println!("  ✅ {} configured: {}", display_name, value);
+                            println!("  ✅ {display_name} configured: {value}");
                         } else {
                             println!("  ⚠️  {} is empty", display_name.yellow());
                             issues_found += 1;
@@ -144,7 +144,7 @@ impl SystemHandler {
             let ollama_base_url = profile["ollamaBaseUrl"]
                 .as_str()
                 .unwrap_or("http://localhost:11434");
-            let test_url = format!("{}/api/tags", ollama_base_url);
+            let test_url = format!("{ollama_base_url}/api/tags");
 
             match reqwest::blocking::get(&test_url) {
                 Ok(response) if response.status().is_success() => {
@@ -157,14 +157,14 @@ impl SystemHandler {
                     println!("  🔍 Testing embedding model: {}", embedding_model.cyan());
 
                     let client = reqwest::blocking::Client::new();
-                    let embedding_url = format!("{}/api/embeddings", ollama_base_url);
+                    let embedding_url = format!("{ollama_base_url}/api/embeddings");
                     match crate::services::ollama::generate_embedding(
                         &client,
                         &embedding_url,
                         embedding_model,
                         "test",
                     ) {
-                        Ok(_) => println!("  ✅ Embedding model '{}' is working", embedding_model),
+                        Ok(_) => println!("  ✅ Embedding model '{embedding_model}' is working"),
                         Err(e) => {
                             println!(
                                 "  ⚠️  Embedding model '{}' failed: {}",
@@ -179,14 +179,14 @@ impl SystemHandler {
                     let llm_name = profile["llmName"].as_str().unwrap_or("");
                     if !llm_name.is_empty() {
                         println!("  🔍 Testing LLM: {}", llm_name.cyan());
-                        let generate_url = format!("{}/api/generate", ollama_base_url);
+                        let generate_url = format!("{ollama_base_url}/api/generate");
                         match crate::services::ollama::generate_suggestion(
                             &client,
                             &generate_url,
                             llm_name,
                             "test",
                         ) {
-                            Ok(_) => println!("  ✅ LLM '{}' is working", llm_name),
+                            Ok(_) => println!("  ✅ LLM '{llm_name}' is working"),
                             Err(e) => {
                                 println!("  ⚠️  LLM '{}' failed: {}", llm_name.yellow(), e);
                                 issues_found += 1;
@@ -208,34 +208,90 @@ impl SystemHandler {
         // Test Supabase connectivity (if config exists)
         if let Ok(supabase_config) = supabase_config_result {
             println!("\n{}", "Testing Supabase connectivity...".bold());
-            let test_url = format!("{}/rest/v1/", supabase_config.project_url);
 
             let client = reqwest::blocking::Client::new();
-            match client
-                .get(&test_url)
-                .header("apikey", &supabase_config.api_key)
-                .header(
-                    "Authorization",
-                    format!("Bearer {}", &supabase_config.api_key),
-                )
-                .send()
-            {
-                Ok(response) if response.status().is_success() => {
+
+            // Test basic connection
+            match crate::services::supabase::test_connection(&client, &supabase_config) {
+                Ok(_) => {
                     println!("  ✅ Supabase connection successful");
-                }
-                Ok(response) => {
-                    println!(
-                        "  ⚠️  Supabase responded with status: {}",
-                        response.status().to_string().yellow()
-                    );
-                    println!("     Check your API key and URL configuration");
-                    issues_found += 1;
+
+                    // Test database schema
+                    println!("  🔍 Checking database schema...");
+                    match crate::services::supabase::check_notes_table_exists(
+                        &client,
+                        &supabase_config,
+                    ) {
+                        Ok(true) => {
+                            println!("  ✅ Notes table exists and is accessible");
+
+                            // Test if we can write to the table
+                            println!("  🔍 Testing database write access...");
+                            let test_url = format!("{}/rest/v1/notes", supabase_config.project_url);
+
+                            match client
+                                .post(&test_url)
+                                .header("apikey", &supabase_config.api_key)
+                                .header(
+                                    "Authorization",
+                                    format!("Bearer {}", &supabase_config.api_key),
+                                )
+                                .header("Content-Type", "application/json")
+                                .header("Prefer", "return=minimal")
+                                .json(&serde_json::json!({
+                                    "content": "Doctor health check test note",
+                                    "embedding": serde_json::Value::Null
+                                }))
+                                .send()
+                            {
+                                Ok(resp) if resp.status().is_success() => {
+                                    println!("  ✅ Database write access confirmed");
+                                }
+                                Ok(resp) => {
+                                    let status = resp.status();
+                                    println!(
+                                        "  ⚠️  Database write test failed: HTTP {}",
+                                        status.to_string().yellow()
+                                    );
+                                    if status.as_u16() == 403 {
+                                        println!(
+                                            "      Check your RLS (Row Level Security) policies"
+                                        );
+                                    }
+                                    issues_found += 1;
+                                }
+                                Err(e) => {
+                                    println!(
+                                        "  ⚠️  Database write test failed: {}",
+                                        e.to_string().yellow()
+                                    );
+                                    issues_found += 1;
+                                }
+                            }
+                        }
+                        Ok(false) => {
+                            println!("  ❌ Notes table does not exist");
+                            println!("      You need to set up your database schema");
+
+                            // Offer to set up database automatically
+                            println!("\n{}", "🔧 Database Setup Available".bold().cyan());
+                            println!("  The notes table is missing from your Supabase database.");
+                            println!("  You can set up the database schema by running:");
+                            println!("    {}", "logswise-cli setup".green());
+                            println!("  Or set up manually using SUPABASE_SETUP.md");
+
+                            issues_found += 1;
+                        }
+                        Err(e) => {
+                            println!("  ❌ Failed to check database schema: {}", e.red());
+                            println!("      This might indicate permission or connection issues");
+                            issues_found += 1;
+                        }
+                    }
                 }
                 Err(e) => {
-                    println!(
-                        "  ❌ Failed to connect to Supabase: {}",
-                        e.to_string().red()
-                    );
+                    println!("  ❌ Supabase connection failed: {}", e.red());
+                    println!("      Check your Supabase URL and API key");
                     issues_found += 1;
                 }
             }
@@ -260,5 +316,91 @@ impl SystemHandler {
         println!("  ollama serve           # Start Ollama server");
         println!("  ollama pull <model>    # Download a model");
         println!("  logswise-cli guide     # Show detailed help");
+    }
+
+    pub fn run_init(&self) {
+        println!("\n{}\n", "🔧 Database Initialization".bold().cyan());
+
+        // Check if we have Supabase configuration
+        let supabase_config = match crate::utils::load_supabase_config() {
+            Ok(config) => config,
+            Err(_) => {
+                println!("{}", "❌ No Supabase configuration found.".red());
+                println!(
+                    "Please run 'logswise-cli setup' first to configure your Supabase connection."
+                );
+                std::process::exit(1);
+            }
+        };
+
+        println!("Found Supabase configuration:");
+        println!("  Project URL: {}", supabase_config.project_url.cyan());
+        println!(
+            "  API Key: {}...{}",
+            &supabase_config.api_key[..8].cyan(),
+            &supabase_config.api_key[supabase_config.api_key.len() - 4..].cyan()
+        );
+        println!();
+
+        let client = reqwest::blocking::Client::new();
+
+        // Test connection
+        println!("🔍 Testing Supabase connection...");
+        match crate::services::supabase::test_connection(&client, &supabase_config) {
+            Ok(_) => println!("  ✅ Connection successful!"),
+            Err(e) => {
+                println!("  ❌ Connection failed: {}", e.red());
+                println!("Please check your Supabase URL and API key.");
+                std::process::exit(1);
+            }
+        }
+
+        // Check if database is already set up
+        println!("\n🔍 Checking database schema...");
+        match crate::services::supabase::check_notes_table_exists(&client, &supabase_config) {
+            Ok(true) => {
+                println!("  ✅ Notes table already exists!");
+                println!(
+                    "\n{}",
+                    "Your database appears to be set up correctly.".green()
+                );
+                println!("Run 'logswise-cli doctor' for a comprehensive health check.");
+            }
+            Ok(false) => {
+                println!("  ❌ Notes table not found.");
+                println!("\n{}", "Setting up database schema...".cyan());
+
+                match crate::services::supabase::setup_database_schema(&client, &supabase_config) {
+                    Ok(_) => {
+                        println!(
+                            "\n{}",
+                            "✅ Database initialization completed successfully!".green()
+                        );
+                        println!("Your Supabase database is now ready to use with Logswise CLI.");
+                    }
+                    Err(e) => {
+                        println!(
+                            "\n{}",
+                            "⚠️  Automatic setup was not completely successful.".yellow()
+                        );
+                        println!("Error: {e}");
+                        println!();
+                        println!("Please complete the setup manually by following the instructions above,");
+                        println!("or refer to the SUPABASE_SETUP.md file for detailed setup instructions.");
+                    }
+                }
+            }
+            Err(e) => {
+                println!("  ❌ Failed to check database: {}", e.red());
+                println!("Please check your Supabase configuration and permissions.");
+                std::process::exit(1);
+            }
+        }
+
+        println!("\n{}", "Next steps:".bold());
+        println!("  • Run 'logswise-cli doctor' to verify everything is working");
+        println!("  • Add your first note: 'logswise-cli note \"Your note here\"'");
+        println!("  • Get suggestions: 'logswise-cli suggestion \"Your query\"'");
+        println!("  • Start interactive mode: 'logswise-cli interactive'");
     }
 }

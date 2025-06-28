@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logswise CLI - Effortless Notes, Context-Aware Suggestions, and AI Chat</title>
-    <meta name="description" content="A powerful command-line tool for note-taking, context-aware AI suggestions, and chat powered by Ollama and Supabase.">
+    <title>Logswise CLI - Effortless Notes, Context-Aware Suggestions, and AI Chat with Auto Setup</title>
+    <meta name="description"
+        content="A powerful command-line tool for note-taking, context-aware AI suggestions, and chat powered by Ollama and Supabase. Now with automatic database setup!">
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
+
 <body>
     <!-- Hero Section -->
     <header class="hero">
@@ -20,6 +23,7 @@
                 </div>
                 <div class="nav-links">
                     <a href="#features">Features</a>
+                    <a href="#whats-new">What's New</a>
                     <a href="#installation">Installation</a>
                     <a href="#usage">Usage</a>
                     <a href="#commands">Commands</a>
@@ -35,10 +39,12 @@
                 <h1>Logswise CLI</h1>
                 <p class="hero-subtitle">Effortless notes, context-aware suggestions, and AI chat for developers</p>
                 <p class="hero-description">
-                    A powerful command-line tool that combines note-taking, AI-powered suggestions, and chat functionality. 
+                    A powerful command-line tool that combines note-taking, AI-powered suggestions, and chat
+                    functionality.
                     Powered by your own Ollama instance and Supabase for privacy-first, team-ready collaboration.
+                    <strong>Now with automatic database setup!</strong>
                 </p>
-                
+
                 <div class="hero-buttons">
                     <a href="#installation" class="btn btn-primary">
                         <i class="fas fa-download"></i> Get Started
@@ -79,7 +85,7 @@
                             <p>Seamless terminal integration</p>
                         </div>
                     </div>
-                    
+
                     <div class="hero-stats">
                         <div class="stat-item">
                             <i class="fas fa-download"></i>
@@ -104,14 +110,15 @@
         <div class="container">
             <h2>Why Choose Logswise CLI?</h2>
             <p class="section-subtitle">Built for developers who want powerful, privacy-first tools</p>
-            
+
             <div class="features-grid">
                 <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-sticky-note"></i>
                     </div>
                     <h3>Smart Note-Taking</h3>
-                    <p>Capture ideas, bugs, and insights with lightning-fast commands. Perfect for quick note-taking and documentation.</p>
+                    <p>Capture ideas, bugs, and insights with lightning-fast commands. Perfect for quick note-taking and
+                        documentation.</p>
                 </div>
 
                 <div class="feature-card">
@@ -119,7 +126,8 @@
                         <i class="fas fa-brain"></i>
                     </div>
                     <h3>AI-Powered Suggestions</h3>
-                    <p>Get context-aware suggestions based on your notes and profile. Perfect for standups, reviews, and planning.</p>
+                    <p>Get context-aware suggestions based on your notes and profile. Perfect for standups, reviews, and
+                        planning.</p>
                 </div>
 
                 <div class="feature-card">
@@ -150,8 +158,18 @@
                     <div class="feature-icon">
                         <i class="fas fa-rocket"></i>
                     </div>
+                    <h3>🚀 Auto Database Setup</h3>
+                    <p>One-command setup automatically creates Supabase tables and schema. No manual database
+                        configuration needed!</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-zap"></i>
+                    </div>
                     <h3>Lightning Fast</h3>
-                    <p>Built in Rust for maximum performance. Short aliases and interactive mode for efficient workflows.</p>
+                    <p>Built in Rust for maximum performance. Short aliases and interactive mode for efficient
+                        workflows.</p>
                 </div>
             </div>
         </div>
@@ -162,7 +180,7 @@
         <div class="container">
             <h2>Quick Installation</h2>
             <p class="section-subtitle">Get up and running in minutes</p>
-            
+
             <div class="installation-steps">
                 <div class="step">
                     <div class="step-number">1</div>
@@ -195,10 +213,10 @@
                 <div class="step">
                     <div class="step-number">3</div>
                     <div class="step-content">
-                        <h3>Setup Supabase</h3>
-                        <p>Create a Supabase project for note storage</p>
+                        <h3>Create Supabase Project</h3>
+                        <p>Create a Supabase project and get your credentials</p>
                         <div class="code-block">
-                            <code># See SUPABASE_SETUP.md for detailed instructions</code>
+                            <code># Visit app.supabase.com to create project</code>
                             <button class="copy-btn" onclick="copyCode(this)">
                                 <i class="fas fa-copy"></i>
                             </button>
@@ -224,13 +242,33 @@ brew install logswise-cli</code>
                 <div class="step">
                     <div class="step-number">5</div>
                     <div class="step-content">
-                        <h3>Run Setup</h3>
-                        <p>Configure your profile and connections</p>
+                        <h3>🚀 One-Command Setup</h3>
+                        <p>Configure profile and automatically set up Supabase database</p>
                         <div class="code-block">
                             <code>logswise-cli setup</code>
                             <button class="copy-btn" onclick="copyCode(this)">
                                 <i class="fas fa-copy"></i>
                             </button>
+                        </div>
+                        <div class="step-note">
+                            <p><strong>New:</strong> Automatically creates database tables and schema!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <h3>⚙️ Initialize Database</h3>
+                        <p>Verify and complete Supabase database setup</p>
+                        <div class="code-block">
+                            <code>logswise-cli init</code>
+                            <button class="copy-btn" onclick="copyCode(this)">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                        <div class="step-note">
+                            <p><strong>Ensures:</strong> All database operations are complete and verified!</p>
                         </div>
                     </div>
                 </div>
@@ -243,7 +281,7 @@ brew install logswise-cli</code>
         <div class="container">
             <h2>How It Works</h2>
             <p class="section-subtitle">Simple commands, powerful results</p>
-            
+
             <div class="usage-examples">
                 <div class="example">
                     <div class="example-code">
@@ -265,14 +303,16 @@ brew install logswise-cli</code>
                     </div>
                     <div class="example-description">
                         <h3>Take Notes Instantly</h3>
-                        <p>Use short commands to quickly capture thoughts, progress, and insights. Your notes are automatically embedded and stored for future context.</p>
+                        <p>Use short commands to quickly capture thoughts, progress, and insights. Your notes are
+                            automatically embedded and stored for future context.</p>
                     </div>
                 </div>
 
                 <div class="example">
                     <div class="example-description">
                         <h3>Get Smart Suggestions</h3>
-                        <p>Ask questions and get AI-powered suggestions based on your notes, profile, and context. Perfect for planning and problem-solving.</p>
+                        <p>Ask questions and get AI-powered suggestions based on your notes, profile, and context.
+                            Perfect for planning and problem-solving.</p>
                     </div>
                     <div class="example-code">
                         <div class="terminal-window">
@@ -314,7 +354,8 @@ brew install logswise-cli</code>
                     </div>
                     <div class="example-description">
                         <h3>Interactive Mode</h3>
-                        <p>Enter guided interactive mode for continuous workflows. Perfect for daily planning, retrospectives, and deep work sessions.</p>
+                        <p>Enter guided interactive mode for continuous workflows. Perfect for daily planning,
+                            retrospectives, and deep work sessions.</p>
                     </div>
                 </div>
             </div>
@@ -326,7 +367,7 @@ brew install logswise-cli</code>
         <div class="container">
             <h2>Command Reference</h2>
             <p class="section-subtitle">All the tools you need at your fingertips</p>
-            
+
             <div class="commands-grid">
                 <div class="command-group">
                     <h3><i class="fas fa-edit"></i> Core Commands</h3>
@@ -363,7 +404,8 @@ brew install logswise-cli</code>
                     <div class="command-list">
                         <div class="command-item">
                             <code>logswise-cli interactive</code>
-                            <div class="command-description">Enter guided interactive mode for continuous workflows</div>
+                            <div class="command-description">Enter guided interactive mode for continuous workflows
+                            </div>
                         </div>
                         <div class="command-item">
                             <code>logswise-cli recent --count 10</code>
@@ -381,21 +423,70 @@ brew install logswise-cli</code>
                     <div class="command-list">
                         <div class="command-item">
                             <code>logswise-cli setup</code>
-                            <div class="command-description">Configure your profile and connections</div>
+                            <div class="command-description">🚀 Configure profile and automatically set up database
+                            </div>
+                        </div>
+                        <div class="command-item">
+                            <code>logswise-cli init</code>
+                            <div class="command-description">⚙️ Initialize or verify database setup (requires existing
+                                config)</div>
+                        </div>
+                        <div class="command-item">
+                            <code>logswise-cli doctor</code>
+                            <div class="command-description">🔧 Run comprehensive health checks and database validation
+                            </div>
                         </div>
                         <div class="command-item">
                             <code>logswise-cli stats</code>
                             <div class="command-description">Display current configuration and statistics</div>
                         </div>
                         <div class="command-item">
-                            <code>logswise-cli doctor</code>
-                            <div class="command-description">Run system health checks and diagnostics</div>
-                        </div>
-                        <div class="command-item">
                             <code>logswise-cli guide</code>
                             <div class="command-description">Show detailed usage guide and examples</div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- What's New Section -->
+    <section id="whats-new" class="whats-new">
+        <div class="container">
+            <h2>🚀 What's New?</h2>
+            <p class="section-subtitle">Latest improvements to make your workflow even smoother</p>
+
+            <div class="new-features">
+                <div class="new-feature-card highlight">
+                    <div class="feature-icon">
+                        <i class="fas fa-magic"></i>
+                    </div>
+                    <h3>Automatic Database Setup</h3>
+                    <p>No more manual SQL commands! The CLI now automatically creates your Supabase tables, indexes, and
+                        functions during setup. Just provide your credentials and you're ready to go!</p>
+                    <div class="feature-badges">
+                        <span class="badge">One Command</span>
+                        <span class="badge">Zero Config</span>
+                        <span class="badge">Smart Fallback</span>
+                    </div>
+                </div>
+
+                <div class="new-feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <h3>Enhanced Health Checks</h3>
+                    <p>The <code>doctor</code> command now validates your entire database schema, tests write
+                        permissions, and provides actionable guidance for any issues.</p>
+                </div>
+
+                <div class="new-feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <h3>Database Initialization</h3>
+                    <p>New <code>init</code> command lets you set up or verify your database schema anytime, perfect for
+                        existing installations.</p>
                 </div>
             </div>
         </div>
@@ -419,9 +510,11 @@ brew install logswise-cli</code>
                     <h4>Resources</h4>
                     <ul>
                         <li><a href="https://github.com/k61b/logswise-cli/blob/main/README.md">Documentation</a></li>
-                        <li><a href="https://github.com/k61b/logswise-cli/blob/main/SUPABASE_SETUP.md">Setup Guide</a></li>
+                        <li><a href="https://github.com/k61b/logswise-cli/blob/main/SUPABASE_SETUP.md">Setup Guide</a>
+                        </li>
                         <li><a href="https://github.com/k61b/logswise-cli/issues">Issues</a></li>
-                        <li><a href="https://github.com/k61b/logswise-cli/blob/main/CONTRIBUTING.md">Contributing</a></li>
+                        <li><a href="https://github.com/k61b/logswise-cli/blob/main/CONTRIBUTING.md">Contributing</a>
+                        </li>
                     </ul>
                 </div>
 
@@ -458,4 +551,5 @@ brew install logswise-cli</code>
 
     <script src="script.js"></script>
 </body>
+
 </html>

@@ -11,7 +11,7 @@ pub fn get_suggestions(query: &str) {
     let profile = match utils::load_profile() {
         Ok(p) => p,
         Err(e) => {
-            println!("{}", format!("Error loading profile: {}", e).red());
+            println!("{}", format!("Error loading profile: {e}").red());
             println!("Please run 'logswise-cli setup' first.");
             return;
         }
@@ -27,8 +27,8 @@ pub fn get_suggestions(query: &str) {
     let ollama_base_url = profile["ollamaBaseUrl"]
         .as_str()
         .unwrap_or("http://localhost:11434");
-    let ollama_embedding_url = format!("{}/api/embeddings", ollama_base_url);
-    let ollama_generate_url = format!("{}/api/generate", ollama_base_url);
+    let ollama_embedding_url = format!("{ollama_base_url}/api/embeddings");
+    let ollama_generate_url = format!("{ollama_base_url}/api/generate");
     let ollama_model = profile["embeddingModel"]
         .as_str()
         .unwrap_or("nomic-embed-text");
@@ -52,7 +52,7 @@ pub fn get_suggestions(query: &str) {
     let config = match utils::load_supabase_config() {
         Ok(cfg) => cfg,
         Err(e) => {
-            println!("{}", format!("Error loading Supabase config: {}", e).red());
+            println!("{}", format!("Error loading Supabase config: {e}").red());
             println!("Please run 'logswise-cli setup' first.");
             return;
         }
@@ -156,8 +156,7 @@ pub fn get_suggestions(query: &str) {
     );
     let cli_instruction = "Reply in this format:\n=== Quick Summary ===\n(3-line summary)\n=== Suggestions by Category ===\n- Learning:\n  1. Suggestion (with a simple way to track success)\n  2. ...\n- Collaboration:\n  3. ...\n- Well-being:\n  4. ...\n(Up to 10 total, grouped by category. For each, add a quick feedback loop, e.g., 'Do a team poll after 2 weeks' or 'Check adoption in next retro'. Keep the tone informal and practical for a small, busy team. No markdown, CLI readable.)";
     let full_prompt = format!(
-        "{}{}\n\nUser wants suggestions for: {}\n{}{}\nSuggestions:",
-        user_info, notes_context, query, personalization, cli_instruction
+        "{user_info}{notes_context}\n\nUser wants suggestions for: {query}\n{personalization}{cli_instruction}\nSuggestions:"
     );
     println!("🔎 Using Ollama model: {}", llm_name.cyan());
     spinner.set_message("Ollama: Sending request...");
@@ -172,8 +171,7 @@ pub fn get_suggestions(query: &str) {
                     final_response.trim()
                 };
                 println!(
-                    "----------------------------------------\n{}\n----------------------------------------\n",
-                    final_answer
+                    "----------------------------------------\n{final_answer}\n----------------------------------------\n"
                 );
             } else {
                 println!("{} {}", "❌ No suggestion from model:".red(), llm_name);
@@ -236,8 +234,7 @@ mod tests {
         let personalization = "At TestCo scale (10-100), consider centralized log filtering.\n";
         let cli_instruction = "Reply in this format:\n=== Quick Summary ===\n(3-line summary)\n=== Suggestions by Category ===\n- Learning:\n  1. Suggestion (with a simple way to track success)\n  2. ...\n- Collaboration:\n  3. ...\n- Well-being:\n  4. ...\n(Up to 10 total, grouped by category. For each, add a quick feedback loop, e.g., 'Do a team poll after 2 weeks' or 'Check adoption in next retro'. Keep the tone informal and practical for a small, busy team. No markdown, CLI readable)";
         let full_prompt = format!(
-            "{}{}\n\nUser wants suggestions for: {}\n{}{}\nSuggestions:",
-            user_info, notes_context, query, personalization, cli_instruction
+            "{user_info}{notes_context}\n\nUser wants suggestions for: {query}\n{personalization}{cli_instruction}\nSuggestions:"
         );
         assert!(full_prompt.contains("User wants suggestions for: How to improve logging?"));
         assert!(full_prompt.contains("Recent Notes:"));

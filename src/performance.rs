@@ -54,7 +54,7 @@ impl OperationContext {
         if !self.details.is_empty() {
             result.push_str("\n   Context:");
             for detail in &self.details {
-                result.push_str(&format!("\n   • {}", detail));
+                result.push_str(&format!("\n   • {detail}"));
             }
         }
         result
