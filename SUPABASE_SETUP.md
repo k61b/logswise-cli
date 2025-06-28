@@ -1,5 +1,13 @@
 # Supabase Setup for Logswise CLI
 
+> **🚀 New: Automatic Setup Available!**
+>
+> As of the latest version, Logswise CLI can automatically set up your Supabase database during the initial setup process. Simply run `logswise-cli setup` and the CLI will handle table creation and schema setup for you.
+>
+> If you already have Supabase configured but need to set up the database, run: `logswise-cli init`
+>
+> The manual instructions below are provided for reference or if automatic setup is not available for your Supabase instance.
+
 ## 1. Create a Supabase Project
 
 - Go to https://app.supabase.com/ and create a new project.
@@ -58,3 +66,9 @@ and enter your Supabase Project URL and API key when prompted.
 - Your Supabase DB only needs a `notes` table as shown above.
 - No personal profile info is stored in the database—only notes.
 - Suggestions and chat are powered by your local LLM (Ollama) using your context.
+
+**Automatic Setup Commands:**
+
+- `logswise-cli setup` - Complete setup including automatic database creation
+- `logswise-cli init` - Initialize database schema (requires existing config)
+- `logswise-cli doctor` - Verify setup and diagnose any issues

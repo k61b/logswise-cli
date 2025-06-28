@@ -75,4 +75,6 @@ pub enum Commands {
         /// Shell type (bash, zsh, fish, powershell)
         shell: String,
     },
+    /// Initialize or verify database setup (requires existing Supabase config)
+    Init,
 }

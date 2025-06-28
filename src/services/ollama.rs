@@ -39,7 +39,7 @@ pub fn generate_embedding(
 
             let resp_json: Value = match serde_json::from_str(&resp_text) {
                 Ok(json) => json,
-                Err(e) => return Err(format!("Failed to parse Ollama response: {}", e)),
+                Err(e) => return Err(format!("Failed to parse Ollama response: {e}")),
             };
 
             if resp_json.get("embedding").is_some()
@@ -54,10 +54,7 @@ pub fn generate_embedding(
                     })
                     .unwrap_or_default())
             } else {
-                Err(format!(
-                    "Unexpected embedding response format: {}",
-                    resp_text
-                ))
+                Err(format!("Unexpected embedding response format: {resp_text}"))
             }
         }
         Ok(resp) => {
@@ -65,14 +62,10 @@ pub fn generate_embedding(
             let err_text = resp.text().unwrap_or_default();
             if status.as_u16() == 404 {
                 Err(format!(
-                    "Model '{}' not found. Try: ollama pull {}",
-                    model, model
+                    "Model '{model}' not found. Try: ollama pull {model}"
                 ))
             } else {
-                Err(format!(
-                    "Ollama returned error status {}: {}",
-                    status, err_text
-                ))
+                Err(format!("Ollama returned error status {status}: {err_text}"))
             }
         }
         Err(e) => {
@@ -87,7 +80,7 @@ pub fn generate_embedding(
                         .to_string(),
                 )
             } else {
-                Err(format!("Failed to connect to Ollama: {}", e))
+                Err(format!("Failed to connect to Ollama: {e}"))
             }
         }
     }
@@ -132,7 +125,7 @@ pub fn generate_suggestion(
                     }
                     // Check for errors in streaming response
                     if let Some(error) = data.get("error").and_then(|v| v.as_str()) {
-                        return Err(format!("Ollama error: {}", error));
+                        return Err(format!("Ollama error: {error}"));
                     }
                 }
             }
@@ -148,13 +141,11 @@ pub fn generate_suggestion(
             let err_body = resp.text().unwrap_or_default();
             if status.as_u16() == 404 {
                 Err(format!(
-                    "Model '{}' not found. Try: ollama pull {}",
-                    model, model
+                    "Model '{model}' not found. Try: ollama pull {model}"
                 ))
             } else {
                 Err(format!(
-                    "Ollama server returned error status: {}\n{}",
-                    status, err_body
+                    "Ollama server returned error status: {status}\n{err_body}"
                 ))
             }
         }
@@ -167,7 +158,7 @@ pub fn generate_suggestion(
                         .to_string(),
                 )
             } else {
-                Err(format!("Error connecting to Ollama: {}", e))
+                Err(format!("Error connecting to Ollama: {e}"))
             }
         }
     }

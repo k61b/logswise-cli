@@ -104,12 +104,20 @@ impl HelpHandler {
             "  {} Check configuration health and connectivity",
             "doctor".green().bold()
         );
+        println!(
+            "  {} Initialize database schema (after setup)",
+            "init".green().bold()
+        );
         println!("  {}   Show this detailed help\n", "guide".green().bold());
 
         println!("{}", "EXAMPLES:".bold());
         println!(
             "  {}  # Set up your profile and configuration",
             "logswise-cli setup".cyan()
+        );
+        println!(
+            "  {}  # Initialize database (after setup)",
+            "logswise-cli init".cyan()
         );
         println!(
             "  {}  # Add a quick note (short form)",
@@ -141,6 +149,10 @@ impl HelpHandler {
         println!(
             "  {}  # Diagnose configuration and connectivity issues",
             "logswise-cli doctor".cyan()
+        );
+        println!(
+            "  {}  # Initialize or fix database setup",
+            "logswise-cli init".cyan()
         );
         println!(
             "  {}  # Show model information",

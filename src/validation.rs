@@ -42,7 +42,7 @@ pub fn validate_config(config: &Value) -> Vec<String> {
 
     for field in &required_fields {
         if config.get(field).is_none() || config[field].as_str().unwrap_or("").trim().is_empty() {
-            errors.push(format!("Missing or empty field: {}", field));
+            errors.push(format!("Missing or empty field: {field}"));
         }
     }
 
@@ -90,7 +90,7 @@ pub fn check_config_health(_config: &SupabaseConfig, profile: &Value) -> bool {
     if !validation_errors.is_empty() {
         println!("{}", "⚠️  Configuration validation issues found:".yellow());
         for error in validation_errors {
-            println!("   • {}", error);
+            println!("   • {error}");
         }
         println!(
             "\n{}",

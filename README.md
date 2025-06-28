@@ -9,7 +9,10 @@ Logswise CLI is a command-line tool for note-taking, context-aware suggestions, 
 
 ## 🚀 What's New?
 
-- **🔧 Health Check System:** New `doctor` command validates configuration and tests connectivity to Ollama/Supabase
+- **� Automatic Database Setup:** New one-command setup automatically creates Supabase tables and schema with `logswise-cli setup`
+- **⚙️ Database Initialization:** New `init` command for standalone database setup and verification
+- **🔧 Enhanced Health Check:** `doctor` command now includes comprehensive database schema validation
+- **�🔧 Health Check System:** New `doctor` command validates configuration and tests connectivity to Ollama/Supabase
 - **⚡ Enhanced Error Handling:** Eliminated all dangerous `unwrap()` calls with graceful error recovery
 - **✅ Input Validation:** Comprehensive validation for notes (10K character limit), queries, and messages
 - **🛡️ Network Resilience:** 30-second timeouts and detailed error messages for connection failures
@@ -85,7 +88,9 @@ This is useful for quickly finding related notes without waiting for LLM generat
 - **💡 Get Suggestions:** Receive helpful, context-aware suggestions based on your queries, recent notes, and profile information
 - **🤖 Chat with Assistant:** Engage in conversation with an AI assistant, powered by your configured LLM (Ollama)
 - **🔍 Semantic Search:** Use embedding-only mode for lightning-fast note retrieval
-- **🔧 Health Diagnostics:** Comprehensive configuration and connectivity checking with the `doctor` command
+- **� Automatic Database Setup:** One-command setup automatically creates Supabase tables and schema
+- **�🔧 Health Diagnostics:** Comprehensive configuration and connectivity checking with the `doctor` command
+- **⚙️ Database Initialization:** Dedicated `init` command for database setup and verification
 - **⚡ Network Resilience:** 30-second timeouts and robust error handling for all network operations
 - **📊 Progress Indicators:** Visual feedback during long-running operations
 - **🛡️ Input Validation:** Comprehensive validation for all user inputs with helpful error messages
@@ -129,7 +134,32 @@ Follow the prompts to enter your profile information:
 
 Your information is stored locally in `~/.logswise/setup.json`.
 
-For detailed Supabase setup, see [SUPABASE_SETUP.md](SUPABASE_SETUP.md).
+**🚀 New: Automatic Database Setup**
+
+The setup process now automatically creates the required Supabase tables and schema! After providing your Supabase URL and API key, the CLI will:
+
+- ✅ Test your Supabase connection
+- ✅ Automatically create the `notes` table
+- ✅ Set up embedding columns for semantic search
+- ✅ Create necessary indexes and functions
+- ✅ Verify everything is working correctly
+
+If automatic setup is not available for your Supabase instance, you'll get clear instructions for manual setup.
+
+**Additional Commands:**
+
+- **Initialize Database:** If you need to set up the database later or verify your setup:
+
+  ```sh
+  logswise-cli init
+  ```
+
+- **Health Check:** Verify your configuration and test all connections:
+  ```sh
+  logswise-cli doctor
+  ```
+
+For detailed manual Supabase setup (if needed), see [SUPABASE_SETUP.md](SUPABASE_SETUP.md).
 
 ---
 
@@ -287,7 +317,9 @@ This will:
 - ✅ Test Ollama server connectivity
 - ✅ Verify embedding model availability
 - ✅ Test LLM model functionality
-- ✅ Check Supabase connection
+- ✅ Check Supabase connection and database schema
+- ✅ Verify database table structure and write permissions
+- 🔧 Detect missing database setup and provide guidance
 - 📊 Provide actionable recommendations for any issues found
 
 ### Model Configuration Issues
