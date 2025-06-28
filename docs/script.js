@@ -1,5 +1,8 @@
 // Smooth scrolling for navigation links
 document.addEventListener('DOMContentLoaded', function() {
+    // Mobile navigation handling
+    initMobileNavigation();
+    
     // Handle navigation link clicks
     const navLinks = document.querySelectorAll('a[href^="#"]');
     navLinks.forEach(link => {
@@ -9,6 +12,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const targetElement = document.getElementById(targetId);
             
             if (targetElement) {
+                // Close mobile menu if open
+                closeMobileMenu();
+                
                 const offsetTop = targetElement.offsetTop - 80; // Account for fixed nav
                 window.scrollTo({
                     top: offsetTop,
@@ -26,28 +32,171 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Add scroll effect to navbar
     handleNavbarScroll();
+    
+    // Improved copy functionality for mobile
+    initCopyFunctionality();
 });
 
-// Copy code functionality
+// Mobile Navigation Functions
+function initMobileNavigation() {
+    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+    const navLinks = document.querySelector('.nav-links');
+    const body = document.body;
+    
+    if (!mobileMenuBtn || !navLinks) return;
+    
+    // Toggle mobile menu
+    mobileMenuBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleMobileMenu();
+    });
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.nav-container')) {
+            closeMobileMenu();
+        }
+    });
+    
+    // Close menu on escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeMobileMenu();
+        }
+    });
+    
+    // Handle orientation change
+    window.addEventListener('orientationchange', function() {
+        setTimeout(closeMobileMenu, 100);
+    });
+    
+    // Prevent body scroll when menu is open
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.attributeName === 'class') {
+                if (navLinks.classList.contains('active')) {
+                    body.style.overflow = 'hidden';
+                } else {
+                    body.style.overflow = '';
+                }
+            }
+        });
+    });
+    
+    observer.observe(navLinks, { attributes: true });
+}
+
+function toggleMobileMenu() {
+    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+    const navLinks = document.querySelector('.nav-links');
+    
+    if (!mobileMenuBtn || !navLinks) return;
+    
+    mobileMenuBtn.classList.toggle('active');
+    navLinks.classList.toggle('active');
+    
+    // Update ARIA attributes for accessibility
+    const isOpen = navLinks.classList.contains('active');
+    mobileMenuBtn.setAttribute('aria-expanded', isOpen);
+    navLinks.setAttribute('aria-hidden', !isOpen);
+}
+
+function closeMobileMenu() {
+    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+    const navLinks = document.querySelector('.nav-links');
+    
+    if (!mobileMenuBtn || !navLinks) return;
+    
+    mobileMenuBtn.classList.remove('active');
+    navLinks.classList.remove('active');
+    
+    // Update ARIA attributes
+    mobileMenuBtn.setAttribute('aria-expanded', false);
+    navLinks.setAttribute('aria-hidden', true);
+}
+
+// Enhanced copy functionality with better mobile support
+function initCopyFunctionality() {
+    // Add copy buttons if they don't exist
+    const codeBlocks = document.querySelectorAll('.code-block');
+    codeBlocks.forEach(block => {
+        if (!block.querySelector('.copy-btn')) {
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'copy-btn';
+            copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+            copyBtn.setAttribute('aria-label', 'Copy code');
+            copyBtn.addEventListener('click', function() {
+                copyCode(this);
+            });
+            block.appendChild(copyBtn);
+        }
+    });
+}
+
+// Improved copy code functionality
 function copyCode(button) {
     const codeBlock = button.parentElement.querySelector('code');
     const textToCopy = codeBlock.textContent;
     
-    // Create temporary textarea to copy text
+    // Modern clipboard API with fallback
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            showCopySuccess(button);
+        }).catch(() => {
+            fallbackCopyText(textToCopy, button);
+        });
+    } else {
+        fallbackCopyText(textToCopy, button);
+    }
+}
+
+function fallbackCopyText(text, button) {
     const textarea = document.createElement('textarea');
-    textarea.value = textToCopy;
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.left = '-9999px';
+    textarea.style.top = '-9999px';
     document.body.appendChild(textarea);
+    textarea.focus();
     textarea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textarea);
     
-    // Show feedback
-    const originalIcon = button.innerHTML;
+    try {
+        document.execCommand('copy');
+        showCopySuccess(button);
+    } catch (err) {
+        console.error('Copy failed:', err);
+        showCopyError(button);
+    }
+    
+    document.body.removeChild(textarea);
+}
+
+function showCopySuccess(button) {
+    const originalContent = button.innerHTML;
     button.innerHTML = '<i class="fas fa-check"></i>';
     button.style.color = '#4CAF50';
+    button.style.background = 'rgba(76, 175, 80, 0.2)';
+    
+    // Add haptic feedback for mobile devices
+    if ('vibrate' in navigator) {
+        navigator.vibrate(50);
+    }
     
     setTimeout(() => {
-        button.innerHTML = originalIcon;
+        button.innerHTML = originalContent;
+        button.style.color = '';
+        button.style.background = '';
+    }, 2000);
+}
+
+function showCopyError(button) {
+    const originalContent = button.innerHTML;
+    button.innerHTML = '<i class="fas fa-times"></i>';
+    button.style.color = '#f44336';
+    
+    setTimeout(() => {
+        button.innerHTML = originalContent;
         button.style.color = '';
     }, 2000);
 }
@@ -117,37 +266,49 @@ function observeElements() {
     });
 }
 
-// Navbar scroll effect
+// Enhanced navbar scroll effect
 function handleNavbarScroll() {
     const navbar = document.querySelector('.navbar');
     
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 100) {
-            navbar.style.background = 'rgba(26, 32, 44, 0.95)';
-            navbar.style.backdropFilter = 'blur(10px)';
-            navbar.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
+    if (!navbar) return;
+    
+    let ticking = false;
+    
+    function updateNavbar() {
+        if (window.scrollY > 50) {
+            navbar.classList.add('scrolled');
         } else {
-            navbar.style.background = 'transparent';
-            navbar.style.backdropFilter = 'none';
-            navbar.style.boxShadow = 'none';
+            navbar.classList.remove('scrolled');
         }
-    });
+        ticking = false;
+    }
+    
+    function requestTick() {
+        if (!ticking) {
+            requestAnimationFrame(updateNavbar);
+            ticking = true;
+        }
+    }
+    
+    window.addEventListener('scroll', requestTick, { passive: true });
+    
+    // Handle initial state
+    updateNavbar();
 }
 
-// Parallax effect for hero section
-window.addEventListener('scroll', () => {
-    const scrolled = window.pageYOffset;
-    const hero = document.querySelector('.hero');
-    const rate = scrolled * -0.5;
-    
-    if (hero) {
-        hero.style.transform = `translateY(${rate}px)`;
-    }
-});
-
-// Add loading animation
+// Add loading animation and performance optimizations
 window.addEventListener('load', () => {
     document.body.classList.add('loaded');
+    
+    // Preload critical images
+    const criticalImages = document.querySelectorAll('img[data-preload]');
+    criticalImages.forEach(img => {
+        const src = img.getAttribute('data-src');
+        if (src) {
+            img.src = src;
+            img.removeAttribute('data-src');
+        }
+    });
 });
 
 // Mobile menu toggle (if needed)
