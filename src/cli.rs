@@ -13,6 +13,21 @@ pub struct Cli {
 }
 
 #[derive(Subcommand)]
+pub enum PersonalizeAction {
+    /// Run the full personalization setup
+    Setup,
+    /// Update existing personalization settings
+    Update,
+    /// Show current personalization settings
+    Show,
+    /// Provide feedback on suggestions
+    Feedback {
+        /// Category of the suggestion to provide feedback on
+        category: Option<String>,
+    },
+}
+
+#[derive(Subcommand)]
 pub enum Commands {
     /// Run interactive setup for your profile and configuration
     Setup,
@@ -48,6 +63,11 @@ pub enum Commands {
     },
     /// Start interactive mode for continuous note-taking and chatting
     Interactive,
+    /// Set up enhanced personalization for better suggestions
+    Personalize {
+        #[command(subcommand)]
+        action: Option<PersonalizeAction>,
+    },
     /// Show information about Logswise CLI
     About,
     /// Display your profile and configuration stats

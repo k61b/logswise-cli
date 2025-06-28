@@ -6,11 +6,13 @@
 
 mod chat_handler;
 mod cli;
+mod enhanced_setup;
 mod errors;
 mod handlers;
 mod interactive;
 mod note_handler;
 mod performance;
+mod personalization;
 mod router;
 mod setup;
 mod suggestion_handler;
