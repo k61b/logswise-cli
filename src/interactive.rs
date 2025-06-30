@@ -17,10 +17,14 @@ pub fn run_interactive() {
     );
     println!();
 
+    // Show recent notes before the first menu display
+    show_startup_notes();
+
     loop {
         let action_options = vec![
             "💬 Chat",
             "📝 Add Note",
+            "📋 View Recent Notes",
             "💡 Get Suggestions",
             "📊 View Stats",
             "❓ Help",
@@ -57,6 +61,10 @@ pub fn run_interactive() {
                 }
             }
             Ok(2) => {
+                // View Recent Notes
+                note_handler::show_recent_notes(3);
+            }
+            Ok(3) => {
                 // Get Suggestions
                 let query: String = Input::new()
                     .with_prompt("💡 What do you need suggestions for?")
@@ -67,17 +75,17 @@ pub fn run_interactive() {
                     suggestion_handler::get_suggestions(&query);
                 }
             }
-            Ok(3) => {
+            Ok(4) => {
                 // View Stats
                 use crate::handlers::system::SystemHandler;
                 let system_handler = SystemHandler::new();
                 system_handler.print_stats();
             }
-            Ok(4) => {
+            Ok(5) => {
                 // Help
                 print_interactive_help();
             }
-            Ok(5) => {
+            Ok(6) => {
                 // Exit
                 println!(
                     "{}",
@@ -106,6 +114,7 @@ fn print_interactive_help() {
         "• {} - Capture thoughts, ideas, or code snippets",
         "Add Note".green()
     );
+    println!("• {} - Show your last 3 notes", "View Recent Notes".green());
     println!(
         "• {} - Get context-aware advice and recommendations",
         "Get Suggestions".green()
@@ -122,4 +131,151 @@ fn print_interactive_help() {
         "Tip: All your notes and conversations are automatically saved and used as context!"
             .yellow()
     );
+}
+
+/// Shows recent notes with a beautiful UI on startup
+fn show_startup_notes() {
+    use crate::utils::load_supabase_config;
+    use reqwest::blocking::Client;
+
+    // Try to load config and show notes if available
+    let config = match load_supabase_config() {
+        Ok(cfg) => cfg,
+        Err(_) => {
+            // If no config, show a friendly message about setup
+            println!(
+                "{}",
+                "┌─ Quick Start ─────────────────────────────────────────────────────────────┐"
+                    .bright_black()
+            );
+            println!(
+                "{}  🔧 {}",
+                "│".bright_black(),
+                "Run 'setup' to configure Logswise for note-taking".cyan()
+            );
+            println!(
+                "{}  📚 {}",
+                "│".bright_black(),
+                "Then start adding notes and chatting with AI!".cyan()
+            );
+            println!(
+                "{}",
+                "└───────────────────────────────────────────────────────────────────────────┘"
+                    .bright_black()
+            );
+            println!();
+            return;
+        }
+    };
+
+    let client = Client::new();
+    let url = format!("{}/rest/v1/notes", config.project_url);
+
+    // Fetch recent notes quietly (no spinner for startup)
+    let response = client
+        .get(&url)
+        .header("apikey", &config.api_key)
+        .header("Authorization", format!("Bearer {}", config.api_key))
+        .query(&[
+            ("select", "content,created_at"),
+            ("order", "created_at.desc"),
+            ("limit", "3"),
+        ])
+        .send();
+
+    match response {
+        Ok(resp) if resp.status().is_success() => {
+            match resp.json::<Vec<serde_json::Value>>() {
+                Ok(notes) => {
+                    if notes.is_empty() {
+                        // No notes yet - show encouraging message
+                        println!("{}","┌─ Recent Notes ────────────────────────────────────────────────────────────┐".bright_black());
+                        println!(
+                            "{}  📝 {}",
+                            "│".bright_black(),
+                            "No notes yet - add your first note below!".yellow()
+                        );
+                        println!(
+                            "{}  💡 {}",
+                            "│".bright_black(),
+                            "Notes help provide context for AI suggestions".bright_black()
+                        );
+                        println!("{}", "└───────────────────────────────────────────────────────────────────────────┘".bright_black());
+                    } else {
+                        // Show recent notes with beautiful formatting
+                        println!("{}", "┌─ Recent Notes ────────────────────────────────────────────────────────────┐".bright_black());
+
+                        for (i, note) in notes.iter().enumerate() {
+                            let content = note["content"].as_str().unwrap_or("(empty)");
+                            let created_at = note["created_at"].as_str().unwrap_or("unknown time");
+
+                            // Format the timestamp to show just the date
+                            let formatted_time = created_at.split('T').next().unwrap_or(created_at);
+
+                            // Truncate long notes for the preview
+                            let preview = if content.len() > 54 {
+                                format!("{}...", &content[0..54])
+                            } else {
+                                content.to_string()
+                            };
+
+                            let bullet = match i {
+                                0 => "●".green(),
+                                1 => "●".yellow(),
+                                2 => "●".blue(),
+                                _ => "●".white(),
+                            };
+
+                            println!(
+                                "{}  {} {} {}",
+                                "│".bright_black(),
+                                bullet,
+                                preview.white(),
+                                format!("({formatted_time})").bright_black()
+                            );
+                        }
+
+                        println!("{}", "└───────────────────────────────────────────────────────────────────────────┘".bright_black());
+                    }
+                }
+                Err(_) => {
+                    // Error parsing - show generic message
+                    println!("{}","┌─ Recent Notes ────────────────────────────────────────────────────────────┐".bright_black());
+                    println!(
+                        "{}  ⚠️  {}",
+                        "│".bright_black(),
+                        "Unable to load recent notes".yellow()
+                    );
+                    println!("{}", "└───────────────────────────────────────────────────────────────────────────┘".bright_black());
+                }
+            }
+        }
+        Ok(_) | Err(_) => {
+            // Network error or HTTP error - show connection message
+            println!(
+                "{}",
+                "┌─ Recent Notes ────────────────────────────────────────────────────────────┐"
+                    .bright_black()
+            );
+            println!(
+                "{}  🔌 {}",
+                "│".bright_black(),
+                "Unable to connect to Supabase".yellow()
+            );
+            println!(
+                "{}  💡 {}",
+                "│".bright_black(),
+                "Check your internet connection and config".bright_black()
+            );
+            println!(
+                "{}",
+                "└───────────────────────────────────────────────────────────────────────────┘"
+                    .bright_black()
+            );
+        }
+    }
+
+    // Add a subtle separator before the menu
+    println!("{}", "─".repeat(79).bright_black());
+    println!();
 }

@@ -42,7 +42,7 @@ impl SetupHandler {
             // Handle import logic
             println!(
                 "{}",
-                format!("Importing configuration from: {}", import_path).cyan()
+                format!("Importing configuration from: {import_path}").cyan()
             );
             if let Err(e) = self.config_manager.import_existing_setup() {
                 eprintln!("{} {}", "Error:".red(), e);

@@ -31,7 +31,10 @@ use router::CommandRouter;
 
 fn validate_input(cli: &Cli) {
     match &cli.command {
-        cli::Commands::Setup { import: Some(import_path), .. } => {
+        cli::Commands::Setup {
+            import: Some(import_path),
+            ..
+        } => {
             if !std::path::Path::new(import_path).exists() {
                 eprintln!("❌ Import file does not exist: {import_path}");
                 std::process::exit(1);

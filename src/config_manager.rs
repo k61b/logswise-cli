@@ -494,7 +494,7 @@ impl ConfigManager {
                         "Intern", "Junior", "Mid", "Senior", "Lead", "Manager", "Director",
                     ];
                     let selection = Select::new()
-                        .with_prompt(format!("Select {}", field_name))
+                        .with_prompt(format!("Select {field_name}"))
                         .items(&options)
                         .interact()
                         .map_err(|e| format!("Input error: {e}"))?;
@@ -510,7 +510,7 @@ impl ConfigManager {
                         "5000+",
                     ];
                     let selection = Select::new()
-                        .with_prompt(format!("Select {}", field_name))
+                        .with_prompt(format!("Select {field_name}"))
                         .items(&options)
                         .interact()
                         .map_err(|e| format!("Input error: {e}"))?;
@@ -525,7 +525,7 @@ impl ConfigManager {
                         "10+ years",
                     ];
                     let selection = Select::new()
-                        .with_prompt(format!("Select {}", field_name))
+                        .with_prompt(format!("Select {field_name}"))
                         .items(&options)
                         .interact()
                         .map_err(|e| format!("Input error: {e}"))?;
@@ -543,7 +543,7 @@ impl ConfigManager {
                         "Other",
                     ];
                     let selection = Select::new()
-                        .with_prompt(format!("Select {}", field_name))
+                        .with_prompt(format!("Select {field_name}"))
                         .items(&options)
                         .interact()
                         .map_err(|e| format!("Input error: {e}"))?;
@@ -552,7 +552,7 @@ impl ConfigManager {
                 "workMode" => {
                     let options = vec!["Remote", "On-site", "Hybrid"];
                     let selection = Select::new()
-                        .with_prompt(format!("Select {}", field_name))
+                        .with_prompt(format!("Select {field_name}"))
                         .items(&options)
                         .interact()
                         .map_err(|e| format!("Input error: {e}"))?;
@@ -560,10 +560,7 @@ impl ConfigManager {
                 }
                 "llmName" => {
                     let new_value: String = Input::new()
-                        .with_prompt(format!(
-                            "Enter {} (current: {})",
-                            field_name, current_value
-                        ))
+                        .with_prompt(format!("Enter {field_name} (current: {current_value})"))
                         .default(current_value.to_string())
                         .interact_text()
                         .map_err(|e| format!("Input error: {e}"))?;
@@ -686,7 +683,7 @@ impl ConfigManager {
             .unwrap_or(0);
 
         let profession_idx = Select::new()
-            .with_prompt(format!("Profession (current: {})", current_profession))
+            .with_prompt(format!("Profession (current: {current_profession})"))
             .items(&profession_options)
             .default(default_idx)
             .interact()
@@ -707,7 +704,7 @@ impl ConfigManager {
             .unwrap_or(0);
 
         let job_title_idx = Select::new()
-            .with_prompt(format!("Job Title (current: {})", current_job_title))
+            .with_prompt(format!("Job Title (current: {current_job_title})"))
             .items(&job_title_options)
             .default(default_idx)
             .interact()
@@ -718,7 +715,7 @@ impl ConfigManager {
         // Update company name
         let current_company = current_config["companyName"].as_str().unwrap_or("");
         let company_name: String = Input::new()
-            .with_prompt(format!("Company Name (current: {})", current_company))
+            .with_prompt(format!("Company Name (current: {current_company})"))
             .default(current_company.to_string())
             .interact_text()
             .map_err(|e| format!("Input error: {e}"))?;
@@ -756,10 +753,7 @@ impl ConfigManager {
             .unwrap_or(0);
 
         let language_idx = Select::new()
-            .with_prompt(format!(
-                "Preferred Language (current: {})",
-                current_language
-            ))
+            .with_prompt(format!("Preferred Language (current: {current_language})"))
             .items(&language_options)
             .default(default_idx)
             .interact()
@@ -770,7 +764,7 @@ impl ConfigManager {
         // Update LLM name
         let current_llm = current_config["llmName"].as_str().unwrap_or("");
         let llm_name: String = Input::new()
-            .with_prompt(format!("LLM Name (current: {})", current_llm))
+            .with_prompt(format!("LLM Name (current: {current_llm})"))
             .default(current_llm.to_string())
             .interact_text()
             .map_err(|e| format!("Input error: {e}"))?;
@@ -802,7 +796,7 @@ impl ConfigManager {
             .unwrap_or(0);
 
         let size_idx = Select::new()
-            .with_prompt(format!("Company Size (current: {})", current_size))
+            .with_prompt(format!("Company Size (current: {current_size})"))
             .items(&size_options)
             .default(default_idx)
             .interact()
@@ -819,7 +813,7 @@ impl ConfigManager {
             .unwrap_or(0);
 
         let work_mode_idx = Select::new()
-            .with_prompt(format!("Work Mode (current: {})", current_work_mode))
+            .with_prompt(format!("Work Mode (current: {current_work_mode})"))
             .items(&work_mode_options)
             .default(default_idx)
             .interact()
@@ -841,7 +835,7 @@ impl ConfigManager {
             .as_str()
             .unwrap_or("http://localhost:11434");
         let ollama_url: String = Input::new()
-            .with_prompt(format!("Ollama Base URL (current: {})", current_url))
+            .with_prompt(format!("Ollama Base URL (current: {current_url})"))
             .default(current_url.to_string())
             .interact_text()
             .map_err(|e| format!("Input error: {e}"))?;
@@ -853,7 +847,7 @@ impl ConfigManager {
             .as_str()
             .unwrap_or("nomic-embed-text");
         let embedding_model: String = Input::new()
-            .with_prompt(format!("Embedding Model (current: {})", current_embedding))
+            .with_prompt(format!("Embedding Model (current: {current_embedding})"))
             .default(current_embedding.to_string())
             .interact_text()
             .map_err(|e| format!("Input error: {e}"))?;
@@ -875,7 +869,7 @@ impl ConfigManager {
 
         let current_url = current_config["supabaseUrl"].as_str().unwrap_or("");
         let supabase_url: String = Input::new()
-            .with_prompt(format!("Supabase URL (current: {})", current_url))
+            .with_prompt(format!("Supabase URL (current: {current_url})"))
             .default(current_url.to_string())
             .interact_text()
             .map_err(|e| format!("Input error: {e}"))?;
@@ -892,7 +886,7 @@ impl ConfigManager {
         };
 
         let supabase_api_key: String = Input::new()
-            .with_prompt(format!("Supabase API Key (current: {})", masked_key))
+            .with_prompt(format!("Supabase API Key (current: {masked_key})"))
             .interact_text()
             .map_err(|e| format!("Input error: {e}"))?;
 
@@ -913,7 +907,7 @@ impl ConfigManager {
                 self.save_configuration(&updated_config)?;
             }
             Err(e) => {
-                println!("{}", format!("❌ Connection failed: {}", e).red());
+                println!("{}", format!("❌ Connection failed: {e}").red());
                 println!("{}", "Configuration not updated.".yellow());
             }
         }
@@ -1020,7 +1014,7 @@ impl ConfigManager {
         match test_connection(&client, &config) {
             Ok(_) => println!("{}", "✅ Connection successful!".green()),
             Err(e) => {
-                println!("{}", format!("❌ Connection failed: {}", e).red());
+                println!("{}", format!("❌ Connection failed: {e}").red());
                 let continue_anyway = Confirm::new()
                     .with_prompt("Continue anyway? (You can fix this later)")
                     .default(false)
@@ -1045,15 +1039,12 @@ impl ConfigManager {
                 if auto_setup {
                     match setup_database_schema(&client, &config) {
                         Ok(_) => println!("{}", "✅ Database schema created!".green()),
-                        Err(e) => println!("{}", format!("⚠️  Auto-setup failed: {}", e).yellow()),
+                        Err(e) => println!("{}", format!("⚠️  Auto-setup failed: {e}").yellow()),
                     }
                 }
             }
             Ok(true) => println!("{}", "✅ Database already configured!".green()),
-            Err(e) => println!(
-                "{}",
-                format!("⚠️  Could not check database: {}", e).yellow()
-            ),
+            Err(e) => println!("{}", format!("⚠️  Could not check database: {e}").yellow()),
         }
 
         Ok((supabase_url, supabase_api_key))
