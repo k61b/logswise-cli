@@ -1,17 +1,69 @@
-use crate::setup;
+use crate::config_manager::ConfigManager;
 use colored::*;
 use figlet_rs::FIGfont;
 
-pub struct SetupHandler {}
+pub struct SetupHandler {
+    config_manager: ConfigManager,
+}
 
 impl SetupHandler {
     pub fn new() -> Self {
-        Self {}
+        Self {
+            config_manager: ConfigManager::load_or_create()
+                .unwrap_or_else(|_| ConfigManager::new()),
+        }
     }
 
-    pub fn run_setup(&self) {
+    pub fn run_smart_setup(
+        &mut self,
+        update: bool,
+        express: bool,
+        template: bool,
+        import: Option<String>,
+    ) {
         self.print_banner();
-        setup::run_setup();
+
+        if update {
+            if let Err(e) = self.config_manager.run_selective_update() {
+                eprintln!("{} {}", "Error:".red(), e);
+                std::process::exit(1);
+            }
+        } else if express {
+            if let Err(e) = self.config_manager.run_express_setup() {
+                eprintln!("{} {}", "Error:".red(), e);
+                std::process::exit(1);
+            }
+        } else if template {
+            if let Err(e) = self.config_manager.setup_from_template() {
+                eprintln!("{} {}", "Error:".red(), e);
+                std::process::exit(1);
+            }
+        } else if let Some(import_path) = import {
+            // Handle import logic
+            println!(
+                "{}",
+                format!("Importing configuration from: {}", import_path).cyan()
+            );
+            if let Err(e) = self.config_manager.import_existing_setup() {
+                eprintln!("{} {}", "Error:".red(), e);
+                std::process::exit(1);
+            }
+        } else {
+            // Default smart setup
+            if let Err(e) = self.config_manager.run_smart_setup() {
+                eprintln!("{} {}", "Error:".red(), e);
+                std::process::exit(1);
+            }
+        }
+
+        // Save the updated config manager
+        if let Err(e) = self.config_manager.save() {
+            eprintln!(
+                "{} Failed to save configuration: {}",
+                "Warning:".yellow(),
+                e
+            );
+        }
     }
 
     fn print_banner(&self) {

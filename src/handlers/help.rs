@@ -116,6 +116,22 @@ impl HelpHandler {
             "logswise-cli setup".cyan()
         );
         println!(
+            "  {}  # Quick setup with minimal questions",
+            "logswise-cli setup --express".cyan()
+        );
+        println!(
+            "  {}  # Use a template/preset configuration",
+            "logswise-cli setup --template".cyan()
+        );
+        println!(
+            "  {}  # Update existing configuration selectively",
+            "logswise-cli setup --update".cyan()
+        );
+        println!(
+            "  {}  # Import configuration from another machine",
+            "logswise-cli setup --import /path/to/setup.json".cyan()
+        );
+        println!(
             "  {}  # Initialize database (after setup)",
             "logswise-cli init".cyan()
         );

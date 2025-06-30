@@ -30,7 +30,20 @@ pub enum PersonalizeAction {
 #[derive(Subcommand)]
 pub enum Commands {
     /// Run interactive setup for your profile and configuration
-    Setup,
+    Setup {
+        /// Update existing configuration selectively
+        #[arg(short, long)]
+        update: bool,
+        /// Use express setup mode (minimal questions)
+        #[arg(short, long)]
+        express: bool,
+        /// Use template/preset setup mode
+        #[arg(short, long)]
+        template: bool,
+        /// Import configuration from file
+        #[arg(short, long)]
+        import: Option<String>,
+    },
     /// Add a note to your collection
     Note {
         /// The content of the note to add

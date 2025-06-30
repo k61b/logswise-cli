@@ -5,6 +5,15 @@
 
 A command-line tool for note-taking with AI-powered suggestions and chat. Stores your notes in Supabase and uses local Ollama models for AI features.
 
+## ✨ New: Enhanced Setup System
+
+- **🚀 Express Setup**: Get started in under 2 minutes with smart defaults
+- **📋 Templates**: Choose from presets for different developer roles
+- **🔄 Selective Updates**: Update only specific configuration sections
+- **📁 Import/Export**: Share configurations across machines and teams
+
+See [ENHANCED_SETUP.md](ENHANCED_SETUP.md) for details.
+
 ## What it does
 
 - **Notes**: Store text notes in a Supabase database (up to 10K characters each)
@@ -37,11 +46,23 @@ brew install logswise-cli
 
 3. **Set up a Supabase project** at [supabase.com](https://supabase.com) (free tier works)
 
-4. **Configure Logswise**:
+4. **Configure Logswise** (Enhanced Setup Options):
    ```sh
+   # Quick setup - only 5 questions, smart defaults
+   logswise-cli setup --express
+   
+   # Use a template/preset for your role
+   logswise-cli setup --template
+   
+   # Traditional full setup
    logswise-cli setup
+   
+   # Update existing configuration selectively
+   logswise-cli setup --update
    ```
    Follow the prompts to enter your info, Supabase URL/key, and model name.
+
+   💡 **New**: Express setup gets you running in under 2 minutes!
 
 5. **Initialize the database**:
    ```sh

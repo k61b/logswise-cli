@@ -30,10 +30,18 @@ impl CommandRouter {
         }
     }
 
-    pub fn route(&self, command: Commands) {
+    pub fn route(&mut self, command: Commands) {
         match command {
             // Setup and onboarding
-            Commands::Setup => self.setup_handler.run_setup(),
+            Commands::Setup {
+                update,
+                express,
+                template,
+                import,
+            } => {
+                self.setup_handler
+                    .run_smart_setup(update, express, template, import);
+            }
 
             // Note-related commands
             Commands::Note { content } | Commands::N { content } => {
