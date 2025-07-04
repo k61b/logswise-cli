@@ -1,35 +1,57 @@
+//! Common error types for the application.
+
 use std::fmt;
 
-/// Custom error types for the Logswise CLI
+/// Represents the different kinds of errors in the application.
 #[derive(Debug)]
-#[allow(dead_code)] // These will be used in future improvements
-pub enum LogswiseError {
-    /// Configuration file not found or invalid
-    ConfigError(String),
-    /// Network/API communication errors
-    NetworkError(String),
-    /// Input validation errors
-    ValidationError(String),
-    /// File system errors
-    FileSystemError(String),
-    /// User cancelled operation
-    UserCancelled,
+pub enum AppError {
+    /// Configuration-related errors
+    Config(String),
+    /// Network connectivity errors
+    Network(String),
+    /// LLM model errors
+    #[allow(dead_code)]
+    Model(String),
+    /// File I/O errors
+    Io(String),
+    /// Invalid user input
+    InvalidInput(String),
+    /// Database/Supabase errors
+    Database(String),
 }
 
-impl fmt::Display for LogswiseError {
+impl fmt::Display for AppError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            LogswiseError::ConfigError(msg) => write!(f, "Configuration error: {msg}"),
-            LogswiseError::NetworkError(msg) => write!(f, "Network error: {msg}"),
-            LogswiseError::ValidationError(msg) => write!(f, "Validation error: {msg}"),
-            LogswiseError::FileSystemError(msg) => write!(f, "File system error: {msg}"),
-            LogswiseError::UserCancelled => write!(f, "Operation cancelled by user"),
+            AppError::Config(msg) => write!(f, "Configuration error: {}", msg),
+            AppError::Network(msg) => write!(f, "Network error: {}", msg),
+            AppError::Model(msg) => write!(f, "Model error: {}", msg),
+            AppError::Io(msg) => write!(f, "IO error: {}", msg),
+            AppError::InvalidInput(msg) => write!(f, "Invalid input: {}", msg),
+            AppError::Database(msg) => write!(f, "Database error: {}", msg),
         }
     }
 }
 
-impl std::error::Error for LogswiseError {}
+impl std::error::Error for AppError {}
 
-/// Result type alias for Logswise operations
-#[allow(dead_code)] // Will be used in future improvements
-pub type LogswiseResult<T> = Result<T, LogswiseError>;
+impl From<std::io::Error> for AppError {
+    fn from(err: std::io::Error) -> Self {
+        AppError::Io(err.to_string())
+    }
+}
+
+impl From<reqwest::Error> for AppError {
+    fn from(err: reqwest::Error) -> Self {
+        AppError::Network(err.to_string())
+    }
+}
+
+impl From<serde_json::Error> for AppError {
+    fn from(err: serde_json::Error) -> Self {
+        AppError::Config(format!("JSON parsing error: {}", err))
+    }
+}
+
+/// Convenience type alias for Results with AppError.
+pub type AppResult<T> = Result<T, AppError>;

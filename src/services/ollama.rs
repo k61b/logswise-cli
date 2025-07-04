@@ -1,11 +1,11 @@
-use reqwest::blocking::Client;
+use reqwest::Client;
 use serde_json::Value;
 use std::time::Duration;
 
 /// Default timeout for Ollama requests (30 seconds)
 const OLLAMA_TIMEOUT: Duration = Duration::from_secs(30);
 
-pub fn generate_embedding(
+pub async fn generate_embedding(
     client: &Client,
     ollama_url: &str,
     model: &str,
@@ -29,10 +29,11 @@ pub fn generate_embedding(
         .timeout(OLLAMA_TIMEOUT)
         .header("Content-Type", "application/json")
         .json(&embedding_body)
-        .send();
+        .send()
+        .await;
     match embedding_res {
         Ok(resp) if resp.status().is_success() => {
-            let resp_text = resp.text().unwrap_or_default();
+            let resp_text = resp.text().await.unwrap_or_default();
             if resp_text.is_empty() {
                 return Err("Received empty response from Ollama".to_string());
             }
@@ -59,7 +60,7 @@ pub fn generate_embedding(
         }
         Ok(resp) => {
             let status = resp.status();
-            let err_text = resp.text().unwrap_or_default();
+            let err_text = resp.text().await.unwrap_or_default();
             if status.as_u16() == 404 {
                 Err(format!(
                     "Model '{model}' not found. Try: ollama pull {model}"
@@ -86,7 +87,7 @@ pub fn generate_embedding(
     }
 }
 
-pub fn generate_suggestion(
+pub async fn generate_suggestion(
     client: &Client,
     ollama_url: &str,
     model: &str,
@@ -109,10 +110,11 @@ pub fn generate_suggestion(
         .timeout(OLLAMA_TIMEOUT)
         .header("Content-Type", "application/json")
         .json(&ollama_body)
-        .send();
+        .send()
+        .await;
     match ollama_res {
         Ok(resp) if resp.status().is_success() => {
-            let raw_body = resp.text().unwrap_or_default();
+            let raw_body = resp.text().await.unwrap_or_default();
             if raw_body.is_empty() {
                 return Err("Received empty response from Ollama".to_string());
             }
@@ -138,7 +140,7 @@ pub fn generate_suggestion(
         }
         Ok(resp) => {
             let status = resp.status();
-            let err_body = resp.text().unwrap_or_default();
+            let err_body = resp.text().await.unwrap_or_default();
             if status.as_u16() == 404 {
                 Err(format!(
                     "Model '{model}' not found. Try: ollama pull {model}"
@@ -162,4 +164,23 @@ pub fn generate_suggestion(
             }
         }
     }
+}
+
+// Async wrapper functions that can be called from async context
+pub async fn generate_embedding_async(
+    ollama_url: &str,
+    model: &str,
+    prompt: &str,
+) -> Result<Vec<f32>, String> {
+    let client = Client::new();
+    generate_embedding(&client, ollama_url, model, prompt).await
+}
+
+pub async fn generate_suggestion_async(
+    ollama_url: &str,
+    model: &str,
+    prompt: &str,
+) -> Result<String, String> {
+    let client = Client::new();
+    generate_suggestion(&client, ollama_url, model, prompt).await
 }

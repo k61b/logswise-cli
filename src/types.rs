@@ -25,8 +25,6 @@ pub struct SupabaseConfig {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::fs;
-    use std::path::PathBuf;
 
     #[test]
     fn test_note_struct() {
@@ -50,10 +48,7 @@ mod tests {
 
     #[test]
     fn test_load_profile_and_supabase_config() {
-        // Create a temp setup.json
-        let tmp_dir = tempfile::tempdir().unwrap();
-        let mut setup_path = PathBuf::from(tmp_dir.path());
-        setup_path.push("setup.json");
+        // Test JSON parsing without actual file system
         let json = r#"{
             "profession": "Developer",
             "jobTitle": "Senior",
@@ -63,9 +58,7 @@ mod tests {
             "supabaseUrl": "https://test.supabase.co",
             "supabaseApiKey": "testkey"
         }"#;
-        fs::write(&setup_path, json).unwrap();
-        let data = fs::read_to_string(&setup_path).unwrap();
-        let profile: serde_json::Value = serde_json::from_str(&data).unwrap();
+        let profile: serde_json::Value = serde_json::from_str(&json).unwrap();
         assert_eq!(profile["companyName"], "TestCo");
         assert_eq!(profile["supabaseUrl"], "https://test.supabase.co");
     }

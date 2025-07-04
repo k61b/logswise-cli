@@ -67,6 +67,7 @@ pub struct InteractionHistory {
 }
 
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 pub struct QueryIntent {
     pub intent_type: String,
     pub context_type: String,
@@ -145,6 +146,7 @@ impl UserContext {
     }
 
     /// Generate rich prompt context for LLM using advanced contextualization
+    #[allow(dead_code)]
     pub fn generate_llm_context(&self, query: &str, relevant_notes: &[String]) -> String {
         let mut context = String::new();
 
@@ -408,6 +410,7 @@ impl UserContext {
     }
 
     /// Add a new goal
+    #[allow(dead_code)]
     pub fn add_goal(&mut self, description: String, category: String, timeline: String) {
         self.goals.push(Goal {
             description,
@@ -418,11 +421,13 @@ impl UserContext {
     }
 
     /// Add current project context
+    #[allow(dead_code)]
     pub fn add_project(&mut self, project: ProjectContext) {
         self.current_projects.push(project);
     }
 
     /// Advanced query intent analysis for contextualized responses
+    #[allow(dead_code)]
     fn analyze_query_intent(&self, query: &str) -> QueryIntent {
         let query_lower = query.to_lowercase();
 

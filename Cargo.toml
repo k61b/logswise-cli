@@ -7,12 +7,14 @@ edition = "2021"
 clap = { version = "4", features = ["derive"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-reqwest = { version = "0.12", features = ["json", "blocking"] }
+reqwest = { version = "0.12", features = ["json", "blocking", "stream"] }
 dialoguer = { version = "0.11", features = ["fuzzy-select"] }
 colored = "2"
 figlet-rs = "0.1.5"
 dirs = "5"
-tempfile = "3.20.0"
 indicatif = "0.17.11"
-clap_complete = "4.5.54"
 chrono = { version = "0.4", features = ["serde"] }
+tokio = { version = "1.0", features = ["full"] }
+futures = "0.3"
+futures-util = "0.3"
+crossterm = "0.27"

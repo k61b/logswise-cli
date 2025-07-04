@@ -1,10 +1,11 @@
 use crate::types::SupabaseConfig;
 use colored::*;
-use reqwest::blocking::Client;
+use reqwest::Client;
 use serde_json::Value;
 use std::time::Duration;
 
-pub fn semantic_search_notes(
+#[allow(dead_code)]
+pub async fn semantic_search_notes(
     client: &Client,
     config: &SupabaseConfig,
     embedding: &[f32],
@@ -27,10 +28,11 @@ pub fn semantic_search_notes(
         .header("Authorization", format!("Bearer {}", &config.api_key))
         .header("Content-Type", "application/json")
         .json(&sql_body)
-        .send();
+        .send()
+        .await;
     let mut notes = Vec::new();
     if let Ok(resp) = notes_res {
-        if let Ok(notes_val) = resp.json::<Value>() {
+        if let Ok(notes_val) = resp.json::<Value>().await {
             if let Some(arr) = notes_val.as_array() {
                 for n in arr {
                     if let Some(content) = n["content"].as_str() {
@@ -44,7 +46,7 @@ pub fn semantic_search_notes(
 }
 
 /// Test Supabase connection by making a simple query
-pub fn test_connection(client: &Client, config: &SupabaseConfig) -> Result<(), String> {
+pub async fn test_connection(client: &Client, config: &SupabaseConfig) -> Result<(), String> {
     let url = format!("{}/rest/v1/", config.project_url);
 
     let response = client
@@ -53,6 +55,7 @@ pub fn test_connection(client: &Client, config: &SupabaseConfig) -> Result<(), S
         .header("Authorization", format!("Bearer {}", &config.api_key))
         .timeout(Duration::from_secs(10))
         .send()
+        .await
         .map_err(|e| format!("Connection failed: {e}"))?;
 
     if response.status().is_success() {
@@ -63,7 +66,10 @@ pub fn test_connection(client: &Client, config: &SupabaseConfig) -> Result<(), S
 }
 
 /// Check if the notes table exists
-pub fn check_notes_table_exists(client: &Client, config: &SupabaseConfig) -> Result<bool, String> {
+pub async fn check_notes_table_exists(
+    client: &Client,
+    config: &SupabaseConfig,
+) -> Result<bool, String> {
     let url = format!("{}/rest/v1/notes", config.project_url);
 
     let response = client
@@ -73,6 +79,7 @@ pub fn check_notes_table_exists(client: &Client, config: &SupabaseConfig) -> Res
         .query(&[("limit", "1")])
         .timeout(Duration::from_secs(10))
         .send()
+        .await
         .map_err(|e| format!("Failed to check table: {e}"))?;
 
     // If we get a 200, table exists. If we get 404, table doesn't exist.
@@ -81,7 +88,7 @@ pub fn check_notes_table_exists(client: &Client, config: &SupabaseConfig) -> Res
         200 => Ok(true),
         404 => {
             // Check if it's a "table not found" error or "endpoint not found"
-            let error_text = response.text().unwrap_or_default();
+            let error_text = response.text().await.unwrap_or_default();
             if error_text.contains("relation") && error_text.contains("does not exist") {
                 Ok(false)
             } else {
@@ -98,7 +105,7 @@ pub fn check_notes_table_exists(client: &Client, config: &SupabaseConfig) -> Res
 }
 
 /// Execute SQL commands to set up the database schema
-pub fn setup_database_schema(client: &Client, config: &SupabaseConfig) -> Result<(), String> {
+pub async fn setup_database_schema(client: &Client, config: &SupabaseConfig) -> Result<(), String> {
     println!();
     println!("{}", "🔧 Setting up database schema...".cyan());
     println!();
@@ -107,7 +114,7 @@ pub fn setup_database_schema(client: &Client, config: &SupabaseConfig) -> Result
     // we'll provide clear instructions and optionally try to create the table via the REST API
 
     // First, try to create the table using the REST API
-    match create_notes_table_via_api(client, config) {
+    match create_notes_table_via_api(client, config).await {
         Ok(_) => {
             println!("{} Successfully created notes table!", "✅".green());
 
@@ -127,7 +134,10 @@ pub fn setup_database_schema(client: &Client, config: &SupabaseConfig) -> Result
 }
 
 /// Try to create the notes table using Supabase REST API
-fn create_notes_table_via_api(client: &Client, config: &SupabaseConfig) -> Result<(), String> {
+async fn create_notes_table_via_api(
+    client: &Client,
+    config: &SupabaseConfig,
+) -> Result<(), String> {
     // This approach uses the direct table creation - some Supabase instances allow this
     let url = format!("{}/rest/v1/notes", config.project_url);
 
@@ -144,6 +154,7 @@ fn create_notes_table_via_api(client: &Client, config: &SupabaseConfig) -> Resul
         }))
         .timeout(Duration::from_secs(10))
         .send()
+        .await
         .map_err(|e| format!("Request failed: {e}"))?;
 
     if response.status().is_success() {
@@ -153,7 +164,7 @@ fn create_notes_table_via_api(client: &Client, config: &SupabaseConfig) -> Resul
         // Table doesn't exist and can't be auto-created
         Err("Table does not exist".to_string())
     } else {
-        let error_text = response.text().unwrap_or_default();
+        let error_text = response.text().await.unwrap_or_default();
         Err(format!("API error: {error_text}"))
     }
 }
@@ -257,4 +268,20 @@ fn show_complete_sql_setup() {
         "After running these commands, your database will be ready for use!".green()
     );
     println!();
+}
+
+// Async wrapper functions that can be called from async context
+pub async fn test_connection_async(config: &SupabaseConfig) -> Result<(), String> {
+    let client = Client::new();
+    test_connection(&client, config).await
+}
+
+pub async fn check_notes_table_exists_async(config: &SupabaseConfig) -> Result<bool, String> {
+    let client = Client::new();
+    check_notes_table_exists(&client, config).await
+}
+
+pub async fn setup_database_schema_async(config: &SupabaseConfig) -> Result<(), String> {
+    let client = Client::new();
+    setup_database_schema(&client, config).await
 }

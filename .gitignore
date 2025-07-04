@@ -26,3 +26,5 @@
 # Ignore IDE specific files
 /.idea
 /.vscode
+# Ignore claude specific files
+/.claude

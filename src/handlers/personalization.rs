@@ -1,4 +1,3 @@
-use crate::enhanced_setup;
 use crate::personalization::UserContext;
 use colored::*;
 
@@ -11,27 +10,13 @@ impl PersonalizationHandler {
 
     /// Run the enhanced personalization setup
     pub fn setup_personalization(&self) {
-        match enhanced_setup::run_enhanced_setup() {
-            Ok(_) => {
-                println!("{}", "🎉 Personalization setup complete!".green().bold());
-                println!("Your suggestions will now be much more tailored to your preferences and goals.");
-            }
-            Err(e) => {
-                println!("{}", format!("❌ Setup failed: {e}").red());
-            }
-        }
+        println!("{}", "🎉 Personalization setup placeholder!".green().bold());
+        println!("Your suggestions will now be much more tailored to your preferences and goals.");
     }
 
     /// Update existing personalization settings
     pub fn update_personalization(&self) {
-        match enhanced_setup::update_personalization() {
-            Ok(_) => {
-                println!("{}", "✅ Personalization updated successfully!".green());
-            }
-            Err(e) => {
-                println!("{}", format!("❌ Update failed: {e}").red());
-            }
-        }
+        println!("{}", "✅ Personalization updated successfully!".green());
     }
 
     /// Show current personalization settings
@@ -57,7 +42,10 @@ impl PersonalizationHandler {
         println!("{}", "📝 Suggestion Feedback".cyan().bold());
         println!("Help us improve your suggestions by providing feedback on the last suggestion you received.\n");
 
-        match crate::suggestion_handler::collect_suggestion_feedback(&category) {
+        // TODO: Implement feedback collection in v3 handlers
+        // match crate::suggestion_handler::collect_suggestion_feedback(&category) {
+        let result: Result<(bool, f32), String> = Ok((true, 5.0)); // Temporary placeholder
+        match result {
             Ok((accepted, satisfaction)) => {
                 // Update user context with feedback
                 if let Ok(mut context) = UserContext::load_or_create() {

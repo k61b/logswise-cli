@@ -1,46 +1,63 @@
-use crate::services::ollama::generate_embedding;
-use crate::utils::load_supabase_config;
+use crate::errors::{AppError, AppResult};
+use crate::services::config::load_supabase_config;
 use colored::*;
 use indicatif::{ProgressBar, ProgressStyle};
-use reqwest::blocking::Client;
+use reqwest::Client;
 use serde_json::json;
 use std::time::Duration;
 
 /// Adds a note to the Supabase database.
-pub fn add_note(content: &str) {
-    // Input validation
+pub async fn add_note(content: &str) {
+    if let Err(e) = add_note_impl(content).await {
+        println!("{}", format!("❌ {}", e).red());
+        if matches!(e, AppError::Config(_)) {
+            println!("Please run 'logswise-cli setup' first.");
+        }
+    }
+}
+
+/// Internal implementation of add_note with proper error handling.
+async fn add_note_impl(content: &str) -> AppResult<()> {
+    validate_note_content(content)?;
+
+    let config = load_supabase_config()
+        .map_err(|e| AppError::Config(format!("Supabase config error: {}", e)))?;
+
+    let profile = crate::utils::load_profile()
+        .map_err(|e| AppError::Config(format!("Profile load error: {}", e)))?;
+
+    let spinner = create_spinner();
+    let client = Client::new();
+
+    // Generate embedding for the note content
+    spinner.set_message("Generating embedding for note...");
+    let embedding_vec = generate_note_embedding(&profile, content, &spinner).await;
+
+    // Store note in Supabase
+    store_note_in_supabase(&client, &config, content, embedding_vec, &spinner).await?;
+
+    spinner.finish_and_clear();
+    println!("{}", "📝 Note added successfully!".green());
+    Ok(())
+}
+
+fn validate_note_content(content: &str) -> AppResult<()> {
     if content.trim().is_empty() {
-        println!("{}", "❌ Note content cannot be empty".red());
-        return;
+        return Err(AppError::InvalidInput(
+            "Note content cannot be empty".to_string(),
+        ));
     }
 
     if content.len() > 10000 {
-        println!(
-            "{}",
-            "❌ Note content too long (max 10,000 characters)".red()
-        );
-        return;
+        return Err(AppError::InvalidInput(
+            "Note content too long (max 10,000 characters)".to_string(),
+        ));
     }
 
-    let config = match load_supabase_config() {
-        Ok(cfg) => cfg,
-        Err(e) => {
-            println!("{}", format!("Error loading Supabase config: {e}").red());
-            println!("Please run 'logswise-cli setup' first.");
-            return;
-        }
-    };
+    Ok(())
+}
 
-    // Load profile for Ollama configuration
-    let profile = match crate::utils::load_profile() {
-        Ok(p) => p,
-        Err(e) => {
-            println!("{}", format!("Error loading profile: {e}").red());
-            println!("Please run 'logswise-cli setup' first.");
-            return;
-        }
-    };
-
+fn create_spinner() -> ProgressBar {
     let spinner = ProgressBar::new_spinner();
     spinner.set_style(
         ProgressStyle::default_spinner()
@@ -49,11 +66,14 @@ pub fn add_note(content: &str) {
             .unwrap(),
     );
     spinner.enable_steady_tick(Duration::from_millis(100));
+    spinner
+}
 
-    let client = Client::new();
-
-    // 1. Generate embedding for the note content using shared Ollama service
-    spinner.set_message("Generating embedding for note...");
+async fn generate_note_embedding(
+    profile: &serde_json::Value,
+    content: &str,
+    spinner: &ProgressBar,
+) -> Option<Vec<f32>> {
     let ollama_base_url = profile["ollamaBaseUrl"]
         .as_str()
         .unwrap_or("http://localhost:11434");
@@ -61,7 +81,10 @@ pub fn add_note(content: &str) {
     let ollama_model = profile["embeddingModel"]
         .as_str()
         .unwrap_or("nomic-embed-text");
-    let embedding_vec = match generate_embedding(&client, &ollama_url, ollama_model, content) {
+
+    match crate::services::ollama::generate_embedding_async(&ollama_url, ollama_model, content)
+        .await
+    {
         Ok(embedding) => Some(embedding),
         Err(msg) => {
             spinner.finish_and_clear();
@@ -72,50 +95,49 @@ pub fn add_note(content: &str) {
             );
             None
         }
-    };
+    }
+}
 
-    // 2. Store note and embedding in Supabase
+async fn store_note_in_supabase(
+    client: &Client,
+    config: &crate::types::SupabaseConfig,
+    content: &str,
+    embedding_vec: Option<Vec<f32>>,
+    spinner: &ProgressBar,
+) -> AppResult<()> {
     spinner.set_message("Saving note to Supabase...");
+
     let url = format!("{}/rest/v1/notes", config.project_url);
     let body = if let Some(embedding) = embedding_vec {
         json!({ "content": content, "embedding": embedding })
     } else {
         json!({ "content": content })
     };
-    let res = client
+
+    let response = client
         .post(&url)
         .header("apikey", &config.api_key)
         .header("Authorization", format!("Bearer {}", &config.api_key))
         .header("Content-Type", "application/json")
         .json(&body)
-        .send();
-    match res {
-        Ok(resp) if resp.status().is_success() => {
-            spinner.finish_and_clear();
-            println!("{}", "📝 Note added successfully!".green());
-        }
-        Ok(resp) => {
-            spinner.finish_and_clear();
-            let error_text = resp.text().unwrap_or_default();
-            println!("{} {}", "❌ Failed to add note:".red(), error_text);
-            println!(
-                "{}",
-                "Check your Supabase configuration and try again.".yellow()
-            );
-        }
-        Err(e) => {
-            spinner.finish_and_clear();
-            println!("{} {}", "❌ Failed to add note:".red(), e);
-            println!(
-                "{}",
-                "Check your internet connection and Supabase configuration.".yellow()
-            );
-        }
+        .send()
+        .await
+        .map_err(|e| AppError::Network(format!("Failed to send request: {}", e)))?;
+
+    if !response.status().is_success() {
+        let status = response.status();
+        let error_text = response.text().await.unwrap_or_default();
+        return Err(AppError::Database(format!(
+            "HTTP {}: {}",
+            status, error_text
+        )));
     }
+
+    Ok(())
 }
 
 /// Shows recent notes from Supabase
-pub fn show_recent_notes(count: usize) {
+pub async fn show_recent_notes(count: usize) {
     let config = match load_supabase_config() {
         Ok(cfg) => cfg,
         Err(e) => {
@@ -147,13 +169,14 @@ pub fn show_recent_notes(count: usize) {
             ("order", "created_at.desc"),
             ("limit", &count.to_string()),
         ])
-        .send();
+        .send()
+        .await;
 
     match response {
         Ok(resp) => {
             spinner.finish_and_clear();
             if resp.status().is_success() {
-                match resp.json::<Vec<serde_json::Value>>() {
+                match resp.json::<Vec<serde_json::Value>>().await {
                     Ok(notes) => {
                         if notes.is_empty() {
                             println!(

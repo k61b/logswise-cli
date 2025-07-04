@@ -1,4 +1,4 @@
-use crate::config_manager::ConfigManager;
+use crate::config::{updater::ConfigUpdater, ConfigManager};
 use colored::*;
 use figlet_rs::FIGfont;
 
@@ -14,7 +14,7 @@ impl SetupHandler {
         }
     }
 
-    pub fn run_smart_setup(
+    pub async fn run_smart_setup(
         &mut self,
         update: bool,
         express: bool,
@@ -24,17 +24,19 @@ impl SetupHandler {
         self.print_banner();
 
         if update {
-            if let Err(e) = self.config_manager.run_selective_update() {
+            if let Err(e) =
+                ConfigUpdater::run_selective_update(&mut self.config_manager.templates).await
+            {
                 eprintln!("{} {}", "Error:".red(), e);
                 std::process::exit(1);
             }
         } else if express {
-            if let Err(e) = self.config_manager.run_express_setup() {
+            if let Err(e) = self.config_manager.run_express_setup().await {
                 eprintln!("{} {}", "Error:".red(), e);
                 std::process::exit(1);
             }
         } else if template {
-            if let Err(e) = self.config_manager.setup_from_template() {
+            if let Err(e) = self.config_manager.setup_from_template().await {
                 eprintln!("{} {}", "Error:".red(), e);
                 std::process::exit(1);
             }
@@ -50,7 +52,7 @@ impl SetupHandler {
             }
         } else {
             // Default smart setup
-            if let Err(e) = self.config_manager.run_smart_setup() {
+            if let Err(e) = self.config_manager.run_smart_setup().await {
                 eprintln!("{} {}", "Error:".red(), e);
                 std::process::exit(1);
             }

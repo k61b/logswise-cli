@@ -9,7 +9,7 @@ use clap::{Parser, Subcommand};
 )]
 pub struct Cli {
     #[command(subcommand)]
-    pub command: Commands,
+    pub command: Option<Commands>,
 }
 
 #[derive(Subcommand)]
@@ -44,69 +44,12 @@ pub enum Commands {
         #[arg(short, long)]
         import: Option<String>,
     },
-    /// Add a note to your collection
-    Note {
-        /// The content of the note to add
-        content: String,
-    },
-    /// Add a note to your collection (alias for 'note')
-    N {
-        /// The content of the note to add
-        content: String,
-    },
-    /// Get context-aware suggestions for a query
-    Suggestion {
-        /// The query to get suggestions for
-        query: String,
-    },
-    /// Get context-aware suggestions for a query (alias for 'suggestion')
-    S {
-        /// The query to get suggestions for
-        query: String,
-    },
-    /// Chat with the AI assistant
-    Chat {
-        /// The message to send to the assistant
-        message: String,
-    },
-    /// Chat with the AI assistant (alias for 'chat')
-    C {
-        /// The message to send to the assistant
-        message: String,
-    },
-    /// Start interactive mode for continuous note-taking and chatting
-    Interactive,
+    /// Start the main interactive interface with all features (default mode)
+    Simple,
     /// Set up enhanced personalization for better suggestions
     Personalize {
         #[command(subcommand)]
         action: Option<PersonalizeAction>,
-    },
-    /// Show information about Logswise CLI
-    About,
-    /// Display your profile and configuration stats
-    Stats,
-    /// Explain how Logswise works
-    How,
-    /// Show information about embedding models vs LLMs
-    Models,
-    /// Show troubleshooting tips for model configuration
-    Troubleshoot,
-    /// Explain how context is used in suggestions and chat
-    Context,
-    /// Show detailed help and examples  
-    Guide,
-    /// Check configuration health and connectivity
-    Doctor,
-    /// Show recent notes
-    Recent {
-        /// Number of recent notes to show (default: 5)
-        #[arg(short, long, default_value = "5")]
-        count: usize,
-    },
-    /// Generate shell completions
-    Completions {
-        /// Shell type (bash, zsh, fish, powershell)
-        shell: String,
     },
     /// Initialize or verify database setup (requires existing Supabase config)
     Init,

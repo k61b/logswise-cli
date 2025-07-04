@@ -1,7 +1,4 @@
-use clap::CommandFactory;
-use clap_complete::{generate, Shell};
-use colored::*;
-use std::io;
+use colored::Colorize;
 
 pub struct SystemHandler {}
 
@@ -51,26 +48,7 @@ impl SystemHandler {
         );
     }
 
-    pub fn generate_completions(&self, shell: &str) {
-        let shell_type = match shell.to_lowercase().as_str() {
-            "bash" => Shell::Bash,
-            "zsh" => Shell::Zsh,
-            "fish" => Shell::Fish,
-            "powershell" => Shell::PowerShell,
-            _ => {
-                println!(
-                    "{}",
-                    "❌ Unsupported shell. Available: bash, zsh, fish, powershell".red()
-                );
-                return;
-            }
-        };
-
-        let mut app = crate::cli::Cli::command();
-        generate(shell_type, &mut app, "logswise-cli", &mut io::stdout());
-    }
-
-    pub fn run_doctor(&self) {
+    pub async fn run_doctor(&self) {
         println!("\n{}\n", "🔍 Logswise CLI Health Check".bold().cyan());
 
         let mut issues_found = 0;
@@ -146,7 +124,7 @@ impl SystemHandler {
                 .unwrap_or("http://localhost:11434");
             let test_url = format!("{ollama_base_url}/api/tags");
 
-            match reqwest::blocking::get(&test_url) {
+            match reqwest::get(&test_url).await {
                 Ok(response) if response.status().is_success() => {
                     println!("  ✅ Ollama server is reachable");
 
@@ -156,14 +134,14 @@ impl SystemHandler {
                         .unwrap_or("nomic-embed-text");
                     println!("  🔍 Testing embedding model: {}", embedding_model.cyan());
 
-                    let client = reqwest::blocking::Client::new();
                     let embedding_url = format!("{ollama_base_url}/api/embeddings");
-                    match crate::services::ollama::generate_embedding(
-                        &client,
+                    match crate::services::ollama::generate_embedding_async(
                         &embedding_url,
                         embedding_model,
                         "test",
-                    ) {
+                    )
+                    .await
+                    {
                         Ok(_) => println!("  ✅ Embedding model '{embedding_model}' is working"),
                         Err(e) => {
                             println!(
@@ -180,12 +158,13 @@ impl SystemHandler {
                     if !llm_name.is_empty() {
                         println!("  🔍 Testing LLM: {}", llm_name.cyan());
                         let generate_url = format!("{ollama_base_url}/api/generate");
-                        match crate::services::ollama::generate_suggestion(
-                            &client,
+                        match crate::services::ollama::generate_suggestion_async(
                             &generate_url,
                             llm_name,
                             "test",
-                        ) {
+                        )
+                        .await
+                        {
                             Ok(_) => println!("  ✅ LLM '{llm_name}' is working"),
                             Err(e) => {
                                 println!("  ⚠️  LLM '{}' failed: {}", llm_name.yellow(), e);
@@ -209,19 +188,20 @@ impl SystemHandler {
         if let Ok(supabase_config) = supabase_config_result {
             println!("\n{}", "Testing Supabase connectivity...".bold());
 
-            let client = reqwest::blocking::Client::new();
+            let client = reqwest::Client::new();
 
             // Test basic connection
-            match crate::services::supabase::test_connection(&client, &supabase_config) {
+            match crate::services::supabase::test_connection_async(&supabase_config).await {
                 Ok(_) => {
                     println!("  ✅ Supabase connection successful");
 
                     // Test database schema
                     println!("  🔍 Checking database schema...");
-                    match crate::services::supabase::check_notes_table_exists(
-                        &client,
+                    match crate::services::supabase::check_notes_table_exists_async(
                         &supabase_config,
-                    ) {
+                    )
+                    .await
+                    {
                         Ok(true) => {
                             println!("  ✅ Notes table exists and is accessible");
 
@@ -243,6 +223,7 @@ impl SystemHandler {
                                     "embedding": serde_json::Value::Null
                                 }))
                                 .send()
+                                .await
                             {
                                 Ok(resp) if resp.status().is_success() => {
                                     println!("  ✅ Database write access confirmed");
@@ -315,10 +296,9 @@ impl SystemHandler {
         println!("  logswise-cli setup     # Fix configuration");
         println!("  ollama serve           # Start Ollama server");
         println!("  ollama pull <model>    # Download a model");
-        println!("  logswise-cli guide     # Show detailed help");
     }
 
-    pub fn run_init(&self) {
+    pub async fn run_init(&self) {
         println!("\n{}\n", "🔧 Database Initialization".bold().cyan());
 
         // Check if we have Supabase configuration
@@ -342,11 +322,11 @@ impl SystemHandler {
         );
         println!();
 
-        let client = reqwest::blocking::Client::new();
+        let _client = reqwest::Client::new();
 
         // Test connection
         println!("🔍 Testing Supabase connection...");
-        match crate::services::supabase::test_connection(&client, &supabase_config) {
+        match crate::services::supabase::test_connection_async(&supabase_config).await {
             Ok(_) => println!("  ✅ Connection successful!"),
             Err(e) => {
                 println!("  ❌ Connection failed: {}", e.red());
@@ -357,7 +337,7 @@ impl SystemHandler {
 
         // Check if database is already set up
         println!("\n🔍 Checking database schema...");
-        match crate::services::supabase::check_notes_table_exists(&client, &supabase_config) {
+        match crate::services::supabase::check_notes_table_exists_async(&supabase_config).await {
             Ok(true) => {
                 println!("  ✅ Notes table already exists!");
                 println!(
@@ -370,7 +350,8 @@ impl SystemHandler {
                 println!("  ❌ Notes table not found.");
                 println!("\n{}", "Setting up database schema...".cyan());
 
-                match crate::services::supabase::setup_database_schema(&client, &supabase_config) {
+                match crate::services::supabase::setup_database_schema_async(&supabase_config).await
+                {
                     Ok(_) => {
                         println!(
                             "\n{}",
