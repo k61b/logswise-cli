@@ -119,7 +119,7 @@ impl ChatSession {
                     println!(); // Add spacing
                 }
                 Err(e) => {
-                    println!("{}", format!("❌ Error: {}", e).red());
+                    println!("{}", format!("❌ Error: {e}").red());
                     println!("{}", "Try again or type '/exit' to quit.".bright_black());
                 }
             }
@@ -160,8 +160,7 @@ impl ChatSession {
 
         // Keep it simple and short for fast processing
         let mut context = format!(
-            "You are a helpful AI assistant chatting with a {}. Be conversational and helpful.\n\n",
-            profession
+            "You are a helpful AI assistant chatting with a {profession}. Be conversational and helpful.\n\n"
         );
 
         // Only include the last few messages to keep prompt short
@@ -320,14 +319,11 @@ impl ChatSession {
             .filter(|msg| msg.role == "assistant")
             .count();
 
-        println!(
-            "• Session Duration: {}m {}s",
-            duration_minutes, duration_seconds
-        );
+        println!("• Session Duration: {duration_minutes}m {duration_seconds}s");
         println!("• Total Messages: {}", self.conversation_history.len());
-        println!("• Your Messages: {}", user_messages);
-        println!("• Assistant Messages: {}", assistant_messages);
-        println!("• Total Characters: {}", total_chars);
+        println!("• Your Messages: {user_messages}");
+        println!("• Assistant Messages: {assistant_messages}");
+        println!("• Total Characters: {total_chars}");
         println!(
             "• Memory Usage: {}/{} messages",
             self.conversation_history.len(),

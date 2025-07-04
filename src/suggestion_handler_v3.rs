@@ -15,7 +15,7 @@ impl StreamingSuggestionHandler {
     pub fn new() -> Self {
         let mut prompt_manager = PromptManager::new();
         if let Err(e) = prompt_manager.load_registry() {
-            eprintln!("Warning: Could not load prompt registry: {}", e);
+            eprintln!("Warning: Could not load prompt registry: {e}");
         }
 
         Self {
@@ -90,13 +90,13 @@ impl StreamingSuggestionHandler {
             .header("Authorization", format!("Bearer {}", config.api_key))
             .query(&[
                 ("select", "content,created_at"),
-                ("content", &format!("ilike.%{}%", keyword)),
+                ("content", &format!("ilike.%{keyword}%")),
                 ("order", "created_at.desc"),
                 ("limit", "20"),
             ])
             .send()
             .await
-            .map_err(|e| format!("Failed to search logs: {}", e))?;
+            .map_err(|e| format!("Failed to search logs: {e}"))?;
 
         if !response.status().is_success() {
             return Err(format!("Search failed: HTTP {}", response.status()));
@@ -105,7 +105,7 @@ impl StreamingSuggestionHandler {
         let notes = response
             .json::<Vec<serde_json::Value>>()
             .await
-            .map_err(|e| format!("Failed to parse search results: {}", e))?;
+            .map_err(|e| format!("Failed to parse search results: {e}"))?;
 
         Ok(notes
             .into_iter()
@@ -132,7 +132,7 @@ impl StreamingSuggestionHandler {
             ])
             .send()
             .await
-            .map_err(|e| format!("Failed to fetch logs: {}", e))?;
+            .map_err(|e| format!("Failed to fetch logs: {e}"))?;
 
         if !response.status().is_success() {
             return Err(format!("Fetch failed: HTTP {}", response.status()));
@@ -141,7 +141,7 @@ impl StreamingSuggestionHandler {
         let notes = response
             .json::<Vec<serde_json::Value>>()
             .await
-            .map_err(|e| format!("Failed to parse logs: {}", e))?;
+            .map_err(|e| format!("Failed to parse logs: {e}"))?;
 
         let mut results = Vec::new();
         for note in notes {
@@ -168,15 +168,14 @@ impl StreamingSuggestionHandler {
         let logs_context = self.format_logs_context(relevant_logs);
 
         format!(
-            "You are a helpful AI assistant providing advice to a {}.\n\n\
-            {}\n\n\
-            QUERY: {}\n\n\
+            "You are a helpful AI assistant providing advice to a {profession}.\n\n\
+            {logs_context}\n\n\
+            QUERY: {query}\n\n\
             INSTRUCTIONS:\n\
             - Use the log entries above for context about people/situations mentioned\n\
             - Reference specific past experiences when applicable\n\
             - Provide actionable advice based on the documented information\n\n\
-            RESPONSE:",
-            profession, logs_context, query
+            RESPONSE:"
         )
     }
 
@@ -230,7 +229,7 @@ impl StreamingSuggestionHandler {
             .search_logs_for_entities(query, config)
             .await
             .unwrap_or_else(|e| {
-                eprintln!("Warning: Log search failed: {}", e);
+                eprintln!("Warning: Log search failed: {e}");
                 Vec::new()
             });
 
@@ -300,8 +299,7 @@ impl StreamingSuggestionHandler {
         );
 
         let prompt = format!(
-            "You are a helpful AI assistant providing suggestions to a professional. Please provide helpful advice for: {}",
-            query
+            "You are a helpful AI assistant providing suggestions to a professional. Please provide helpful advice for: {query}"
         );
 
         let (ollama_url, ollama_model) = get_ollama_config(profile);
@@ -330,6 +328,6 @@ impl Default for StreamingSuggestionHandler {
 pub async fn get_suggestions_streaming(query: &str) {
     let mut handler = StreamingSuggestionHandler::new();
     if let Err(e) = handler.get_suggestions(query).await {
-        eprintln!("Failed to get suggestions: {}", e);
+        eprintln!("Failed to get suggestions: {e}");
     }
 }

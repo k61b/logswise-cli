@@ -23,7 +23,7 @@ pub async fn run_simple_interactive() -> Result<(), String> {
         show_main_menu();
 
         // Get user selection with arrow keys and number shortcuts
-        let selection = show_menu_selector().map_err(|e| format!("Menu selection error: {}", e))?;
+        let selection = show_menu_selector().map_err(|e| format!("Menu selection error: {e}"))?;
 
         match selection {
             0 => {
@@ -32,7 +32,7 @@ pub async fn run_simple_interactive() -> Result<(), String> {
                 println!("{}", "Press Ctrl+C to return to menu".bright_black());
 
                 if let Err(e) = chat_session::start_chat_session().await {
-                    println!("{}", format!("Chat error: {}", e).red());
+                    println!("{}", format!("Chat error: {e}").red());
                     pause_for_user().await;
                 }
             }
@@ -201,14 +201,14 @@ fn show_menu_selector() -> Result<usize, Box<dyn std::error::Error>> {
 async fn get_user_input(prompt: &str, placeholder: &str) -> Result<String, String> {
     println!();
     println!("{}", prompt.bright_cyan());
-    println!("{}", format!("({})", placeholder).bright_black());
+    println!("{}", format!("({placeholder})").bright_black());
     println!();
 
     let input: String = Input::new()
         .with_prompt("Enter your input")
         .allow_empty(true)
         .interact_text()
-        .map_err(|e| format!("Input error: {}", e))?;
+        .map_err(|e| format!("Input error: {e}"))?;
 
     Ok(input)
 }
@@ -261,10 +261,10 @@ pub async fn run_enhanced_interactive() -> Result<(), String> {
     use std::time::Duration;
 
     // Setup terminal for raw input
-    enable_raw_mode().map_err(|e| format!("Failed to enable raw mode: {}", e))?;
+    enable_raw_mode().map_err(|e| format!("Failed to enable raw mode: {e}"))?;
     let mut stdout = io::stdout();
     execute!(stdout, EnterAlternateScreen, EnableMouseCapture)
-        .map_err(|e| format!("Failed to setup terminal: {}", e))?;
+        .map_err(|e| format!("Failed to setup terminal: {e}"))?;
 
     let mut selected_index = 0;
     let menu_items = vec![
@@ -281,11 +281,9 @@ pub async fn run_enhanced_interactive() -> Result<(), String> {
         show_enhanced_menu(selected_index, &menu_items);
 
         // Handle keyboard input
-        if event::poll(Duration::from_millis(100))
-            .map_err(|e| format!("Event poll error: {}", e))?
-        {
+        if event::poll(Duration::from_millis(100)).map_err(|e| format!("Event poll error: {e}"))? {
             if let Event::Key(KeyEvent { code, .. }) =
-                event::read().map_err(|e| format!("Key read error: {}", e))?
+                event::read().map_err(|e| format!("Key read error: {e}"))?
             {
                 match code {
                     KeyCode::Up => {
@@ -301,9 +299,9 @@ pub async fn run_enhanced_interactive() -> Result<(), String> {
                     KeyCode::Enter => {
                         // Cleanup terminal before executing action
                         disable_raw_mode()
-                            .map_err(|e| format!("Failed to disable raw mode: {}", e))?;
+                            .map_err(|e| format!("Failed to disable raw mode: {e}"))?;
                         execute!(stdout, LeaveAlternateScreen, DisableMouseCapture)
-                            .map_err(|e| format!("Failed to cleanup terminal: {}", e))?;
+                            .map_err(|e| format!("Failed to cleanup terminal: {e}"))?;
 
                         // Execute selected action
                         execute_menu_action(selected_index).await?;
@@ -315,9 +313,9 @@ pub async fn run_enhanced_interactive() -> Result<(), String> {
 
                         // Re-setup terminal for continued use
                         enable_raw_mode()
-                            .map_err(|e| format!("Failed to re-enable raw mode: {}", e))?;
+                            .map_err(|e| format!("Failed to re-enable raw mode: {e}"))?;
                         execute!(stdout, EnterAlternateScreen, EnableMouseCapture)
-                            .map_err(|e| format!("Failed to re-setup terminal: {}", e))?;
+                            .map_err(|e| format!("Failed to re-setup terminal: {e}"))?;
                     }
                     KeyCode::Char('q') | KeyCode::Esc => {
                         break;
@@ -334,9 +332,9 @@ pub async fn run_enhanced_interactive() -> Result<(), String> {
     }
 
     // Cleanup terminal
-    disable_raw_mode().map_err(|e| format!("Failed to disable raw mode: {}", e))?;
+    disable_raw_mode().map_err(|e| format!("Failed to disable raw mode: {e}"))?;
     execute!(stdout, LeaveAlternateScreen, DisableMouseCapture)
-        .map_err(|e| format!("Failed to cleanup terminal: {}", e))?;
+        .map_err(|e| format!("Failed to cleanup terminal: {e}"))?;
 
     show_goodbye();
     Ok(())
@@ -375,7 +373,7 @@ async fn execute_menu_action(selection: usize) -> Result<(), String> {
         0 => {
             println!("\n{}", "💬 Starting AI Chat Session...".cyan().bold());
             if let Err(e) = chat_session::start_chat_session().await {
-                println!("{}", format!("Chat error: {}", e).red());
+                println!("{}", format!("Chat error: {e}").red());
             }
         }
         1 => {
@@ -462,7 +460,7 @@ async fn show_system_menu() -> Result<(), String> {
             .items(&options)
             .default(0)
             .interact()
-            .map_err(|e| format!("Menu selection error: {}", e))?;
+            .map_err(|e| format!("Menu selection error: {e}"))?;
 
         match selection {
             0 => {
@@ -525,7 +523,7 @@ async fn show_help_menu() -> Result<(), String> {
             .items(&options)
             .default(0)
             .interact()
-            .map_err(|e| format!("Menu selection error: {}", e))?;
+            .map_err(|e| format!("Menu selection error: {e}"))?;
 
         let help_handler = HelpHandler::new();
 
@@ -572,7 +570,7 @@ async fn show_personalization_menu() -> Result<(), String> {
             .items(&options)
             .default(0)
             .interact()
-            .map_err(|e| format!("Menu selection error: {}", e))?;
+            .map_err(|e| format!("Menu selection error: {e}"))?;
 
         use crate::handlers::personalization::PersonalizationHandler;
         let personalization_handler = PersonalizationHandler::new();

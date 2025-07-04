@@ -9,7 +9,7 @@ use std::time::Duration;
 /// Adds a note to the Supabase database.
 pub async fn add_note(content: &str) {
     if let Err(e) = add_note_impl(content).await {
-        println!("{}", format!("❌ {}", e).red());
+        println!("{}", format!("❌ {e}").red());
         if matches!(e, AppError::Config(_)) {
             println!("Please run 'logswise-cli setup' first.");
         }
@@ -21,10 +21,10 @@ async fn add_note_impl(content: &str) -> AppResult<()> {
     validate_note_content(content)?;
 
     let config = load_supabase_config()
-        .map_err(|e| AppError::Config(format!("Supabase config error: {}", e)))?;
+        .map_err(|e| AppError::Config(format!("Supabase config error: {e}")))?;
 
     let profile = crate::utils::load_profile()
-        .map_err(|e| AppError::Config(format!("Profile load error: {}", e)))?;
+        .map_err(|e| AppError::Config(format!("Profile load error: {e}")))?;
 
     let spinner = create_spinner();
     let client = Client::new();
@@ -122,15 +122,12 @@ async fn store_note_in_supabase(
         .json(&body)
         .send()
         .await
-        .map_err(|e| AppError::Network(format!("Failed to send request: {}", e)))?;
+        .map_err(|e| AppError::Network(format!("Failed to send request: {e}")))?;
 
     if !response.status().is_success() {
         let status = response.status();
         let error_text = response.text().await.unwrap_or_default();
-        return Err(AppError::Database(format!(
-            "HTTP {}: {}",
-            status, error_text
-        )));
+        return Err(AppError::Database(format!("HTTP {status}: {error_text}")));
     }
 
     Ok(())

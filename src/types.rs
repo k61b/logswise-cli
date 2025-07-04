@@ -58,7 +58,7 @@ mod tests {
             "supabaseUrl": "https://test.supabase.co",
             "supabaseApiKey": "testkey"
         }"#;
-        let profile: serde_json::Value = serde_json::from_str(&json).unwrap();
+        let profile: serde_json::Value = serde_json::from_str(json).unwrap();
         assert_eq!(profile["companyName"], "TestCo");
         assert_eq!(profile["supabaseUrl"], "https://test.supabase.co");
     }

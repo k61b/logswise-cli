@@ -35,7 +35,7 @@ impl CommandRouter {
             // Main interactive interface
             Commands::Simple => {
                 if let Err(e) = crate::simple_interactive::run_simple_interactive().await {
-                    eprintln!("Interactive mode error: {}", e);
+                    eprintln!("Interactive mode error: {e}");
                 }
             }
 

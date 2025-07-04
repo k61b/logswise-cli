@@ -21,7 +21,7 @@ fn load_raw_profile() -> AppResult<serde_json::Value> {
         AppError::Config("Setup not found. Please run 'logswise-cli setup' first.".to_string())
     })?;
     serde_json::from_str(&data)
-        .map_err(|e| AppError::Config(format!("Failed to parse setup.json: {}", e)))
+        .map_err(|e| AppError::Config(format!("Failed to parse setup.json: {e}")))
 }
 
 /// Load the user profile configuration.
@@ -71,7 +71,7 @@ pub fn get_ollama_config(profile: &serde_json::Value) -> (String, String) {
         .and_then(|v| v.as_str())
         .unwrap_or("llama3");
 
-    (format!("{}/api/generate", base_url), model.to_string())
+    (format!("{base_url}/api/generate"), model.to_string())
 }
 
 /// Extract Ollama configuration from profile (with AppError).
@@ -87,5 +87,5 @@ pub fn get_ollama_config_typed(profile: &serde_json::Value) -> AppResult<(String
         .and_then(|v| v.as_str())
         .ok_or_else(|| AppError::Config("LLM model name not found in config".to_string()))?;
 
-    Ok((format!("{}/api/generate", base_url), model.to_string()))
+    Ok((format!("{base_url}/api/generate"), model.to_string()))
 }

@@ -171,8 +171,8 @@ impl StreamingHandler {
                                 }
                                 Err(json_err) => {
                                     // Log the problematic line for debugging but continue processing
-                                    eprintln!("Warning: Could not parse JSON line: {}", line);
-                                    eprintln!("JSON error: {}", json_err);
+                                    eprintln!("Warning: Could not parse JSON line: {line}");
+                                    eprintln!("JSON error: {json_err}");
                                     // Continue processing other lines instead of failing
                                 }
                             }

@@ -55,10 +55,7 @@ impl NoteService {
         if !response.status().is_success() {
             let status = response.status();
             let error_text = response.text().await.unwrap_or_default();
-            return Err(AppError::Database(format!(
-                "HTTP {}: {}",
-                status, error_text
-            )));
+            return Err(AppError::Database(format!("HTTP {status}: {error_text}")));
         }
 
         let notes_json: Vec<serde_json::Value> = response.json().await?;
@@ -105,7 +102,7 @@ impl NoteService {
         let ollama_base_url = profile["ollamaBaseUrl"]
             .as_str()
             .unwrap_or("http://localhost:11434");
-        let ollama_url = format!("{}/api/embeddings", ollama_base_url);
+        let ollama_url = format!("{ollama_base_url}/api/embeddings");
         let ollama_model = profile["embeddingModel"]
             .as_str()
             .unwrap_or("nomic-embed-text");
@@ -143,10 +140,7 @@ impl NoteService {
         if !response.status().is_success() {
             let status = response.status();
             let error_text = response.text().await.unwrap_or_default();
-            return Err(AppError::Database(format!(
-                "HTTP {}: {}",
-                status, error_text
-            )));
+            return Err(AppError::Database(format!("HTTP {status}: {error_text}")));
         }
 
         Ok(())

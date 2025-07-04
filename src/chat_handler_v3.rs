@@ -20,7 +20,7 @@ impl StreamingChatHandler {
     pub fn new() -> Self {
         let mut prompt_manager = PromptManager::new();
         if let Err(e) = prompt_manager.load_registry() {
-            eprintln!("Warning: Could not load prompt registry: {}", e);
+            eprintln!("Warning: Could not load prompt registry: {e}");
         }
 
         Self {
@@ -39,7 +39,7 @@ impl StreamingChatHandler {
                 .get_notes_context_simple(&config, message)
                 .await
                 .unwrap_or_else(|e| {
-                    eprintln!("Warning: Could not get notes context: {}", e);
+                    eprintln!("Warning: Could not get notes context: {e}");
                     "No relevant notes found.".to_string()
                 }),
             Err(_) => {
@@ -77,19 +77,19 @@ impl StreamingChatHandler {
                 .header("Authorization", format!("Bearer {}", config.api_key))
                 .query(&[
                     ("select", "content"),
-                    ("content", &format!("ilike.%{}%", keyword)),
+                    ("content", &format!("ilike.%{keyword}%")),
                     ("order", "created_at.desc"),
                     ("limit", "3"), // Keep it very limited
                 ])
                 .send()
                 .await
-                .map_err(|e| format!("Failed to search notes: {}", e))?;
+                .map_err(|e| format!("Failed to search notes: {e}"))?;
 
             if response.status().is_success() {
                 let notes = response
                     .json::<Vec<serde_json::Value>>()
                     .await
-                    .map_err(|e| format!("Failed to parse notes: {}", e))?;
+                    .map_err(|e| format!("Failed to parse notes: {e}"))?;
 
                 for note in notes {
                     if let Some(content) = note["content"].as_str() {
@@ -184,7 +184,7 @@ impl StreamingChatHandler {
             Ok(embedding) => embedding,
             Err(e) => {
                 pb.finish_with_message("⚠️  Could not generate embedding");
-                return Err(format!("Embedding error: {}", e));
+                return Err(format!("Embedding error: {e}"));
             }
         };
 
@@ -226,11 +226,10 @@ impl StreamingChatHandler {
             .unwrap_or("General");
 
         let rendered_prompt = format!(
-            "You are a helpful AI assistant chatting with a {}.\n\n\
-            Context: {}\n\n\
-            User: {}\n\n\
-            Respond in a friendly, conversational way:",
-            profession, notes_context, message
+            "You are a helpful AI assistant chatting with a {profession}.\n\n\
+            Context: {notes_context}\n\n\
+            User: {message}\n\n\
+            Respond in a friendly, conversational way:"
         );
 
         // Get Ollama configuration
@@ -276,6 +275,6 @@ impl Default for StreamingChatHandler {
 pub async fn chat_with_assistant_streaming(message: &str) {
     let mut handler = StreamingChatHandler::new();
     if let Err(e) = handler.chat_with_assistant(message).await {
-        eprintln!("Failed to chat with assistant: {}", e);
+        eprintln!("Failed to chat with assistant: {e}");
     }
 }
