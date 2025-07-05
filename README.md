@@ -79,19 +79,23 @@ brew install logswise-cli
 
 ## Basic Usage
 
+The CLI primarily operates in interactive mode. Simply run:
+
 ```sh
-# Add a note
-logswise-cli note "Fixed the login bug by updating the auth token validation"
+# Start interactive mode (default)
+logswise-cli
 
-# Get AI suggestions (uses your notes as context)
-logswise-cli suggestion "How should I handle database migrations?"
-
-# Chat with AI assistant
-logswise-cli chat "What are the best practices for error handling?"
-
-# View recent notes
-logswise-cli recent --count 10
+# Or explicitly:
+logswise-cli simple
 ```
+
+This opens a menu-driven interface where you can:
+- **💬 Chat with AI** - Interactive AI chat session
+- **📝 Add new log entry** - Add notes to the system  
+- **💡 Get AI suggestions** - Get context-aware suggestions
+- **📊 View recent logs** - Show recent note entries
+- **⚙️ System & Configuration** - Access system settings and diagnostics
+- **❓ Help & Information** - Access help documentation
 
 ## Model Types
 
@@ -107,7 +111,7 @@ Change models anytime by editing `~/.logswise/setup.json` or re-running setup.
 
 ## Available Commands
 
-The CLI has a simple command structure with these actual commands:
+The CLI has a simple command structure focused on setup and interactive use:
 
 ```sh
 # Setup and configuration
@@ -134,17 +138,17 @@ logswise-cli personalize feedback     # Provide feedback on suggestions
 logswise-cli --version
 ```
 
-**Note**: Commands like `note`, `suggestion`, `chat`, `recent`, `doctor`, and `stats` mentioned in some documentation are accessed through the interactive mode, not as direct CLI commands.
+**Note**: Most functionality (adding notes, getting suggestions, chat, viewing recent entries, diagnostics, and stats) is accessed through the interactive mode menu system.
 
 ## Troubleshooting
 
 **Common Issues:**
 
 - **"embedding-only mode" message**: You're using an embedding model. Switch to an LLM for chat/suggestions.
-- **Chat/suggestions don't work**: Run `logswise-cli doctor` to diagnose. Check that Ollama is running and your model is available.
+- **Chat/suggestions don't work**: Use the System Health Check in the interactive menu to diagnose. Check that Ollama is running and your model is available.
 - **Connection errors**: Verify Ollama URL and Supabase credentials in `~/.logswise/setup.json`
 
-**Health check**: `logswise-cli doctor` validates your entire setup.
+**Health check**: Access System Health Check through the interactive menu's System & Configuration section.
 
 ## Contributing
 
