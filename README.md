@@ -1,24 +1,26 @@
 # Logswise CLI
 
 [![CI](https://github.com/k61b/logswise-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/k61b/logswise-cli/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
 
-A command-line tool for note-taking with AI-powered suggestions and chat. Stores your notes in Supabase and uses local Ollama models for AI features.
+A Rust-based command-line tool for note-taking with AI-powered suggestions and chat. Stores notes in Supabase and uses local Ollama models for AI features.
 
-## ✨ New: Enhanced Setup System
+## Current Features
 
-- **🚀 Express Setup**: Get started in under 2 minutes with smart defaults
-- **📋 Templates**: Choose from presets for different developer roles
-- **🔄 Selective Updates**: Update only specific configuration sections
-- **📁 Import/Export**: Share configurations across machines and teams
+- **Note Storage**: Store text notes (up to 10K characters) in Supabase with vector embeddings
+- **AI Suggestions**: Get contextual suggestions based on stored notes using local LLM
+- **AI Chat**: Interactive chat with AI that has access to your note history
+- **Interactive Mode**: Menu-driven interface for all operations
+- **Personalization**: Configure AI behavior and response styles
+- **Multiple Setup Modes**: Express, template-based, and full configuration options
 
-See [ENHANCED_SETUP.md](ENHANCED_SETUP.md) for details.
+## Technical Implementation
 
-## What it does
-
-- **Notes**: Store text notes in a Supabase database (up to 10K characters each)
-- **AI Suggestions**: Get contextual suggestions based on your query and stored notes
-- **AI Chat**: Chat with an AI assistant that knows about your notes
+- **Database**: Supabase PostgreSQL with pgvector extension for semantic search
+- **AI Backend**: Local Ollama models for text generation and embeddings
+- **Configuration**: JSON-based config stored in `~/.logswise/setup.json`
+- **Language**: Rust with async/await for concurrent operations
+- **UI**: Terminal-based with colored output and interactive menus
 
 ## Installation
 
@@ -103,34 +105,36 @@ logswise-cli recent --count 10
 
 Change models anytime by editing `~/.logswise/setup.json` or re-running setup.
 
-## All Commands
+## Available Commands
 
-**Shortcuts**: `n` = `note`, `s` = `suggestion`, `c` = `chat`
+The CLI has a simple command structure with these actual commands:
 
 ```sh
-# Core commands
-logswise-cli note "Your note content"
-logswise-cli suggestion "What should I do about X?"
-logswise-cli chat "Tell me about Y"
-logswise-cli recent --count 10
+# Setup and configuration
+logswise-cli setup                    # Full interactive setup
+logswise-cli setup --express          # Quick setup with defaults
+logswise-cli setup --template         # Choose from role-based templates
+logswise-cli setup --update           # Update existing configuration
+logswise-cli setup --import <file>    # Import configuration from file
 
-# Interactive mode (menu-driven interface)
-logswise-cli interactive
+# Database initialization
+logswise-cli init                     # Create/verify database schema
 
-# Configuration and health
-logswise-cli setup      # Initial setup
-logswise-cli doctor     # Check configuration and connectivity
-logswise-cli init       # Set up database tables
+# Interactive mode (default)
+logswise-cli                          # Main interactive interface
+logswise-cli simple                   # Same as above (explicit)
 
-# Profile and personalization
-logswise-cli personalize setup    # Configure AI personalization
-logswise-cli personalize show     # View current settings
-logswise-cli stats                 # Show your profile
+# Personalization
+logswise-cli personalize setup        # Configure AI personalization
+logswise-cli personalize update       # Update personalization settings
+logswise-cli personalize show         # View current personalization
+logswise-cli personalize feedback     # Provide feedback on suggestions
 
-# Utilities
+# System info
 logswise-cli --version
-logswise-cli completions zsh      # Generate shell completions
 ```
+
+**Note**: Commands like `note`, `suggestion`, `chat`, `recent`, `doctor`, and `stats` mentioned in some documentation are accessed through the interactive mode, not as direct CLI commands.
 
 ## Troubleshooting
 
@@ -148,4 +152,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
+This project is licensed under the [AGPL v3.0 License](LICENSE).

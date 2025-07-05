@@ -8,7 +8,7 @@ A CLI tool for note-taking, suggestions, and AI chat, powered by Supabase and LL
 - `README.md` — Main documentation
 - `SUPABASE_SETUP.md` — Supabase setup instructions
 - `.gitignore` — Files to exclude from git
-- `LICENSE` — MIT License
+- `LICENSE` — AGPL v3.0 License
 - `CONTRIBUTING.md` — Contribution guidelines
 - `CODE_OF_CONDUCT.md` — Code of conduct
 
@@ -16,7 +16,7 @@ A CLI tool for note-taking, suggestions, and AI chat, powered by Supabase and LL
 
 - [x] Sensitive data is not committed (see `.gitignore`)
 - [x] No secrets or API keys in code
-- [x] MIT License included
+- [x] AGPL v3.0 License included
 - [x] Contribution and conduct guidelines
 - [x] Usage and setup documented
 - [x] No TypeScript errors

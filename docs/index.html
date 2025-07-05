@@ -3,643 +3,840 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=5.0">
-    <meta name="theme-color" content="#667eea">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <title>Logswise CLI - Enterprise-Grade AI Assistant for Developers</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logswise CLI - Self-Hosted AI-Powered Work Logging</title>
     <meta name="description"
-        content="Revolutionary command-line tool featuring world-class AI personalization, context-aware suggestions, and intelligent chat capabilities. Enterprise-grade assistance comparable to leading AI solutions.">
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        content="A privacy-first, self-hosted CLI tool for work logging with AI-powered insights. Your data stays yours.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+        }
+
+        .section-divider {
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .feature-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #000 0%, #4b5563 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -16px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #000 0%, #1f2937 100%);
+            color: white;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px -8px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: white;
+            color: #000;
+            border: 1px solid #d1d5db;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .btn-secondary:hover {
+            background-color: #f9fafb;
+            border-color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.1);
+        }
+
+        .code-block {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            color: #10b981;
+            border: 1px solid #374151;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            position: relative;
+        }
+
+        .code-block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #10b981, transparent);
+            opacity: 0.3;
+        }
+
+        .hero-gradient {
+            background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+        }
+
+        .icon-gradient {
+            background: linear-gradient(135deg, #000 0%, #374151 100%);
+        }
+
+        .section-bg {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        }
+
+        .nav-link {
+            position: relative;
+            text-decoration: none;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #000, #4b5563);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .floating-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, #000 0%, #4b5563 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .step-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .step-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -16px rgba(0, 0, 0, 0.15);
+        }
+
+        .benefit-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .benefit-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px -8px rgba(0, 0, 0, 0.1);
+            border-left-color: #000;
+        }
+
+        .terminal-demo {
+            background: #000;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            width: 100%;
+            max-width: 700px;
+            height: 500px;
+            overflow: hidden;
+            transform: perspective(1000px) rotateX(8deg) rotateY(-3deg);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+            border: 1px solid #333;
+        }
+
+        .terminal-header {
+            background: #2d2d2d;
+            padding: 8px 12px;
+            border-bottom: 1px solid #444;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .terminal-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .terminal-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .terminal-dot.red { background: #ff5f57; }
+        .terminal-dot.yellow { background: #ffbd2e; }
+        .terminal-dot.green { background: #28ca42; }
+
+        .terminal-title {
+            color: #888;
+            font-size: 11px;
+            margin-left: 6px;
+        }
+
+        .terminal-content {
+            padding: 16px;
+            color: #fff;
+            background: #000;
+            border-radius: 0 0 8px 8px;
+            height: calc(500px - 40px);
+            overflow-y: auto;
+        }
+
+        .terminal-line {
+            margin-bottom: 4px;
+        }
+
+        .prompt {
+            color: #10b981;
+        }
+
+        .command {
+            color: #fff;
+        }
+
+        .output {
+            color: #ccc;
+        }
+
+        .highlight {
+            color: #10b981;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        @media (max-width: 1024px) {
+            .hero-grid {
+                gap: 2rem;
+            }
+            
+            .terminal-demo {
+                max-width: 500px;
+            }
+            
+            h1 {
+                font-size: 3rem !important;
+                line-height: 1.1 !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-grid {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+                text-align: center;
+            }
+            
+            .terminal-demo {
+                font-size: 12px;
+                max-width: 100%;
+                height: 400px;
+                transform: perspective(600px) rotateX(5deg) rotateY(-2deg);
+            }
+            
+            .terminal-content {
+                height: calc(400px - 40px);
+            }
+        }
+    </style>
 </head>
 
-<body>
-    <!-- Hero Section -->
-    <header class="hero">
-        <nav class="navbar">
-            <div class="nav-container">
-                <div class="logo">
-                    <i class="fas fa-terminal"></i>
-                    <span>Logswise CLI</span>
+<body class="bg-white text-gray-900">
+    <!-- Header -->
+    <header class="py-6 border-b border-gray-200">
+        <div class="max-w-6xl mx-auto px-6 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-black rounded flex items-center justify-center">
+                    <i data-lucide="terminal" class="w-5 h-5 text-white"></i>
                 </div>
-                
-                <!-- Mobile menu button -->
-                <button class="mobile-menu-btn" aria-label="Toggle mobile menu" aria-expanded="false">
-                    <span class="hamburger-line"></span>
-                    <span class="hamburger-line"></span>
-                    <span class="hamburger-line"></span>
-                </button>
-                
-                <div class="nav-links" aria-hidden="true" role="navigation">
-                    <a href="#features">Features</a>
-                    <a href="#whats-new">What's New</a>
-                    <a href="#installation">Installation</a>
-                    <a href="#usage">Usage</a>
-                    <a href="#commands">Commands</a>
-                    <a href="https://github.com/k61b/logswise-cli" target="_blank" class="github-link">
-                        <i class="fab fa-github"></i> GitHub
-                    </a>
-                </div>
+                <span class="text-xl font-semibold">Logswise CLI</span>
             </div>
-        </nav>
+            <div class="hidden md:flex items-center gap-6">
+                <a href="#features" class="nav-link text-gray-600 hover:text-gray-900 transition-colors">Features</a>
+                <a href="#installation" class="nav-link text-gray-600 hover:text-gray-900 transition-colors">Installation</a>
+                <a href="https://github.com/k61b/logswise-cli" class="nav-link text-gray-600 hover:text-gray-900 transition-colors">GitHub</a>
+            </div>
+            
+            <!-- Mobile menu button -->
+            <div class="md:hidden">
+                <a href="https://github.com/k61b/logswise-cli" class="text-gray-600 hover:text-gray-900 transition-colors">
+                    <i data-lucide="github" class="w-6 h-6"></i>
+                </a>
+            </div>
+        </div>
+    </header>
 
-        <div class="hero-content">
-            <div class="hero-text">
-                <h1>Logswise CLI</h1>
-                <p class="hero-subtitle">World-Class AI Assistant with Enterprise-Grade Intelligence</p>
-                <p class="hero-description">
-                    Revolutionary command-line tool featuring <strong>advanced AI personalization</strong> with
-                    query intent recognition, strategic response frameworks, and context-aware intelligence.
-                    Delivers professional-grade assistance with <strong>zero hallucination</strong> and
-                    <strong>maximum relevance</strong> - comparable to leading enterprise AI solutions.
-                    <strong>Built for developers who demand excellence.</strong>
-                </p>
-
-                <div class="hero-buttons">
-                    <a href="#installation" class="btn btn-primary">
-                        <i class="fas fa-rocket"></i> Experience Enterprise AI
-                    </a>
-                    <a href="#features" class="btn btn-secondary">
-                        <i class="fas fa-brain"></i> Explore Intelligence
-                    </a>
-                </div>
-
-                <div class="hero-highlights">
-                    <div class="highlight-grid">
-                        <div class="highlight-item">
-                            <div class="highlight-icon">
-                                <i class="fas fa-brain"></i>
-                            </div>
-                            <h3>Enterprise AI</h3>
-                            <p>World-class personalization engine</p>
-                        </div>
-                        <div class="highlight-item">
-                            <div class="highlight-icon">
-                                <i class="fas fa-shield-alt"></i>
-                            </div>
-                            <h3>Zero Hallucination</h3>
-                            <p>Enterprise-grade anti-fabrication safeguards</p>
-                        </div>
-                        <div class="highlight-item">
-                            <div class="highlight-icon">
-                                <i class="fas fa-chart-line"></i>
-                            </div>
-                            <h3>Strategic Intelligence</h3>
-                            <p>Context-aware suggestions with metrics</p>
-                        </div>
-                        <div class="highlight-item">
-                            <div class="highlight-icon">
-                                <i class="fas fa-zap"></i>
-                            </div>
-                            <h3>Lightning Performance</h3>
-                            <p>Built in Rust for maximum speed</p>
-                        </div>
+    <!-- Hero Section -->
+    <section class="py-32 section-divider hero-gradient">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="hero-grid">
+                <!-- Left Column: Hero Text -->
+                <div>
+                    <div class="mb-6">
+                        <span class="inline-flex items-center gap-2 bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-medium">
+                            <i data-lucide="shield-check" class="w-4 h-4"></i>
+                            Self-Hosted & Privacy-First
+                        </span>
                     </div>
 
-                    <div class="hero-stats">
-                        <div class="stat-item">
-                            <i class="fas fa-star"></i>
-                            <span>Enterprise Grade</span>
+                    <h1 class="text-5xl md:text-6xl font-bold mb-6 leading-tight fade-in">
+                        Your Work, Your Data,<br>
+                        <span class="text-gradient">Your AI</span>
+                    </h1>
+
+                    <p class="text-xl text-gray-600 mb-10 leading-relaxed">
+                        A self-hosted CLI tool for work logging with AI-powered insights.
+                        Keep your data private while getting intelligent suggestions from your own notes.
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <a href="#installation" class="btn-primary px-8 py-3 rounded-md font-medium inline-flex items-center gap-2">
+                            <i data-lucide="download" class="w-5 h-5"></i>
+                            Get Started
+                        </a>
+                        <a href="https://github.com/k61b/logswise-cli" class="btn-secondary px-8 py-3 rounded-md font-medium inline-flex items-center gap-2">
+                            <i data-lucide="github" class="w-5 h-5"></i>
+                            View Source
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Right Column: Terminal Demo -->
+                <div class="flex justify-center lg:justify-end">
+                    <div class="terminal-demo">
+                        <div class="terminal-header">
+                            <div class="terminal-dots">
+                                <div class="terminal-dot red"></div>
+                                <div class="terminal-dot yellow"></div>
+                                <div class="terminal-dot green"></div>
+                            </div>
+                            <div class="terminal-title">terminal</div>
                         </div>
-                        <div class="stat-item">
-                            <i class="fab fa-github"></i>
-                            <span>Open Source</span>
-                        </div>
-                        <div class="stat-item">
-                            <i class="fas fa-users"></i>
-                            <span>Team Ready</span>
+                        <div class="terminal-content">
+                            <div class="terminal-line">
+                                <span class="prompt">$ </span><span class="command">logswise</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="output">Selected: Get AI suggestions</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="output">Topic: </span><span class="highlight">team collaboration</span>
+                            </div>
+                            <div class="terminal-line"></div>
+                            <div class="terminal-line">
+                                <span class="highlight">Searching logs... Found 15 entries</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="highlight">AI analyzing patterns...</span>
+                            </div>
+                            <div class="terminal-line"></div>
+                            <div class="terminal-line">
+                                <span class="output">Based on your recent log entries, I can see some patterns around</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="output">team collaboration challenges. Let me provide some targeted advice.</span>
+                            </div>
+                            <div class="terminal-line"></div>
+                            <div class="terminal-line">
+                                <span class="output">I noticed you mentioned "sprint planning confusion" and "unclear</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="output">requirements from product team" in your recent entries. You also</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="output">logged about "productive standup with Sarah" but "frustrating</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="output">code review process with backend team."</span>
+                            </div>
+                            <div class="terminal-line"></div>
+                            <div class="terminal-line">
+                                <span class="output">Based on these patterns, here are my recommendations:</span>
+                            </div>
+                            <div class="terminal-line"></div>
+                            <div class="terminal-line">
+                                <span class="output">1. Address sprint planning issues: Since you've logged confusion</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="output">   multiple times, suggest a pre-planning session to clarify</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="output">   requirements before the official sprint planning meeting.</span>
+                            </div>
+                            <div class="terminal-line"></div>
+                            <div class="terminal-line">
+                                <span class="output">2. Improve code review workflow: Your logs show this is a</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="output">   recurring pain point. Consider establishing review guidelines</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="output">   and time limits to make the process more efficient.</span>
+                            </div>
+                            <div class="terminal-line"></div>
+                            <div class="terminal-line">
+                                <span class="output">3. Replicate Sarah's standup approach: You mentioned her standups</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="output">   are productive. Consider what makes them work and suggest</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="output">   applying that format to other team meetings.</span>
+                            </div>
+                            <div class="terminal-line"></div>
+                            <div class="terminal-line">
+                                <span class="output">4. Bridge product-engineering gap: Your logs indicate frequent</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="output">   miscommunication. Schedule regular sync meetings between</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="output">   teams to prevent requirement misunderstandings.</span>
+                            </div>
+                            <div class="terminal-line"></div>
+                            <div class="terminal-line">
+                                <span class="highlight">These suggestions are based on your logged experiences.</span>
+                            </div>
+                            <div class="terminal-line"></div>
+                            <div class="terminal-line">
+                                <span class="prompt">$ </span><span style="background: #10b981; width: 8px; height: 14px; display: inline-block;"></span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </header>
+    </section>
+
 
     <!-- Features Section -->
-    <section id="features" class="features">
-        <div class="container">
-            <h2>Why Choose Logswise CLI?</h2>
-            <p class="section-subtitle">Built for developers who want powerful, privacy-first tools</p>
+    <section id="features" class="py-24 section-divider">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                    Built for Privacy & Productivity
+                </h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Everything you need to capture, analyze, and learn from your work without compromising your privacy.
+                </p>
+            </div>
 
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-brain"></i>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="feature-card p-8 rounded-lg border border-gray-200">
+                    <div
+                        class="w-12 h-12 icon-gradient rounded-lg flex items-center justify-center mb-6 floating-animation">
+                        <i data-lucide="edit-3" class="w-6 h-6 text-white"></i>
                     </div>
-                    <h3>🧠 Enterprise AI Personalization</h3>
-                    <p>Advanced AI system with <strong>query intent recognition</strong>, urgency assessment, and
-                        strategic project portfolio analysis. Features chain-of-thought reasoning, contextual response
-                        frameworks, and professional excellence standards with zero hallucination.</p>
+                    <h3 class="text-xl font-semibold mb-4">Smart Work Logging</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Capture your daily work, thoughts, and insights with a simple command-line interface.
+                        Notes are stored with semantic search capabilities.
+                    </p>
                 </div>
 
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-chart-line"></i>
+                <div class="feature-card p-8 rounded-lg border border-gray-200">
+                    <div
+                        class="w-12 h-12 icon-gradient rounded-lg flex items-center justify-center mb-6 floating-animation">
+                        <i data-lucide="brain" class="w-6 h-6 text-white"></i>
                     </div>
-                    <h3>📈 Strategic Intelligence</h3>
-                    <p>Context-aware suggestions with <strong>success metrics</strong>, stakeholder impact analysis, and
-                        adaptive response frameworks. Supports meeting prep, progress reporting, career advancement, and
-                        problem-solving with measurable outcomes.</p>
+                    <h3 class="text-xl font-semibold mb-4">AI-Powered Insights</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Get contextual suggestions and chat with an AI that knows your work history.
+                        Powered by your local Ollama models.
+                    </p>
                 </div>
 
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fa-solid fa-bullseye"></i>
+                <div class="feature-card p-8 rounded-lg border border-gray-200">
+                    <div
+                        class="w-12 h-12 icon-gradient rounded-lg flex items-center justify-center mb-6 floating-animation">
+                        <i data-lucide="shield" class="w-6 h-6 text-white"></i>
                     </div>
-                    <h3>🎯 Goal-Driven Development</h3>
-                    <p>Visual progress tracking with timeline intelligence, priority-based project categorization, and
-                        <strong>evidence-based recommendations</strong>. Aligns all suggestions with documented career
-                        goals and current challenges.</p>
+                    <h3 class="text-xl font-semibold mb-4">Self-Hosted Privacy</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Your data stays on your infrastructure. Use your own Supabase instance and
+                        local AI models for complete control.
+                    </p>
                 </div>
 
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-comments"></i>
+                <div class="feature-card p-8 rounded-lg border border-gray-200">
+                    <div
+                        class="w-12 h-12 icon-gradient rounded-lg flex items-center justify-center mb-6 floating-animation">
+                        <i data-lucide="zap" class="w-6 h-6 text-white"></i>
                     </div>
-                    <h3>🤖 Intelligent Conversation AI</h3>
-                    <p>Professional-grade chat with <strong>conversation context awareness</strong>, sophisticated
-                        anti-hallucination safeguards, and enterprise communication standards. Never invents
-                        relationships or organizational details.</p>
+                    <h3 class="text-xl font-semibold mb-4">Fast & Efficient</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Built in Rust for speed and reliability. Minimal resource usage with powerful
+                        vector search and AI integration.
+                    </p>
                 </div>
 
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-shield-alt"></i>
+                <div class="feature-card p-8 rounded-lg border border-gray-200">
+                    <div
+                        class="w-12 h-12 icon-gradient rounded-lg flex items-center justify-center mb-6 floating-animation">
+                        <i data-lucide="search" class="w-6 h-6 text-white"></i>
                     </div>
-                    <h3>🔒 Zero Hallucination Framework</h3>
-                    <p>Enterprise-grade safeguards against fabricated information with advanced anti-hallucination
-                        instructions, context sanitization, and professional fact-checking mechanisms.</p>
+                    <h3 class="text-xl font-semibold mb-4">Vector Search</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Semantic search through all your notes using advanced vector embeddings
+                        for intelligent content discovery.
+                    </p>
                 </div>
 
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-rocket"></i>
+                <div class="feature-card p-8 rounded-lg border border-gray-200">
+                    <div
+                        class="w-12 h-12 icon-gradient rounded-lg flex items-center justify-center mb-6 floating-animation">
+                        <i data-lucide="terminal" class="w-6 h-6 text-white"></i>
                     </div>
-                    <h3>🚀 Enterprise Infrastructure</h3>
-                    <p>One-command database setup, comprehensive health diagnostics, 30-second timeouts with graceful
-                        error recovery, and production-ready reliability standards.</p>
+                    <h3 class="text-xl font-semibold mb-4">CLI Native</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Designed for developers who love the terminal. Clean interface with
+                        powerful automation capabilities.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section class="py-24 section-bg section-divider">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                    Why Self-Hosted Matters
+                </h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Take control of your data and workflow with the benefits of self-hosting.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="benefit-card">
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 icon-gradient rounded-lg flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="lock" class="w-5 h-5 text-white"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-semibold mb-2">Data Ownership</h4>
+                            <p class="text-gray-600">Your work logs, insights, and AI interactions remain completely
+                                private and under your control.</p>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-users"></i>
+                <div class="benefit-card">
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 icon-gradient rounded-lg flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="dollar-sign" class="w-5 h-5 text-white"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-semibold mb-2">Cost Effective</h4>
+                            <p class="text-gray-600">No monthly subscriptions or per-seat pricing. Use free Supabase
+                                tier and local AI models.</p>
+                        </div>
                     </div>
-                    <h3>👥 Team Collaboration</h3>
-                    <p>Privacy-first architecture with your own Ollama and Supabase instances. Team dynamics analysis,
-                        stakeholder impact assessment, and professional transparency.</p>
                 </div>
 
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-zap"></i>
+                <div class="benefit-card">
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 icon-gradient rounded-lg flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="arrow-right" class="w-5 h-5 text-white"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-semibold mb-2">No Vendor Lock-in</h4>
+                            <p class="text-gray-600">Open source means you can modify, extend, or migrate your setup
+                                anytime.</p>
+                        </div>
                     </div>
-                    <h3>⚡ Performance Excellence</h3>
-                    <p>Built in Rust for maximum speed with intelligent caching, optimized queries, and lightning-fast
-                        semantic search. Short aliases and interactive workflows for peak productivity.</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 icon-gradient rounded-lg flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="building" class="w-5 h-5 text-white"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-semibold mb-2">Enterprise Ready</h4>
+                            <p class="text-gray-600">Deploy on your own infrastructure with full compliance and security
+                                controls.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 icon-gradient rounded-lg flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="settings" class="w-5 h-5 text-white"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-semibold mb-2">Customizable</h4>
+                            <p class="text-gray-600">Tailor the AI prompts, workflows, and integrations to match your
+                                specific needs.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 icon-gradient rounded-lg flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="bar-chart" class="w-5 h-5 text-white"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-semibold mb-2">Rich Analytics</h4>
+                            <p class="text-gray-600">Analyze your work patterns and productivity trends with full access
+                                to your data.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Installation Section -->
-    <section id="installation" class="installation">
-        <div class="container">
-            <h2>Quick Installation</h2>
-            <p class="section-subtitle">Get up and running in minutes</p>
+    <section id="installation" class="py-24 section-divider">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                    Quick Setup
+                </h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Three simple steps to get your self-hosted AI-powered work logging system running.
+                </p>
+            </div>
 
-            <div class="installation-steps">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <div class="step-content">
-                        <h3>Install Ollama</h3>
-                        <p>Download and install Ollama for local AI processing</p>
-                        <div class="code-block">
-                            <code>curl -fsSL https://ollama.ai/install.sh | sh</code>
-                            <button class="copy-btn" onclick="copyCode(this)">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="step-card text-center">
+                    <div
+                        class="w-12 h-12 icon-gradient text-white rounded-lg flex items-center justify-center mx-auto mb-6 text-lg font-bold">
+                        1
                     </div>
+                    <h3 class="text-xl font-semibold mb-4">Install CLI</h3>
+                    <div class="code-block p-4 rounded-lg text-sm mb-4 text-left">
+                        <div class="mb-1">brew tap k61b/tap</div>
+                        <div>brew install logswise-cli</div>
+                    </div>
+                    <p class="text-gray-600">Or download the latest release from GitHub for your platform.</p>
                 </div>
 
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <div class="step-content">
-                        <h3>Pull a Model</h3>
-                        <p>Download a language model for AI functionality</p>
-                        <div class="code-block">
-                            <code>ollama pull llama3</code>
-                            <button class="copy-btn" onclick="copyCode(this)">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </div>
+                <div class="step-card text-center">
+                    <div
+                        class="w-12 h-12 icon-gradient text-white rounded-lg flex items-center justify-center mx-auto mb-6 text-lg font-bold">
+                        2
                     </div>
+                    <h3 class="text-xl font-semibold mb-4">Setup AI Backend</h3>
+                    <div class="code-block p-4 rounded-lg text-sm mb-4 text-left">
+                        <div class="mb-1">curl -fsSL https://ollama.ai/install.sh | sh</div>
+                        <div class="mb-1">ollama serve</div>
+                        <div>ollama pull llama3</div>
+                    </div>
+                    <p class="text-gray-600">Install Ollama and pull your preferred model for AI features.</p>
                 </div>
 
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <div class="step-content">
-                        <h3>Create Supabase Project</h3>
-                        <p>Create a Supabase project and get your credentials</p>
-                        <div class="code-block">
-                            <code># Visit app.supabase.com to create project</code>
-                            <button class="copy-btn" onclick="copyCode(this)">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </div>
+                <div class="step-card text-center">
+                    <div
+                        class="w-12 h-12 icon-gradient text-white rounded-lg flex items-center justify-center mx-auto mb-6 text-lg font-bold">
+                        3
                     </div>
-                </div>
-
-                <div class="step">
-                    <div class="step-number">4</div>
-                    <div class="step-content">
-                        <h3>Install Logswise CLI</h3>
-                        <p>Install using Homebrew for easy setup and updates</p>
-                        <div class="code-block">
-                            <code>brew tap k61b/tap
-brew install logswise-cli</code>
-                            <button class="copy-btn" onclick="copyCode(this)">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </div>
+                    <h3 class="text-xl font-semibold mb-4">Configure & Run</h3>
+                    <div class="code-block p-4 rounded-lg text-sm mb-4 text-left">
+                        <div class="mb-1">logswise setup --express</div>
+                        <div class="mb-1">logswise init</div>
+                        <div>logswise</div>
                     </div>
-                </div>
-
-                <div class="step">
-                    <div class="step-number">5</div>
-                    <div class="step-content">
-                        <h3>🚀 One-Command Setup</h3>
-                        <p>Configure profile and automatically set up Supabase database</p>
-                        <div class="code-block">
-                            <code>logswise-cli setup</code>
-                            <button class="copy-btn" onclick="copyCode(this)">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </div>
-                        <div class="step-note">
-                            <p><strong>New:</strong> Automatically creates database tables and schema!</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="step">
-                    <div class="step-number">6</div>
-                    <div class="step-content">
-                        <h3>⚙️ Initialize Database</h3>
-                        <p>Verify and complete Supabase database setup</p>
-                        <div class="code-block">
-                            <code>logswise-cli init</code>
-                            <button class="copy-btn" onclick="copyCode(this)">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </div>
-                        <div class="step-note">
-                            <p><strong>Ensures:</strong> All database operations are complete and verified!</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="step">
-                    <div class="step-number">7</div>
-                    <div class="step-content">
-                        <h3>🧠 Enterprise AI Personalization</h3>
-                        <p>Configure advanced AI personalization for strategic intelligence</p>
-                        <div class="code-block">
-                            <code>logswise-cli personalize</code>
-                            <button class="copy-btn" onclick="copyCode(this)">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </div>
-                        <div class="step-note">
-                            <p><strong>Unlocks:</strong> Professional context analysis, goal-driven development
-                                tracking, and adaptive communication styles!</p>
-                        </div>
-                    </div>
+                    <p class="text-gray-600">Quick setup with your Supabase credentials, then start logging!</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Usage Section -->
-    <section id="usage" class="usage">
-        <div class="container">
-            <h2>How It Works</h2>
-            <p class="section-subtitle">Simple commands, powerful results</p>
-
-            <div class="usage-examples">
-                <div class="example">
-                    <div class="example-code">
-                        <div class="terminal-window">
-                            <div class="terminal-header">
-                                <div class="terminal-buttons">
-                                    <span class="btn-close"></span>
-                                    <span class="btn-minimize"></span>
-                                    <span class="btn-maximize"></span>
-                                </div>
-                            </div>
-                            <div class="terminal-body">
-                                <div class="terminal-line">
-                                    <span class="prompt">$</span> logswise-cli n "Implemented user authentication"
-                                </div>
-                                <div class="terminal-output">📝 Note added successfully!</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="example-description">
-                        <h3>Take Notes Instantly</h3>
-                        <p>Use short commands to quickly capture thoughts, progress, and insights. Your notes are
-                            automatically embedded and stored for future context.</p>
-                    </div>
-                </div>
-
-                <div class="example">
-                    <div class="example-description">
-                        <h3>Get Smart Suggestions</h3>
-                        <p>Ask questions and get AI-powered suggestions based on your notes, profile, and context.
-                            Perfect for planning and problem-solving.</p>
-                    </div>
-                    <div class="example-code">
-                        <div class="terminal-window">
-                            <div class="terminal-header">
-                                <div class="terminal-buttons">
-                                    <span class="btn-close"></span>
-                                    <span class="btn-minimize"></span>
-                                    <span class="btn-maximize"></span>
-                                </div>
-                            </div>
-                            <div class="terminal-body">
-                                <div class="terminal-line">
-                                    <span class="prompt">$</span> logswise-cli s "What should I focus on this week?"
-                                </div>
-                                <div class="terminal-output">💡 Based on your recent work, consider...</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="example">
-                    <div class="example-code">
-                        <div class="terminal-window">
-                            <div class="terminal-header">
-                                <div class="terminal-buttons">
-                                    <span class="btn-close"></span>
-                                    <span class="btn-minimize"></span>
-                                    <span class="btn-maximize"></span>
-                                </div>
-                            </div>
-                            <div class="terminal-body">
-                                <div class="terminal-line">
-                                    <span class="prompt">$</span> logswise-cli interactive
-                                </div>
-                                <div class="terminal-output">🎯 Welcome to Interactive Mode!</div>
-                                <div class="terminal-output">Choose: 1) Add Note 2) Get Suggestions 3) Chat...</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="example-description">
-                        <h3>Interactive Mode</h3>
-                        <p>Enter guided interactive mode for continuous workflows. Perfect for daily planning,
-                            retrospectives, and deep work sessions.</p>
-                    </div>
-                </div>
-
-                <div class="example">
-                    <div class="example-description">
-                        <h3 class="enterprise-ai">Enterprise AI Personalization</h3>
-                        <p>Configure advanced AI personalization with professional context, goal-driven development
-                            tracking, and communication style preferences for <strong>strategic intelligence</strong>
-                            and context-aware suggestions.</p>
-                    </div>
-                    <div class="example-code">
-                        <div class="terminal-window">
-                            <div class="terminal-header">
-                                <div class="terminal-buttons">
-                                    <span class="btn-close"></span>
-                                    <span class="btn-minimize"></span>
-                                    <span class="btn-maximize"></span>
-                                </div>
-                            </div>
-                            <div class="terminal-body">
-                                <div class="terminal-line">
-                                    <span class="prompt">$</span> logswise-cli personalize
-                                </div>
-                                <div class="terminal-output">🧠 Setting up enterprise AI personalization...</div>
-                                <div class="terminal-output">✅ Professional context configured</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <!-- Open Source Section -->
+    <section class="py-24 section-bg section-divider">
+        <div class="max-w-6xl mx-auto px-6 text-center">
+            <div class="mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                    Open Source & Community
+                </h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Logswise CLI is completely open source under the AGPL v3.0 license.
+                    Contribute, audit the code, or fork it for your own needs.
+                </p>
             </div>
-        </div>
-    </section>
 
-    <!-- Commands Section -->
-    <section id="commands" class="commands">
-        <div class="container">
-            <h2>Command Reference</h2>
-            <p class="section-subtitle">All the tools you need at your fingertips</p>
-
-            <div class="commands-grid">
-                <div class="command-group">
-                    <h3><i class="fas fa-edit"></i> Core Commands</h3>
-                    <div class="command-list">
-                        <div class="command-item">
-                            <code>logswise-cli note "text"</code>
-                            <div class="command-description">Add a note to your collection</div>
-                        </div>
-                        <div class="command-item">
-                            <code>logswise-cli n "text"</code>
-                            <div class="command-description">Add a note (short alias)</div>
-                        </div>
-                        <div class="command-item">
-                            <code>logswise-cli suggestion "query"</code>
-                            <div class="command-description">Get AI-powered suggestions based on your context</div>
-                        </div>
-                        <div class="command-item">
-                            <code>logswise-cli s "query"</code>
-                            <div class="command-description">Get suggestions (short alias)</div>
-                        </div>
-                        <div class="command-item">
-                            <code>logswise-cli chat "message"</code>
-                            <div class="command-description">Start an interactive chat with AI</div>
-                        </div>
-                        <div class="command-item">
-                            <code>logswise-cli c "message"</code>
-                            <div class="command-description">Chat with AI (short alias)</div>
-                        </div>
-                        <div class="command-item">
-                            <code>logswise-cli personalize</code>
-                            <div class="command-description enterprise">🧠 Configure enterprise-grade AI personalization
-                                with professional context and communication preferences</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="command-group">
-                    <h3><i class="fas fa-magic"></i> Productivity</h3>
-                    <div class="command-list">
-                        <div class="command-item">
-                            <code>logswise-cli interactive</code>
-                            <div class="command-description">Enter guided interactive mode for continuous workflows
-                            </div>
-                        </div>
-                        <div class="command-item">
-                            <code>logswise-cli recent --count 10</code>
-                            <div class="command-description">Display your most recent notes</div>
-                        </div>
-                        <div class="command-item">
-                            <code>logswise-cli completions bash</code>
-                            <div class="command-description">Generate shell completions for enhanced productivity</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="command-group">
-                    <h3><i class="fas fa-cog"></i> System</h3>
-                    <div class="command-list">
-                        <div class="command-item">
-                            <code>logswise-cli setup</code>
-                            <div class="command-description">🚀 Configure profile and automatically set up database
-                            </div>
-                        </div>
-                        <div class="command-item">
-                            <code>logswise-cli init</code>
-                            <div class="command-description">⚙️ Initialize or verify database setup (requires existing
-                                config)</div>
-                        </div>
-                        <div class="command-item">
-                            <code>logswise-cli doctor</code>
-                            <div class="command-description">🔧 Run comprehensive health checks and database validation
-                            </div>
-                        </div>
-                        <div class="command-item">
-                            <code>logswise-cli stats</code>
-                            <div class="command-description">Display current configuration and statistics</div>
-                        </div>
-                        <div class="command-item">
-                            <code>logswise-cli guide</code>
-                            <div class="command-description">Show detailed usage guide and examples</div>
-                        </div>
-                    </div>
-                </div>
+            <div class="flex flex-wrap justify-center gap-4 mb-12">
+                <a href="https://github.com/k61b/logswise-cli"
+                    class="btn-secondary px-6 py-3 rounded-md font-medium inline-flex items-center gap-2">
+                    <i data-lucide="star" class="w-5 h-5"></i>
+                    <span>Star on GitHub</span>
+                </a>
+                <a href="https://github.com/k61b/logswise-cli/blob/main/LICENSE"
+                    class="btn-secondary px-6 py-3 rounded-md font-medium inline-flex items-center gap-2">
+                    <i data-lucide="file-text" class="w-5 h-5"></i>
+                    <span>AGPL v3.0 License</span>
+                </a>
+                <a href="https://github.com/k61b/logswise-cli/issues"
+                    class="btn-secondary px-6 py-3 rounded-md font-medium inline-flex items-center gap-2">
+                    <i data-lucide="bug" class="w-5 h-5"></i>
+                    <span>Report Issues</span>
+                </a>
             </div>
-        </div>
-    </section>
 
-    <!-- What's New Section -->
-    <section id="whats-new" class="whats-new">
-        <div class="container">
-            <h2>🚀 What's New?</h2>
-            <p class="section-subtitle">Latest improvements to make your workflow even smoother</p>
-
-            <div class="new-features">
-                <div class="new-feature-card highlight">
-                    <div class="feature-icon">
-                        <i class="fas fa-brain"></i>
-                    </div>
-                    <h3>🧠 Enterprise-Grade AI Personalization</h3>
-                    <p>Revolutionary AI system with <strong>advanced query intent recognition</strong>, chain-of-thought
-                        reasoning, and contextual response frameworks. Features professional excellence standards, zero
-                        hallucination safeguards, and strategic intelligence comparable to GPT-4 and Claude enterprise
-                        solutions.</p>
-                    <div class="feature-badges">
-                        <span class="badge">Zero Hallucination</span>
-                        <span class="badge">Context-Aware</span>
-                        <span class="badge">Enterprise-Grade</span>
-                    </div>
-                </div>
-
-                <div class="new-feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <h3>📈 Strategic Response Frameworks</h3>
-                    <p>Adaptive response systems for <strong>meeting preparation</strong>, progress reporting, career
-                        advancement, and problem-solving. Each suggestion includes success metrics, stakeholder impact,
-                        and follow-up mechanisms.</p>
-                </div>
-
-                <div class="new-feature-card">
-                    <div class="feature-icon">
-                        <i class="fa-solid fa-bullseye"></i>
-                    </div>
-                    <h3>🎯 Advanced Project Intelligence</h3>
-                    <p>Visual project portfolio analysis with priority categorization, goal-driven development tracking,
-                        and <strong>evidence-based recommendations</strong> aligned with your career objectives.</p>
-                </div>
-
-                <div class="new-feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-magic"></i>
-                    </div>
-                    <h3>⚡ Automatic Database Setup</h3>
-                    <p>Zero-config database initialization with automatic Supabase table creation, schema validation,
-                        and smart fallback mechanisms. Get started in seconds, not hours.</p>
-                </div>
+            <div>
+                <a href="https://github.com/k61b/logswise-cli"
+                    class="btn-primary px-8 py-3 rounded-md font-semibold inline-flex items-center gap-2">
+                    <i data-lucide="github" class="w-5 h-5"></i>
+                    View Source Code
+                </a>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h3><i class="fas fa-terminal"></i> Logswise CLI</h3>
-                    <p>Effortless notes, context-aware suggestions, and AI chat for developers.</p>
-                    <div class="social-links">
-                        <a href="https://github.com/k61b/logswise-cli" target="_blank">
-                            <i class="fab fa-github"></i>
-                        </a>
+    <footer class="py-12 bg-white">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-black rounded flex items-center justify-center">
+                        <i data-lucide="terminal" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <div>
+                        <div class="font-semibold">Logswise CLI</div>
+                        <div class="text-sm text-gray-600">Self-hosted AI-powered work logging</div>
                     </div>
                 </div>
 
-                <div class="footer-section">
-                    <h4>Resources</h4>
-                    <ul>
-                        <li><a href="https://github.com/k61b/logswise-cli/blob/main/README.md">Documentation</a></li>
-                        <li><a href="https://github.com/k61b/logswise-cli/blob/main/SUPABASE_SETUP.md">Setup Guide</a>
-                        </li>
-                        <li><a href="https://github.com/k61b/logswise-cli/issues">Issues</a></li>
-                        <li><a href="https://github.com/k61b/logswise-cli/blob/main/CONTRIBUTING.md">Contributing</a>
-                        </li>
-                    </ul>
+                <div class="flex items-center gap-6 text-sm text-gray-600">
+                    <a href="https://github.com/k61b/logswise-cli"
+                        class="hover:text-gray-900 transition-colors">GitHub</a>
+                    <a href="https://github.com/k61b/logswise-cli/blob/main/LICENSE"
+                        class="hover:text-gray-900 transition-colors">AGPL v3.0 License</a>
+                    <span>&copy; 2025 Logswise CLI</span>
                 </div>
-
-                <div class="footer-section">
-                    <h4>Technologies</h4>
-                    <ul>
-                        <li><a href="https://www.rust-lang.org/" target="_blank">Rust</a></li>
-                        <li><a href="https://ollama.ai/" target="_blank">Ollama</a></li>
-                        <li><a href="https://supabase.com/" target="_blank">Supabase</a></li>
-                        <li><a href="https://docs.rs/clap/" target="_blank">Clap</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-section">
-                    <h4>Quick Start</h4>
-                    <div class="footer-code">
-                        <code>brew tap k61b/tap</code>
-                    </div>
-                    <div class="footer-code">
-                        <code>brew install logswise-cli</code>
-                    </div>
-                    <div class="footer-code">
-                        <code>logswise-cli setup</code>
-                    </div>
-                </div>
-            </div>
-
-            <div class="footer-bottom">
-                <p>&copy; 2025 Logswise CLI. Open source under MIT License.</p>
-                <p>Built with ❤️💙 for developers who value privacy and efficiency.</p>
             </div>
         </div>
     </footer>
 
-    <script src="script.js"></script>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Mobile terminal demo optimization
+        if (window.innerWidth <= 768) {
+            const terminalContent = document.querySelector('.terminal-content');
+            if (terminalContent) {
+                terminalContent.style.fontSize = '11px';
+                terminalContent.style.lineHeight = '1.3';
+            }
+        }
+    </script>
 </body>
 
 </html>

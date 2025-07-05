@@ -71,4 +71,3 @@ and enter your Supabase Project URL and API key when prompted.
 
 - `logswise-cli setup` - Complete setup including automatic database creation
 - `logswise-cli init` - Initialize database schema (requires existing config)
-- `logswise-cli doctor` - Verify setup and diagnose any issues
