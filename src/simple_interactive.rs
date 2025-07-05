@@ -106,7 +106,7 @@ fn show_welcome() {
     );
     println!(
         "{}",
-        "║         Logswise CLI v0.0.9          ║".bright_blue()
+        "║         Logswise CLI v1.0.0          ║".bright_blue()
     );
     println!(
         "{}",
