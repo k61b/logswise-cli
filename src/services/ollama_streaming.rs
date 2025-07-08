@@ -7,8 +7,8 @@ use std::io::{self, Write};
 use std::time::Duration;
 use tokio::time::sleep;
 
-/// Default timeout for Ollama streaming requests (120 seconds for complex context-aware responses)
-const OLLAMA_STREAMING_TIMEOUT: Duration = Duration::from_secs(120);
+/// Default timeout for Ollama streaming requests (300 seconds for large models and complex context-aware responses)
+const OLLAMA_STREAMING_TIMEOUT: Duration = Duration::from_secs(300);
 
 /// Streaming response handler for Ollama API
 pub struct StreamingHandler {
@@ -108,11 +108,27 @@ impl StreamingHandler {
         let mut final_response = String::new();
         let mut first_chunk = true;
         let mut successful_chunks = 0;
+        let mut retry_count = 0;
+        const MAX_RETRIES: u32 = 3;
 
         while let Some(chunk) = stream.next().await {
             match chunk {
                 Ok(bytes) => {
-                    let chunk_str = String::from_utf8_lossy(&bytes);
+                    // Reset retry count on successful chunk
+                    retry_count = 0;
+
+                    // Handle potential UTF-8 encoding issues more gracefully
+                    let chunk_str = match String::from_utf8(bytes.to_vec()) {
+                        Ok(s) => s,
+                        Err(e) => {
+                            // If UTF-8 conversion fails, try with lossy conversion
+                            eprintln!(
+                                "Warning: UTF-8 conversion failed, using lossy conversion: {e}"
+                            );
+                            String::from_utf8_lossy(&bytes).to_string()
+                        }
+                    };
+
                     buffer.push_str(&chunk_str);
 
                     // Process complete lines
@@ -170,9 +186,37 @@ impl StreamingHandler {
                                     }
                                 }
                                 Err(json_err) => {
-                                    // Log the problematic line for debugging but continue processing
-                                    eprintln!("Warning: Could not parse JSON line: {line}");
-                                    eprintln!("JSON error: {json_err}");
+                                    // More robust JSON error handling for malformed chunks
+                                    if line.len() > 1000 {
+                                        eprintln!("Warning: Large malformed JSON line ({} chars), skipping", line.len());
+                                    } else {
+                                        eprintln!("Warning: Could not parse JSON line: {line}");
+                                        eprintln!("JSON error: {json_err}");
+                                    }
+
+                                    // For incomplete JSON that might be cut off, try to salvage partial data
+                                    if line.contains("\"response\":") {
+                                        if let Some(start) = line.find("\"response\":\"") {
+                                            let start_pos = start + 12; // Skip past "response":"
+                                            if let Some(end) = line[start_pos..].find("\"") {
+                                                let partial_response =
+                                                    &line[start_pos..start_pos + end];
+                                                if !partial_response.is_empty() {
+                                                    if first_chunk {
+                                                        pb.finish_with_message(
+                                                            "✅ AI responding...",
+                                                        );
+                                                        println!();
+                                                        first_chunk = false;
+                                                    }
+                                                    print!("{}", partial_response.bright_white());
+                                                    io::stdout().flush().unwrap();
+                                                    final_response.push_str(partial_response);
+                                                    successful_chunks += 1;
+                                                }
+                                            }
+                                        }
+                                    }
                                     // Continue processing other lines instead of failing
                                 }
                             }
@@ -180,8 +224,45 @@ impl StreamingHandler {
                     }
                 }
                 Err(e) => {
-                    pb.finish_and_clear();
-                    return Err(format!("Error reading stream: {e}"));
+                    retry_count += 1;
+                    if retry_count <= MAX_RETRIES {
+                        eprintln!(
+                            "Warning: Stream error (attempt {retry_count}/{MAX_RETRIES}): {e}"
+                        );
+                        eprintln!("Retrying stream read...");
+                        // Small delay before retry
+                        sleep(Duration::from_millis(100)).await;
+                        continue;
+                    } else {
+                        pb.finish_and_clear();
+                        return Err(format!(
+                            "Error reading stream after {MAX_RETRIES} retries: {e}"
+                        ));
+                    }
+                }
+            }
+        }
+
+        // Process any remaining buffer content (in case stream ended mid-JSON)
+        if !buffer.trim().is_empty() {
+            let remaining_line = buffer.trim();
+            if remaining_line.contains("\"response\":") {
+                if let Some(start) = remaining_line.find("\"response\":\"") {
+                    let start_pos = start + 12; // Skip past "response":"
+                    if let Some(end) = remaining_line[start_pos..].find("\"") {
+                        let partial_response = &remaining_line[start_pos..start_pos + end];
+                        if !partial_response.is_empty() {
+                            if first_chunk {
+                                pb.finish_with_message("✅ AI responding...");
+                                println!();
+                                first_chunk = false;
+                            }
+                            print!("{}", partial_response.bright_white());
+                            io::stdout().flush().unwrap();
+                            final_response.push_str(partial_response);
+                            successful_chunks += 1;
+                        }
+                    }
                 }
             }
         }

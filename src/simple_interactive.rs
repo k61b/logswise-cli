@@ -133,44 +133,6 @@ fn show_welcome() {
 fn show_main_menu() {
     println!("{}", "Logswise CLI - Main Interface".bright_cyan().bold());
     println!("{}", "━".repeat(50).bright_blue());
-    println!();
-
-    println!(
-        "{}  {}",
-        "1.".bright_white().bold(),
-        "💬 Chat with AI".bright_white()
-    );
-    println!(
-        "{}  {}",
-        "2.".bright_white().bold(),
-        "📝 Add new log entry".bright_white()
-    );
-    println!(
-        "{}  {}",
-        "3.".bright_white().bold(),
-        "💡 Get AI suggestions".bright_white()
-    );
-    println!(
-        "{}  {}",
-        "4.".bright_white().bold(),
-        "📊 View recent logs".bright_white()
-    );
-    println!(
-        "{}  {}",
-        "5.".bright_white().bold(),
-        "⚙️  System & Configuration".bright_white()
-    );
-    println!(
-        "{}  {}",
-        "6.".bright_white().bold(),
-        "❓ Help & Information".bright_white()
-    );
-    println!(
-        "{}  {}",
-        "7.".bright_white().bold(),
-        "🚪 Exit".bright_white()
-    );
-    println!();
     println!(
         "{}",
         "Use arrow keys, numbers (1-7), or 'q' to quit".bright_black()
